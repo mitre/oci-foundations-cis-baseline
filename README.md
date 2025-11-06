@@ -1,117 +1,288 @@
-## SAF TEMPLATE FILE
+# CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0
+This InSpec Profile was created to facilitate testing and auditing of `CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0`
+infrastructure and applications when validating compliancy with [Center for Internet Security (CIS) Benchmark](https://www.cisecurity.org/cis-benchmarks)
+requirements.
 
-(Below is an example of the README that should be in place for a SAF-developed InSpec profile -- requirements, running instructions, etc.)
+- Profile Version: **3.0.0.1.0**
+- Benchmark Date: **05 Nov 2025**
+- Benchmark Version: **Version 3.0.0 Release 1 (V3.0.0R1)**
 
-InSpec profile to validate the secure configuration of a Kubernetes node against [DISA's](https://iase.disa.mil/stigs/Pages/index.aspx) Kubernetes Secure Technical Implementation Guide (STIG) Version 1 Release 1.
 
-## Getting Started  
-It is intended and recommended that InSpec and this profile be run from a __"runner"__ host (such as a DevOps orchestration server, an administrative management system, or a developer's workstation/laptop) against the target remotely using the SSH transport.
+This profile was developed to reduce the time it takes to perform a security checks based upon the
+CIS Benchmark Guidance from the Center for Internet Security (CIS).
 
-__For the best security of the runner, always install on the runner the _latest version_ of InSpec and supporting Ruby language components.__
+The results of a profile run will provide information needed to support an Authority to Operate (ATO)
+decision for the applicable technology.
 
-Latest versions and installation options are available at the [InSpec](http://inspec.io/) site.
+The CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS Profile uses the [InSpec](https://github.com/inspec/inspec)
+open-source compliance validation language to support automation of the required compliance, security
+and policy testing for Assessment and Authorization (A&A) and Authority to Operate (ATO) decisions
+and Continuous Authority to Operate (cATO) processes.
 
-The Kubernetes STIG includes security requirements for both the Kubernetes cluster itself and the nodes that comprise it. This profile includes the checks for the node portion. It is intended  to be used in conjunction with the <b>[Kubernetes Cluster](https://github.com/mitre/k8s-cluster-stig-baseline)</b> profile that performs automated compliance checks of the Kubernetes cluster.
+Table of Contents
+=================
+* [CIS Benchmark  Information](#benchmark-information)
+* [Getting Started](#getting-started)
+    * [Intended Usage](#intended-usage)
+    * [Tailoring to Your Environment](#tailoring-to-your-environment)
+    * [Testing the Profile Controls](#testing-the-profile-controls)
+* [Running the Profile](#running-the-profile)
+    * [Directly from Github](#directly-from-github)
+    * [Using a local Archive copy](#using-a-local-archive-copy)
+    * [Different Run Options](#different-run-options)
+* [Using Heimdall for Viewing Test Results](#using-heimdall-for-viewing-test-results)
 
+## Benchmark Information
+The Center for Internet Security, Inc. (CIS®) creates and maintains a set of Critical Security Controls (CIS Controls) for applications, computer systems and networks
+connected to the Department of Defense (DoD). These guidelines are the primary security standards
+used by the DoD agencies. In addition to defining security guidelines, the CISs also stipulate
+how security training should proceed and when security checks should occur. Organizations must
+stay compliant with these guidelines or they risk having their access to the DoD terminated.
+
+Requirements associated with the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS are derived from the
+[Security Requirements Guides](https://csrc.nist.gov/glossary/term/security_requirements_guide)
+and align to the [National Institute of Standards and Technology](https://www.nist.gov/) (NIST)
+[Special Publication (SP) 800-53](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#!/800-53)
+Security Controls, [DoD Control Correlation Identifier](https://public.cyber.mil/stigs/cci/) and related standards.
+
+The CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile checks were developed to provide technical implementation
+validation to the defined DoD requirements, the guidance can provide insight for any organizations wishing
+to enhance their security posture and can be tailored easily for use in your organization.
+
+[top](#table-of-contents)
 ## Getting Started
+### InSpec (CINC-auditor) setup
+For maximum flexibility/accessibility `cinc-auditor`, the open-source packaged binary version of Chef InSpec should be used,
+compiled by the CINC (CINC Is Not Chef) project in coordination with Chef using Chef's always-open-source InSpec source code.
+For more information see [CINC Home](https://cinc.sh/)
 
-### Requirements
+It is intended and recommended that CINC-auditor and this profile executed from a __"runner"__ host
+(such as a DevOps orchestration server, an administrative management system, or a developer's workstation/laptop)
+against the target. This can be any Unix/Linux/MacOS or Windows runner host, with access to the Internet.
 
-#### Kubernetes Cluster
-- Kubernetes Platform deployment
-- Access to the Kubernetes Node over ssh
-- Account providing appropriate permissions to perform audit scan
+> [!TIP]
+> **For the best security of the runner, always install on the runner the latest version of CINC-auditor and any other supporting language components.**
 
-
-#### Required software on the InSpec Runner
-- git
-- [InSpec](https://www.chef.io/products/chef-inspec/)
-
-### Setup Environment on the InSpec Runner
-#### Install InSpec
-Go to https://www.inspec.io/downloads/ and consult the documentation for your Operating System to download and install InSpec.
-
-#### Ensure InSpec version is at least 4.23.10 
-```sh
-inspec --version
-```
-### Profile Input Values
-The default values for profile inputs are given in `inspec.yml`. These values can be overridden by creating an `inputs.yml` file -- see [the InSpec documentation for inputs](https://docs.chef.io/inspec/inputs/).
-
-```yml
-  - name: manifests_path
-    description: 'Path to Kubernetes manifest files on the target node'
-    type: string
-    value: '/etc/kubernetes/manifests'
-    required: true
-
-  - name: pki_path
-    description: 'Path to Kubernetes PKI files on the target node'
-    type: string
-    value: '/etc/kubernetes/pki/'
-    required: true
-
-  - name: kubeadm_path
-    description: 'Path to kubeadm file on the target node'
-    type: string
-    value: '/usr/local/bin/kubeadm'
-    required: true
-
-  - name: kubectl_path
-    description: 'Path to kubectl on the target node'
-    type: string
-    value: '/usr/local/bin/kubectl'
-    required: true
-
-  - name: kubernetes_conf_files
-    description: 'Path to Kubernetes conf files on the target node'
-    type: array
-    value:
-        - /etc/kubernetes/admin.conf
-        - /etc/kubernetes/scheduler.conf
-        - /etc/kubernetes/controller-manager.conf
-    required: true
-
+To install CINC-auditor on a UNIX/Linux/MacOS platform use the following command:
+```bash
+curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-auditor
 ```
 
-### How to execute this instance  
-(See: https://www.inspec.io/docs/reference/cli/)
-
-**Execute the Kubernetes Node profile on each node in the cluster. The profile will adapt its checks based on the Kubernetes components located on the node.**
-
-#### Execute a single Control in the Profile 
-**Note**: Replace the profile's directory name - e.g. - `<Profile>` with `.` if currently in the profile's root directory.
-
-```sh
-inspec exec <Profile> -t ssh://TARGET_USERNAME@TARGET_IP:TARGET_PORT --sudo -i <your_PEM_KEY> --controls=<control_id> --show-progress
+To install CINC-auditor on a Windows platform (Powershell) use the following command:
+```powershell
+. { iwr -useb https://omnitruck.cinc.sh/install.ps1 } | iex; install -project cinc-auditor
 ```
 
-#### Execute a Single Control and save results as JSON 
-```sh
-inspec exec <Profile> -t ssh://TARGET_USERNAME@TARGET_IP:TARGET_PORT --sudo -i <your_PEM_KEY> --controls=<control_id> --show-progress --reporter json:results.json
+To confirm successful install of cinc-auditor:
+```
+cinc-auditor -v
 ```
 
-#### Execute All Controls in the Profile 
-```sh
-inspec exec <Profile>  -t ssh://TARGET_USERNAME@TARGET_IP:TARGET_PORT --sudo -i <your_PEM_KEY> --show-progress
+Latest versions and other installation options are available at [CINC Auditor](https://cinc.sh/start/auditor/) site.
+
+[top](#table-of-contents)
+### Intended Usage
+1. The latest `released` version of the profile is intended for use in A&A testing, as well as
+    providing formal results to Authorizing Officials and Identity and Access Management (IAM)s.
+    Please use the `released` versions of the profile in these types of workflows.
+
+2. The `main` branch is a development branch that will become the next release of the profile.
+    The `main` branch is intended for use in _developing and testing_ merge requests for the next
+    release of the profile, and _is not intended_ be used for formal and ongoing testing on systems.
+
+[top](#table-of-contents)
+### Tailoring to Your Environment
+This profile uses InSpec Inputs to provide flexibility during testing. Inputs allow for
+customizing the behavior of Chef InSpec profiles.
+
+InSpec Inputs are defined in the `inspec.yml` file. The `inputs` configured in this
+file are **profile definitions and defaults for the profile** extracted from the profile
+guidances and contain metadata that describe the profile, and shouldn't be modified.
+
+InSpec provides several methods for customizing profile behaviors at run-time that does not require
+modifying the `inspec.yml` file itself (see [Using Customized Inputs](#using-customized-inputs)).
+
+The following inputs are permitted to be configured in an inputs `.yml` file (often named inputs.yml)
+for the profile to run correctly on a specific environment, while still complying with the security
+guidance document intent. This is important to prevent confusion when test results are passed downstream
+to different stakeholders under the *security guidance name used by this profile repository*
+
+For changes beyond the inputs cited in this section, users can create an *organizationally-named overlay repository*.
+For more information on developing overlays, reference the [MITRE SAF Training](https://mitre-saf-training.netlify.app/courses/beginner/10.html)
+
+#### Example of tailoring Inputs *While Still Complying* with the security guidance document for the profile:
+
+```yaml
+  # This file specifies the attributes for the configurable controls
+  # used by the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile.
+
+  # Disable controls that are known to consistently have long run times
+  disable_slow_controls: [true or false]
+
+  # A unique list of administrative users
+  admins_list: [admin1, admin2, admin3]
+
+  # List of configuration files for the specific system
+  logging_conf_files: [
+    <dir-path-1>/*.conf
+    <dir-path-2>/*.conf
+  ]
+
+  ...
 ```
 
-#### Execute all the Controls in the Profile and save results as JSON 
-```sh
-inspec exec <Profile> -t ssh://TARGET_USERNAME@TARGET_IP:TARGET_PORT --sudo -i <your_PEM_KEY> --show-progress  --reporter json:results.json
+> [!NOTE]
+>Inputs are variables that are referenced by control(s) in the profile that implement them.
+ They are declared (defined) and given a default value in the `inspec.yml` file.
+
+#### Using Customized Inputs
+Customized inputs may be used at the CLI by providing an input file or a flag at execution time.
+
+1. Using the `--input` flag
+
+    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --input disable_slow_controls=true`
+
+2. Using the `--input-file` flag.
+
+    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --input-file=<my_inputs_file.yml>`
+
+>[!TIP]
+> For additional information about `input` file examples reference the [MITRE SAF Training](https://mitre.github.io/saf-training/courses/beginner/06.html#input-file-example)
+
+Chef InSpec Resources:
+- [InSpec Profile Documentation](https://docs.chef.io/inspec/profiles/).
+- [InSpec Inputs](https://docs.chef.io/inspec/profiles/inputs/).
+- [inspec.yml](https://docs.chef.io/inspec/profiles/inspec_yml/).
+
+
+[top](#table-of-contents)
+### Testing the Profile Controls
+The Gemfile provided contains all the necessary ruby dependencies for checking the profile controls.
+#### Requirements
+All action are conducted using `ruby` (gemstone/programming language). Currently `inspec`
+commands have been tested with ruby version 3.1.2. A higher version of ruby is not guaranteed to
+provide the expected results. Any modern distribution of Ruby comes with Bundler preinstalled by default.
+
+Install ruby based on the OS being used, see [Installing Ruby](https://www.ruby-lang.org/en/documentation/installation/)
+
+After installing `ruby` install the necessary dependencies by invoking the bundler command
+(must be in the same directory where the Gemfile is located):
+```bash
+bundle install
 ```
 
-## Check Overview
+#### Testing Commands
 
-**Kubernetes Components**
+Linting and validating controls:
+```bash
+  bundle exec rake [inspec or cinc-auditor]:check # Validate the InSpec Profile
+  bundle exec rake lint                           # Run RuboCop Linter
+  bundle exec rake lint:auto_correct              # Autocorrect RuboCop offenses (only when it's safe)
+  bundle exec rake pre_commit_checks              # Pre-commit checks
+```
 
-This profile evaluates the STIG compliance of the following Kubernetes Components by evaluating their process configuration:
+Ensure the controls are ready to be committed into the repo:
+```bash
+  bundle exec rake pre_commit_checks
+```
 
-- kube-apiserver
-- kube-controller-manager
-- kube-scheduler
-- kubelet
-- kube-proxy
-- etcd
 
-If these components are not in use in the target cluster or named differently, the profile has to be adapted for the target K8S distribution using an [InSpec Profile Overlay](https://blog.chef.io/understanding-inspec-profile-inheritance).
+[top](#table-of-contents)
+## Running the Profile
+### Directly from Github
+This option is best used when network connectivity is available and policies permit
+access to the hosting repository.
+
+```bash
+# Using `ssh` transport
+bundle exec [inspec or cinc-auditor] exec https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0/archive/main.tar.gz --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
+
+# Using `winrm` transport
+bundle exec [inspec or cinc-auditor] exec https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0/archive/master.tar.gz --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+[top](#table-of-contents)
+### Using a local Archive copy
+If your runner is not always expected to have direct access to the profile's hosted location,
+use the following steps to create an archive bundle of this overlay and all of its dependent tests:
+
+Git is required to clone the InSpec profile using the instructions below.
+Git can be downloaded from the [Git Web Site](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+When the **"runner"** host uses this profile overlay for the first time, follow these steps:
+
+```bash
+mkdir profiles
+cd profiles
+git clone https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0.git
+bundle exec [inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0
+
+# Using `ssh` transport
+bundle exec [inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
+
+# Using `winrm` transport
+bundle exec [inspec or cinc-auditor] exec <name of generated archive> --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+For every successive run, follow these steps to always have the latest version of this profile baseline:
+
+```bash
+cd cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0
+git pull
+cd ..
+bundle exec [inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0 --overwrite
+
+# Using `ssh` transport
+bundle exec [inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
+
+# Using `winrm` transport
+bundle exec [inspec or cinc-auditor] exec <name of generated archive> --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+[top](#table-of-contents)
+## Different Run Options
+
+[Full exec options](https://docs.chef.io/inspec/cli/#options-3)
+
+[top](#table-of-contents)
+## Using Heimdall for Viewing Test Results
+The JSON results output file can be loaded into **[Heimdall-Lite](https://heimdall-lite.mitre.org/)**
+or **[Heimdall-Server](https://github.com/mitre/heimdall2)** for a user-interactive, graphical view of the profile scan results.
+
+Heimdall-Lite is a `browser only` viewer that allows you to easily view your results directly and locally rendered in your browser.
+Heimdall-Server is configured with a `data-services backend` allowing for data persistency to a database (PostgreSQL).
+For more detail on feature capabilities see [Heimdall Features](https://github.com/mitre/heimdall2?tab=readme-ov-file#features)
+
+Heimdall can **_export your results into a DISA Checklist (CKL) file_** for easily uploading into eMass using the `Heimdall Export` function.
+
+Depending on your environment restrictions, the [SAF CLI](https://saf-cli.mitre.org) can be used to run a local docker instance
+of Heimdall-Lite via the `saf view:heimdall` command.
+
+Additionally both Heimdall applications can be deployed via docker, kubernetes, or the installation packages.
+
+[top](#table-of-contents)
+## Authors
+[Center for Internet Security (CIS)](https://www.cisecurity.org/)
+
+[MITRE Security Automation Framework Team](https://saf.mitre.org)
+
+## NOTICE
+
+© 2018-2025 The MITRE Corporation.
+
+Approved for Public Release; Distribution Unlimited. Case Number 18-3678.
+
+## NOTICE
+
+MITRE hereby grants express written permission to use, reproduce, distribute, modify, and otherwise leverage this software to the extent permitted by the licensed terms provided in the LICENSE.md file included with this project.
+
+## NOTICE
+
+This software was produced for the U. S. Government under Contract Number HHSM-500-2012-00008I, and is subject to Federal Acquisition Regulation Clause 52.227-14, Rights in Data-General.
+
+No other use other than that granted to the U. S. Government, or to those acting on behalf of the U. S. Government under that Clause is authorized without the express written permission of The MITRE Corporation.
+
+For further information, please contact The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, McLean, VA  22102-7539, (703) 983-6000.
+
+## NOTICE
+[CIS Benchmarks are published by Center for Internet Security](https://www.cisecurity.org/cis-benchmarks)
