@@ -7,12 +7,7 @@ license: Apache-2.0
 summary: InSpec profile aligned to CIS Benchmark Guidance for CIS Oracle Cloud
   Infrastructure Foundations Benchmark v3.0.0
 description: null
-version: 3.0.0.1.0
-supports: []
-depends: []
-inspec_version: |
-  "~>6.0"
-
+version: 3.0.1
 
 ### INPUTS ###
 # Inputs are variables that can be referenced by any control in the profile,
@@ -30,4 +25,4 @@ inspec_version: |
 # overrides instead.
 ###
 
-inputs:
+# inputs:
