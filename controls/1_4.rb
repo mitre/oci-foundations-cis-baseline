@@ -1,24 +1,109 @@
-control "1_4" do
-  title "Ensure IAM password policy requires minimum length of 14 or greater"
-  desc "Password policies are used to enforce password complexity requirements. IAM password policies can be used to ensure passwords are at least a certain length and are composed of certain characters. It is recommended the password policy require a minimum password length 14 characters and contain 1 non-alphabetic
-character (Number or “Special Character”).
+control '1_4' do
+  title 'Ensure IAM password policy requires minimum length of 14 or greater'
 
-In keeping with the overall goal of having users create a password that is not overly weak, an eight-character minimum password length is recommended for an MFA account, and 14 characters for a password only account. In addition, maximum password length should be made as long as possible based on system/software capabilities and not restricted by policy. In general, it is true that longer passwords are better (harder to crack), but it is also true that forced password length requirements can cause user behavior that is predictable and undesirable. For example, requiring users to have a minimum 16-character password may cause them to choose repeating patterns like fourfourfourfour or passwordpassword that meet the requirement but aren’t hard to guess. Additionally, length requirements increase the chances that users will adopt other insecure practices, like writing them down, re-using them or storing them unencrypted in their documents. Password composition requirements are a poor defense against guessing attacks. Forcing users to choose some combination of upper-case, lower-case, numbers, and special characters has a negative impact. It places an extra burden on users and many
-will use predictable patterns (for example, a capital letter in the first position, followed by lowercase letters, then one or two numbers, and a “special character” at the end). Attackers know this, so dictionary attacks will often contain these common patterns and use the most common substitutions like, $ for s, @ for a, 1 for l, 0 for o. Passwords that are too complex in nature make it harder for users to remember, leading to bad practices. In addition, composition requirements provide no defense against common attack types such as social engineering or insecure storage of passwords."
-  desc "check", %q(Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment your Domain to review is in Click on the Domain to review Click on Settings Click on Password policy Click each Password policy in the domain Ensure Password length (minimum) is greater than or equal to 14 Under The The following criteria apply to passwords section, ensure that the number given in Numeric (minimum) setting is 1 , or the Special (minimum) setting is 1 . The following criteria apply to passwords:
-6. Ensure that 1 or more is selected for Numeric (minimum) OR Special (minimum) From Cloud Guard: To Enable Cloud Guard Auditing:
-Ensure Cloud Guard is enabled in the root compartment of the tenancy. For more information about enabling Cloud Guard, please look at the instructions included in "Ensure Cloud Guard is enabled in the root compartment of the tenancy" Recommendation in the "Logging and Monitoring" section. From Console: Type Cloud Guard into the Search box at the top of the Console. Click Cloud Guard from the “Services” submenu. Click Detector Recipes in the Cloud Guard menu. Click OCI Configuration Detector Recipe (Oracle Managed) under the Recipe Name column. Find Password policy does not meet complexity requirements in the Detector Rules column. Select the vertical ellipsis icon and chose Edit on the Password policy does not meet complexity requirements row. In the Edit Detector Rule window, find the Input Setting box and verify/change the Required password length setting to 14. Click the Save button. From CLI: Update the Password policy does not meet complexity requirements Detector Rule in Cloud Guard to generate Problems if IAM password policy isn’t configured to enforce a password length of at least 14 characters with the following command: oci cloud-guard detector-recipe-detector-rule update --detector-recipe-id <insert detector recipe ocid> --detector-rule-id PASSWORD_POLICY_NOT_COMPLEX --details '{"configurations":[{ "configKey" : "passwordPolicyMinLength", "name" : "Required password length", "value" : "14", "dataType" : null, "values" : null }]}')
-  desc "fix", "Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on Password policy to remediate Click Edit password rules Update the Password length (minimum) setting to 14 or greater Under The Passwords must meet the following character requirements section, update the number given in Special (minimum) setting to 1 or greater or Under The Passwords must meet the following character requirements section, update the number given in Numeric (minimum) setting to 1 or greater
-7. Click Save changes"
-  desc "mitigations", "The Audit Procedure and Remediation Procedure for OCI IAM without Identity Domains can be found in the CIS OCI Foundation Benchmark 2.0.0 under the respective recommendations."
+  desc <<~DESC
+    "Password policies are used to enforce password complexity requirements. IAM password
+    policies can be used to ensure passwords are at least a certain length and are composed of
+    certain characters. It is recommended the password policy require a minimum password
+    length 14 characters and contain 1 non-alphabetic character (Number or “Special
+    Character”). In keeping with the overall goal of having users create a password that is
+    not overly weak, an eight-character minimum password length is recommended for an MFA
+    account, and 14 characters for a password only account. In addition, maximum password
+    length should be made as long as possible based on system/software capabilities and not
+    restricted by policy. In general, it is true that longer passwords are better (harder to
+    crack), but it is also true that forced password length requirements can cause user
+    behavior that is predictable and undesirable. For example, requiring users to have a
+    minimum 16-character password may cause them to choose repeating patterns like
+    fourfourfourfour or passwordpassword that meet the requirement but aren’t hard to guess.
+    Additionally, length requirements increase the chances that users will adopt other
+    insecure practices, like writing them down, re-using them or storing them unencrypted in
+    their documents. Password composition requirements are a poor defense against guessing
+    attacks. Forcing users to choose some combination of upper-case, lower-case, numbers, and
+    special characters has a negative
+  DESC
+
+  desc 'check', <<~CHECK
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
+    your Domain to review is in Click on the Domain to review Click on Settings Click on
+    Password policy Click each Password policy in the domain Ensure Password length (minimum)
+    is greater than or equal to 14 Under The The following criteria apply to passwords
+    section, ensure that the number given in Numeric (minimum) setting is 1 , or the Special
+    (minimum) setting is 1 . The following criteria apply to passwords: 6. Ensure that 1 or
+    more is selected for Numeric (minimum) OR Special (minimum) From Cloud Guard: To Enable
+    Cloud Guard Auditing: Ensure Cloud Guard is enabled in the root compartment of the
+    tenancy. For more information about enabling Cloud Guard, please look at the instructions
+    included in "Ensure Cloud Guard is enabled in the root compartment of the tenancy"
+    Recommendation in the "Logging and Monitoring" section. From Console: Type Cloud Guard
+    into the Search box at the top of the Console. Click Cloud Guard from the “Services”
+    submenu. Click Detector Recipes in the Cloud Guard menu. Click OCI Configuration Detector
+    Recipe (Oracle Managed) under the Recipe Name column. Find Password policy does not meet
+    complexity requirements in the Detector Rules column. Select the vertical ellipsis icon
+    and chose Edit on the Password policy does not meet complexity requirements row. In the
+    Edit Detector Rule window, find the Input Setting box and verify/change the Required
+    password length setting to 14. Click the Save button. From CLI: Update the Password policy
+    does not meet complexity requirements Detector Rule in Cloud Guard to generate Problems if
+    IAM password policy isn’t configured to enforce a password length of at least 14
+    characters with the following command: oci cloud-guard detector-recipe-detector-rule
+    update --detector-recipe-id <insert detector recipe ocid> --detector-rule-id
+    PASSWORD_POLICY_NOT_COMPLEX --details '{"configurations":[{ "configKey" :
+    
+    "passwordPolicyMinLength", "name" : "Required password length", "value" : "14", "dataType"
+    : null, "values" : null }]}'
+  CHECK
+
+  desc 'fix', <<~FIX
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
+    the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on
+    Password policy to remediate Click Edit password rules Update the Password length
+    (minimum) setting to 14 or greater Under The Passwords must meet the following character
+    requirements section, update the number given in Special (minimum) setting to 1 or greater
+    or Under The Passwords must meet the following character requirements section, update the
+    number given in Numeric (minimum) setting to 1 or greater 7. Click Save changes
+  FIX
+
   impact 0.5
-  tag check_id: "C-1_4"
-  tag severity: "medium"
-  tag gid: "CIS-1_4"
-  tag rid: "xccdf_cis_cis_rule_1_4"
-  tag stig_id: "1.4"
-  tag gtitle: "<GroupDescription></GroupDescription>"
-  tag "documentable"
-  tag cci: ["CCI-000364", "CCI-000365", "CCI-000366", "CCI-000421", "CCI-001097", "CCI-001098", "CCI-002395", "CCI-002110", "CCI-002111", "CCI-002112", "CCI-000012", "CCI-000200", "CCI-000199", "CCI-000205", "CCI-000204"]
-  tag nist: ["CM-6 a", "CM-6 a", "CM-6 b", "CM-9 a", "SC-7 a", "SC-7 c", "SC-7 b", "AC-2 a", "AC-2 a", "AC-2 b", "AC-2 j", "IA-5 (1) (e)", "IA-5 (1) (d)", "IA-5 (1) (a)", "IA-5 (8)"]
+
+  tag check_id: 'C-1_4'
+  tag severity: 'medium'
+  tag gid: 'CIS-1_4'
+  tag rid: 'xccdf_cis_cis_rule_1_4'
+  tag stig_id: '1.4'
+  tag gtitle: '<GroupDescription></GroupDescription>'
+  tag 'documentable'
+
+  tag cci: [
+    'CCI-000364',
+    'CCI-000365',
+    'CCI-000366',
+    'CCI-000421',
+    'CCI-001097',
+    'CCI-001098',
+    'CCI-002395',
+    'CCI-002110',
+    'CCI-002111',
+    'CCI-002112',
+    'CCI-000012',
+    'CCI-000200',
+    'CCI-000199',
+    'CCI-000205',
+    'CCI-000204'
+  ]
+
+  tag nist: [
+    'CM-6 a',
+    'CM-6 a',
+    'CM-6 b',
+    'CM-9 a',
+    'SC-7 a',
+    'SC-7 c',
+    'SC-7 b',
+    'AC-2 a',
+    'AC-2 a',
+    'AC-2 b',
+    'AC-2 j',
+    'IA-5 (1) (e)',
+    'IA-5 (1) (d)',
+    'IA-5 (1) (a)',
+    'IA-5 (8)'
+  ]
 end
