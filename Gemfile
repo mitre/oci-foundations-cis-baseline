@@ -16,6 +16,7 @@ gem 'rubocop'
 gem 'rubocop-rake'
 gem 'test-kitchen'
 gem 'train-awsssm'
+gem 'oci'
 
 source 'https://rubygems.cinc.sh/' do
   gem 'chef-config'
