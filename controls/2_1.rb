@@ -98,4 +98,13 @@ control '2_1' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+  cmd = %q{oci search resource structured-search --query-text "query SecurityList resources where (IngressSecurityRules.source = '0.0.0.0/0' && IngressSecurityRules.protocol = 6 && IngressSecurityRules.tcpOptions.destinationPortRange.max >= 22 && IngressSecurityRules.tcpOptions.destinationPortRange.min <= 22)"}
+  json_output = json(command: cmd)
+  output = json_output.params.dig('data','items')
+
+  describe 'Ensure no security lists allow ingress from 0.0.0.0/0 to port 22' do
+    subject { output }
+    it { should be_empty }
+  end
 end
