@@ -24,16 +24,23 @@ control '1_5' do
   DESC
 
   desc 'check', <<~CHECK
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    your Domain to review is in Click on the Domain to review Click on Settings Click on
-    Password policy Click each Password policy in the domain Ensure Expires after (days) is
-    less than or equal to 365 days
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
+    Select the Compartment your Domain to review is in.
+    Click on the Domain to review.
+    Click on Settings.
+    Click on Password policy.
+    Click each Password policy in the domain and ensure Expires after (days) is
+    less than or equal to 365 days.
   CHECK
 
   desc 'fix', <<~FIX
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on
-    Password policy to remediate Click Edit password rules Change Expires after (days) to 365
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
+    Select the Compartment the Domain to remediate is in.
+    Click on the Domain to remediate.
+    Click on Settings.
+    Click on Password policy to remediate.
+    Click Edit password rules.
+    Change Expires after (days) to 365.
   FIX
 
   impact 0.5
@@ -81,4 +88,22 @@ control '1_5' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+
+  # Get tenancy ID from OCI config and retrieve domain URL
+  tenancy_id = 'ocid1.tenancy.oc1..aaaaaaaaqqfhxbyaxi4ejhb6t6kdogjzn3ch5dfvwjxvwaheloecex5fphxa'
+  domain_url = `oci iam domain list --compartment-id #{tenancy_id} --query "data[0].url" --raw-output`.strip
+
+  cmd = %Q{oci identity-domains password-policies list --endpoint "#{domain_url}" --all}
+  json_output = json(command: cmd)
+  policies = json_output.params.dig('data', 'items') || []
+
+  describe 'Ensure IAM password policy expires passwords within 365 days' do
+    policies.each do |policy|
+      describe "Password policy: #{policy['name']}" do
+        subject { policy['expires_after'] }
+        it { should_not be_nil }
+        it { should be <= 365 }
+      end
+    end
+  end
 end
