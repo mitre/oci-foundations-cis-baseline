@@ -116,6 +116,9 @@ For more information on developing overlays, reference the [MITRE SAF Training](
   # This file specifies the attributes for the configurable controls
   # used by the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile.
 
+  #tenancy_id used by 1_5, 1_6
+  tenancy_id: [your tenancy id]
+
   # Disable controls that are known to consistently have long run times
   disable_slow_controls: [true or false]
 

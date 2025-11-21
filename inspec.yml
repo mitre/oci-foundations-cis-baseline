@@ -25,4 +25,12 @@ version: 3.0.1
 # overrides instead.
 ###
 
-# inputs:
+inputs:
+
+
+  - name: tenancy_id
+    description: 'tenancy id 1_5, 1_6' 
+    type: string
+    value: ""
+    sensitive: true
+    required: true
