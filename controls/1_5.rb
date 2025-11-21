@@ -90,13 +90,15 @@ control '1_5' do
   ]
 
   # Get tenancy ID from OCI config and retrieve domain URL
-  tenancy_id = 'ocid1.tenancy.oc1..aaaaaaaaqqfhxbyaxi4ejhb6t6kdogjzn3ch5dfvwjxvwaheloecex5fphxa'
+  tenancy_id = input('tenancy_id') # if you're not hard coding the tenancy ID the command to run is:inspec exec . --controls=1_5 --input tenancy_id= <tenancy_id>
+  #'ocid1.tenancy.oc1..aaaaaaaaqqfhxbyaxi4ejhb6t6kdogjzn3ch5dfvwjxvwaheloecex5fphxa'
   domain_url =  `oci iam domain list --compartment-id #{tenancy_id} --query "data[0].url" --raw-output`.strip
 
   #cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all"
   cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
   json_output = json(command: cmd)
   policies = json_output.params.dig('data', 'resources')#, 1, 'password-expires-after') #name is under "name" resource
+  
   describe 'Ensure IAM password policy expires passwords within 365 days' do
     policies.each do |policy|
       describe "Password policy: #{policy['name']}" do
