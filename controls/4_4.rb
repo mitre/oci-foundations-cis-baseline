@@ -14,7 +14,7 @@ control '4_4' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles Idp Group
     Mapping Changes (if any) Click the Edit Rule button and verify that the RuleConditions
     section contains a condition for the Service Identity and Event Types: Idp Group Mapping –
@@ -35,7 +35,7 @@ control '4_4' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Identity in the Service Name Drop-down
     and selecting Idp Group Mapping – Create , Idp Group Mapping – Delete and Idp Group
@@ -47,9 +47,9 @@ control '4_4' do
     [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.identitycontrolplane.createidpgroupmapping\",\"com.oraclecloud.identitycontrolplane.deleteidpgroupmapping\",\"com.oraclecloud.identitycontrolplane.updateidpgroupmapping\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

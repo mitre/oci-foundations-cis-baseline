@@ -11,7 +11,7 @@ control '4_16' do
 
   desc 'check', <<~CHECK
     From Console: Login into OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Vault . Click on the individual Vault under the Name heading. Ensure the date of
     each Master Encryption key under the Created column of the Master Encryption key is no
     more than 365 days old, and that the key is in the ENABLED state Repeat for all Vaults in
@@ -24,7 +24,7 @@ control '4_16' do
 
   desc 'fix', <<~FIX
     From Console: Login into OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Vault . Click on the individual Vault under the Name heading. Click on the menu
     next to the time created. Click Rotate Key From CLI: Execute the following: oci kms
     management key rotate --key-id <key-ocid> --endpoint <management-endpoint-url>

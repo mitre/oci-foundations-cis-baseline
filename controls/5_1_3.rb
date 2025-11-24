@@ -14,7 +14,7 @@ control '5_1_3' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Storage from the Services menu. Select Buckets
-    
+
     from under the Object Storage & Archive Storage section. Click on an individual bucket
     under the Name heading. Ensure that the Object Versioning is set to Enabled. Repeat for
     each compartment From CLI: Execute the following command: for region in $(oci iam
@@ -30,7 +30,7 @@ control '5_1_3' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each bucket in the returned results,
-    
+
     click the Bucket Display Name Click Edit next to Object Versioning: Disabled Click Enable
     Versioning From CLI: Follow the audit procedure For each of the buckets identified,
     execute the following command: oci os bucket update --bucket-name <bucket name>

@@ -46,7 +46,7 @@ control '1_4' do
     characters with the following command: oci cloud-guard detector-recipe-detector-rule
     update --detector-recipe-id <insert detector recipe ocid> --detector-rule-id
     PASSWORD_POLICY_NOT_COMPLEX --details '{"configurations":[{ "configKey" :
-    
+
     "passwordPolicyMinLength", "name" : "Required password length", "value" : "14", "dataType"
     : null, "values" : null }]}'
   CHECK

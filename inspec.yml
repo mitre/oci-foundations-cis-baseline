@@ -25,4 +25,75 @@ version: 3.0.1
 # overrides instead.
 ###
 
-# inputs:
+inputs:
+  # 1.1, 1.2, 1.3
+  - name: root_compartment_OCID
+    description: ""
+    type: string
+    value: ""
+
+  # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
+  - name: detector_recipe_ocid
+    description: ""
+    type: string
+    value: "hello"
+
+  # 1.14
+  - name: compartment_name
+    description: ""
+    type: array
+    value: []
+
+  # 1.14, 4.15, 4.16, 4.17
+  - name: compartment_ocid
+    description: ""
+    type: array
+    value: []
+
+  # 1.14
+  - name: resource_ocid
+    description: ""
+    type: array
+    value: []
+
+  # 1.16, 4.1, 4.14, 4.18, 6.1, 6.2
+  - name: tenancy_ocid
+    description: "The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool"
+    type: string
+    value: ""
+
+  # 1.16, 1.17?
+  - name: identity_domain_endpoint
+    description: ""
+    type: string
+    value: ""
+  
+  # 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.15, 4.18
+  - name: display_name
+    description: ""
+    type: array
+    value: []
+
+  # 4.16
+  - name: topic_name
+    description: ""
+    type: array
+    value: []
+
+  # 4.16
+  - name: management_endpoint_url
+    description: ""
+    type: string
+    value: ""
+
+  # 4.17
+  - name: log_group_name
+    description: ""
+    type: array
+    value: []
+
+  # 5.1.2
+  - name: bucket_name
+    description: ""
+    type: array
+    value: []

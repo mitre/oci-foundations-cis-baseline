@@ -52,4 +52,8 @@ control '1_6' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+
+  describe 'Ensure IAM password policy prevents password reuse' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

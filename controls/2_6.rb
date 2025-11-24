@@ -17,7 +17,7 @@ control '2_6' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
-    
+
     Advanced Resource Query and hit enter. Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query in the query box: query
     integrationinstance resources For each OIC Instance returned click on the link under
@@ -34,7 +34,7 @@ control '2_6' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each OIC instance in the returned
-    
+
     results, click the OIC Instance name Click Network Access Either edit the Network Access
     to be more restrictive From CLI Follow the audit procedure. Get the json input format
     using the below command: oci integration integration-instance change-network-endpoint

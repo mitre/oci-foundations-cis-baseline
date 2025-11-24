@@ -11,7 +11,7 @@ control '5_1_1' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar at the top of the screen.
-    
+
     Type Advanced Resource Query and click enter . Click the Advanced Resource Query button in
     the upper right of the screen. Enter the following query in the query box: query bucket
     resources where (publicAccessType == 'ObjectRead') || (publicAccessType ==
@@ -21,9 +21,9 @@ control '5_1_1' do
     Ensure query returns no results Cloud Guard To Enable Cloud Guard Auditing: Ensure Cloud
     Guard is enabled in the root compartment of the tenancy. For more information about
     enabling Cloud Guard, please look at the instructions included in Recommendation 3.15.
-    
+
     From Console: Type Cloud Guard into the Search box at the top of the Console. Click Cloud
-    
+
     Guard from the “Services” submenu. Click Detector Recipes in the Cloud Guard menu. Click
     OCI Configuration Detector Recipe (Oracle Managed) under the Recipe Name column. Find
     Bucket is public in the Detector Rules column. Verify that the Bucket is public Detector
@@ -36,7 +36,7 @@ control '5_1_1' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each bucket in the returned results,
-    
+
     click the Bucket Display Name Click Edit Visibility Select Private Click Save Changes From
     CLI: Follow the audit procedure For each of the buckets identified, execute the following
     command: oci os bucket update --bucket-name <bucket-name> --public-access-type
@@ -77,4 +77,13 @@ control '5_1_1' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  cmd = %q{oci search resource structured-search --query-text "query bucket resources where (publicAccessType == 'ObjectRead') || (publicAccessType == 'ObjectReadWithoutList')"}
+  json_output = json(command: cmd)
+  output = json_output.params.dig('data', 'items')
+
+  describe 'Ensure no Object Storage buckets are publicly visible' do
+    subject { output }
+    it { should be_empty }
+  end
 end

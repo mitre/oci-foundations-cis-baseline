@@ -12,11 +12,11 @@ control '4_18' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Root Compartment that hosts the rules Click the Rule that handles Identity SignOn
     Changes (if any) Click the Edit Rule button and verify that the RuleCondition s section
     contains a condition Event Type for the Service Identity SignOn and Event Types:
-    
+
     Interactive Login On the Action Type contains: Notifications and that a valid Topic is
     referenced. From CLI: Find the OCID of the specific Event Rule based on Display Name and
     Tenancy OCID oci events rule list --compartment-id <tenancy-ocid> --query "data
@@ -31,7 +31,7 @@ control '4_18' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Root compartment that should host the rule Click Create Rule Provide a Display Name
     and Description Create a Rule Condition by selecting Identity SignOn in the Service Name
     Drop-down and selecting Interactive Login In the Actions section select Notifications as
@@ -42,9 +42,9 @@ control '4_18' do
     [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.identitysignon.interactivelogin\",data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<tenancy-ocid>" } Create the actual event rule oci events rule create

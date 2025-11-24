@@ -19,7 +19,7 @@ control '1_17' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users. Click on an individual user under the Name heading. Click on API Keys in the
     lower left-hand corner of the page. Delete one of the API Keys From CLI: Follow the audit

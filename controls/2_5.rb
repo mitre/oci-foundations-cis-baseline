@@ -12,7 +12,7 @@ control '2_5' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click on Networking -> Virtual Cloud Networks
-    
+
     from the services menu For each VCN listed Click on Security Lists Click on Default
     Security List for <VCN Name> Verify that there is no Ingress rule with 'Source 0.0.0.0/0'
     Verify that there is no Egress rule with 'Destination 0.0.0.0/0, All Protocols'
@@ -20,7 +20,7 @@ control '2_5' do
 
   desc 'fix', <<~FIX
     From Console: Login into the OCI Console Click on Networking -> Virtual Cloud Networks
-    
+
     from the services menu For each VCN listed Click on Security Lists Click on Default
     Security List for <VCN Name> Identify the Ingress Rule with 'Source 0.0.0.0/0' Either Edit
     the Security rule to restrict the source and/or port range or delete the rule. Identify
@@ -64,4 +64,8 @@ control '2_5' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+  describe 'Ensure the default security list of every VCN restricts all traffic except ICMP within VCN' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

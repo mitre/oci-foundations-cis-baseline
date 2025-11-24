@@ -16,7 +16,7 @@ control '4_15' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles Cloud Guard
     Changes (if any) Click the Edit Rule button and verify that the RuleConditions section
     contains a condition for the Service Cloud Guard and Event Types: Detected – Problem,
@@ -27,7 +27,7 @@ control '4_15' do
     name used>']".{"id:id"} --output table List the details of a specific Event Rule based on
     the OCID of the rule. In the JSON output locate the Conditions key-value pair and verify
     that the following Conditions are present:
-    
+
     "com.oraclecloud.cloudguard.problemdetected","com.oraclecloud.cloudguard.problemdismissed","com.oraclecloud.cloudguard.problemremediated"
     Verify the value of the is-enabled attribute is true In the JSON output verify that
     actionType is ONS and locate the topic-id Verify the correct topic is used by checking the
@@ -37,7 +37,7 @@ control '4_15' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Cloud Guard in the Service Name Drop-down
     and selecting: Detected – Problem , Remediated – Problem , and Dismissed - Problem In the
@@ -49,7 +49,7 @@ control '4_15' do
     [?name=='<topic_name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic id>" }] }, "condition": "{\"eventType\":[\"
     com.oraclecloud.cloudguard.problemdetected\",\"
     com.oraclecloud.cloudguard.problemdismissed\",\"

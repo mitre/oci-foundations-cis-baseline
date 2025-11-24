@@ -12,7 +12,7 @@ control '4_2' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Notifications Service page:
-    
+
     https://console.us-ashburn-1.oraclecloud.com/notification/topics Select the Compartment
     that hosts the notifications Find and click the Topic relevant to your monitoring alerts.
     Ensure a valid active subscription is shown. From CLI: List the topics in the Compartment
@@ -24,7 +24,7 @@ control '4_2' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Notifications Service page:
-    
+
     https://console.us-ashburn-1.oraclecloud.com/notification/topics Select the Compartment
     that hosts the notifications Click Create Topic Set the name to something relevant Set the
     description to describe the purpose of the topic Click Create Click the newly created

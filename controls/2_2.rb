@@ -11,7 +11,7 @@ control '2_2' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar at the top of the screen.
-    
+
     Type Advanced Resource Query and hit enter . Click the Advanced Resource Query button in
     the upper right corner of the screen. Enter the following query in the query box: query
     SecurityList resources where (IngressSecurityRules.source = '0.0.0.0/0' &&
@@ -34,20 +34,20 @@ control '2_2' do
     Security list allows traffic to non-public port from all sources (0.0.0.0/0) row. In the
     Edit Detector Rule window find the Input Setting box and verify/add to the Restricted
     Protocol: Ports List setting to TCP:[3389], UDP:[3389]. Click the Save button. From CLI:
-    
+
     Update the VCN Security list allows traffic to non-public port from all sources
     (0.0.0.0/0) Detector Rule in Cloud Guard to generate Problems if a VCN security list
     allows public access via port 3389 with the following command: oci cloud-guard
     detector-recipe-detector-rule update --detector-recipe-id <insert detector recipe ocid>
     --detector-rule-id SECURITY_LISTS_OPEN_SOURCE --details '{"configurations":[{ "configKey"
     : "securityListsOpenSourceConfig", "name" : "Restricted Protocol:Ports List", "value" :
-    
+
     "TCP:[3389], UDP:[3389]", "dataType" : null, "values" : null }]}'
   CHECK
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each security list in the returned
-    
+
     results, click the security list name Either edit the ingress rule to be more restrictive,
     delete the ingress rule or click on the VCN and terminate the security list as
     appropriate. From CLI: Follow the audit procedure. For each of the security lists
@@ -104,7 +104,7 @@ control '2_2' do
 
   cmd = %q{oci search resource structured-search --query-text "query SecurityList resources where (IngressSecurityRules.source = '0.0.0.0/0' && IngressSecurityRules.protocol = 6 && IngressSecurityRules.tcpOptions.destinationPortRange.max >= 3389 && IngressSecurityRules.tcpOptions.destinationPortRange.min <= 3389)"}
   json_output = json(command: cmd)
-  output = json_output.params.dig('data','items')
+  output = json_output.params.dig('data', 'items')
 
   describe 'Ensure no security lists allow ingress from 0.0.0.0/0 to port 3389' do
     subject { output }

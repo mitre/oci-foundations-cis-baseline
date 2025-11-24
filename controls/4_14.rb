@@ -13,7 +13,7 @@ control '4_14' do
 
   desc 'check', <<~CHECK
     From Console: Type Cloud Guard into the Search box at the top of the Console. Click Cloud
-    
+
     Guard from the "Services" submenu. View if Cloud Guard is enabled From CLI: Retrieve the
     Cloud Guard status from the console oci cloud-guard configuration get --compartment-id
     <tenancy-ocid> --query 'data.status' Ensure the returned value is "ENABLED"`
@@ -21,7 +21,7 @@ control '4_14' do
 
   desc 'fix', <<~FIX
     From Console: Type Cloud Guard into the Search box at the top of the Console. Click Cloud
-    
+
     Guard from the "Services" submenu. Click Enable Cloud Guard . Click Create Policy . Click
     Next . Under Reporting Region , select a region. Under Compartments To Monitor , choose
     Select Compartment . Under Select Compartments , select the root compartment. Under

@@ -17,7 +17,7 @@ control '1_7' do
 
   desc 'check', <<~CHECK
     From Console: Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select
-    
+
     the Compartment your Domain to review is in Click on the Domain to review Click on
     Security Click Sign-on policies Select the sign-on policy to review Under the sign-on
     rules header, click the three dots on the rule with the highest priority. Select Edit

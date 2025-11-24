@@ -17,7 +17,7 @@ control '1_2' do
 
   desc 'check', <<~CHECK
     From CLI: Run OCI CLI command providing the root compartment OCID to get the list of
-    
+
     groups having access to manage all resources in your tenancy. oci iam policy list
     --compartment-id <root_compartment_OCID> | grep -i "to manage all-resources in tenancy"
     Verify the results to ensure only the Administrators group has access to manage all
@@ -26,14 +26,14 @@ control '1_2' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI console. Go to Identity -> Policies , In the compartment
-    
+
     dropdown, choose the root compartment. Open each policy to view the policy statements.
     Remove any policy statement that allows any group other than Administrators or any service
     access to manage all resources in the tenancy. From CLI: The policies can also be updated
     via OCI CLI, SDK and API, with an example of the CLI commands below: Delete a policy via
     the CLI: oci iam policy delete --policy-id <policy-ocid> Update a policy via the CLI: oci
     iam policy update --policy-id <policy-ocid> --statements <json-array-of-statements> Note:
-    
+
     You should generally not delete the policy that allows the Administrators group the
     ability to manage all resources in the tenancy.
   FIX

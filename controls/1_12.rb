@@ -13,7 +13,7 @@ control '1_12' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. Click on the 'Default' Domain in the (root). Click
     on 'Groups'. Select the 'Administrators' group by clicking on the Name Click on each local
     or synchronized Administrators member profile Click on API Keys to verify if a user has an
@@ -22,7 +22,7 @@ control '1_12' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI console. Select Identity from Services menu. Select Users from
-    
+
     Identity menu, or select Domains , select a domain, and select Users . Select the username
     of a tenancy administrator user with an API key. Select API Keys from the menu in the
     lower left-hand corner. Delete any associated keys from the API Keys table. Repeat steps
@@ -63,4 +63,8 @@ control '1_12' do
     'AC-2 d 3',
     'AC-2 i 1'
   ]
+
+  describe 'Ensure API keys are not created for tenancy administrator users' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

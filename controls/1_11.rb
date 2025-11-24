@@ -15,7 +15,7 @@ control '1_11' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Users from the Identity menu. Click on an individual user under the Name heading.
     Click on Database Passwords in the lower left-hand corner of the page. Ensure the date of
     the Database Passwords under the Created column of the Database Passwords is no more than
@@ -66,4 +66,8 @@ control '1_11' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+
+  describe 'Ensure user IAM Database Passwords rotate within 90 days' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

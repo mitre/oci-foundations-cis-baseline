@@ -45,12 +45,12 @@ control '1_16' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click More action
     Select Deactivate From CLI: Create a input.json: { "operations": [ { "op": "replace",
     "path": "active","value": false} ], "schemas":
-    
+
     ["urn:ietf:params:scim:api:messages:2.0:PatchOp"], "userId": "<user-ocid>" } Execute the
     below: oci identity-domains user patch --from-json file://file.json --endpoint
     <identity-domain-endpoint>

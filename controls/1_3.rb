@@ -10,7 +10,7 @@ control '1_3' do
 
   desc 'check', <<~CHECK
     From CLI: Run the following OCI CLI commands providing the root_compartment_OCID oci iam
-    
+
     policy list --compartment-id <root_compartment_OCID> | grep -i " to use users in tenancy"
     oci iam policy list --compartment-id <root_compartment_OCID> | grep -i " to use groups in
     tenancy" Verify the results to ensure that the policy statements that grant access to use
@@ -20,7 +20,7 @@ control '1_3' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity from Services Menu. Select Policies
-    
+
     from Identity Menu. Click on an individual policy under the Name heading. Ensure Policy
     statements look like this - Allow group IAMAdmins to use users in tenancy where
     target.group.name != 'Administrators' Allow group IAMAdmins to use groups in tenancy where

@@ -10,7 +10,7 @@ control '2_3' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console. Click the search bar at the top of the screen.
-    
+
     Type Advanced Resource Query and hit enter. Click the Advanced Resource Query button in
     the upper right corner of the screen. Enter the following query in the query box: query
     networksecuritygroup resources where lifeCycleState = 'AVAILABLE' For each of the network
@@ -48,7 +48,7 @@ control '2_3' do
 
   desc 'fix', <<~FIX
     From Console: Login into the OCI Console. Click the search bar at the top of the screen.
-    
+
     Type Advanced Resource Query and hit enter. Click the Advanced Resource Query button in
     the upper right corner of the screen. Enter the following query in the query box: query
     networksecuritygroup resources where lifeCycleState = 'AVAILABLE' For each of the network
@@ -70,7 +70,7 @@ control '2_3' do
     fields)>]' eg: oci network nsg rules update
     --nsg-id=ocid1.networksecuritygroup.oc1.iad.xxxxxxxxxxxxxxxxxxxxxx --security-rules='[{
     "description": null, "destination": null, "destination-type": null, "direction":
-    
+
     "INGRESS", "icmp-options": null, "id": "709001", "is-stateless": null, "protocol": "6",
     "source": "140.238.154.0/24", "source-type": "CIDR_BLOCK", "tcp-options": {
     "destination-port-range": { "max": 22, "min": 22 }, "source-port-range": null },

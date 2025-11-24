@@ -15,26 +15,26 @@ control '6_1' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console. Click in the search bar, top of the screen. Type
-    
+
     Advanced Resource Query and hit enter . Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query in the query box: query compartment
     resources where (compartmentId='<tenancy-id>' && lifecycleState='ACTIVE') Ensure query
     returns at least one compartment in addition to the ManagedCompartmentForPaaS compartment
-    
+
     From CLI: Execute the following command oci search resource structured-search --query-text
-    
+
     "query compartment resources where (compartmentId='<tenancy-id>' &&
     lifecycleState='ACTIVE')" Ensure items are returned.
   CHECK
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity from the Services menu. Select
-    
+
     Compartments from the Identity menu. Click Create Compartment Enter a Name Enter a
     Description Select the root compartment as the Parent Compartment Click Create Compartment
-    
+
     From CLI: Execute the following command oci iam compartment create --compartment-id
-    
+
     '<tenancy-id>' --name '<compartment-name>' --description '<compartment description>'
   FIX
 
@@ -64,4 +64,16 @@ control '6_1' do
     'SI-12',
     'AU-11'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = "oci search resource structured-search --query-text \"query compartment resources where (compartmentId='#{tenancy_ocid}' && lifecycleState='ACTIVE')\""
+
+  json_output = json(command: cmd)
+  output = json_output.params.dig('data', 'items')
+
+  describe 'Create at least one compartment in your tenancy to store cloud resources' do
+    subject { output }
+    it { should_not be_empty }
+  end
 end

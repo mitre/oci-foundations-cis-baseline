@@ -14,7 +14,7 @@ control '4_12' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles Network Gateways
     Changes (if any) Click the Edit Rule button and verify that the RuleConditions section
     contains a condition for the Service Networking and Event Types: DRG – Create DRG – Delete
@@ -59,7 +59,7 @@ control '4_12' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Networking in the Service Name Drop-down
     and selecting: DRG – Create DRG – Delete DRG – Update DRG Attachment – Create DRG
@@ -72,16 +72,16 @@ control '4_12' do
     Detach Service Service Gateway – Change Compartment In the Actions section select
     Notifications as Action Type Select the Compartment that hosts the Topic to be used.
     Select the Topic to be used Optionally add Tags to the Rule Click Create Rule From CLI:
-    
+
     Find the topic-id of the topic the Event Rule should use for sending Notifications by
     using the topic name and Compartment OCID oci ons topic list --compartment-id
     <compartment-ocid> --all --query "data
     [?name=='<topic_name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" } ] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.virtualnetwork.createdrg\",\"com.oraclecloud.virtualnetwork.deletedrg\",\"com.oraclecloud.virtualnetwork.updatedrg\",\"com.oraclecloud.virtualnetwork.createdrgattachment\",\"com.oraclecloud.virtualnetwork.deletedrgattachment\",\"com.oraclecloud.virtualnetwork.updatedrgattachment\",\"com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment\",\"com.oraclecloud.virtualnetwork.createinternetgateway\",\"com.oraclecloud.virtualnetwork.deleteinternetgateway\",\"com.oraclecloud.virtualnetwork.updateinternetgateway\",\"com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment\",\"com.oraclecloud.virtualnetwork.createlocalpeeringgateway\",\"com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end\",\"com.oraclecloud.virtualnetwork.updatelocalpeeringgateway\",\"com.oraclecloud.natgateway.changenatgatewaycompartment\",\"com.oraclecloud.natgateway.createnatgateway\",\"com.oraclecloud.natgateway.deletenatgateway\",\"com.oraclecloud.natgateway.updatenatgateway\",\"com.oraclecloud.servicegateway.attachserviceid\",\"com.oraclecloud.servicegateway.changeservicegatewaycompartment\",\"com.oraclecloud.servicegateway.createservicegateway\",\"com.oraclecloud.servicegateway.deleteservicegateway.end\",\"com.oraclecloud.servicegateway.detachserviceid\",\"com.oraclecloud.servicegateway.updateservicegateway\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

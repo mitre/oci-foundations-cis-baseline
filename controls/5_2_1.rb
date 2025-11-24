@@ -18,7 +18,7 @@ control '5_2_1' do
 
   desc 'check', <<~CHECK
     From Console: Login to the OCI Console. Click the search bar at the top of the screen.
-    
+
     Type 'Advanced Resource Query' and press return. Click Advanced resource query . Enter the
     following query in the query box: query volume resources For each block volume returned,
     click the link under Display name . Ensure the value for Encryption Key is not
@@ -35,7 +35,7 @@ control '5_2_1' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each block volume returned, click the
-    
+
     link under Display name. If the value for Encryption Key is Oracle-managed key , click
     Assign next to Oracle-managed key . Select a Vault Compartment and Vault . Select a Master
     Encryption Key Compartment and Master Encryption key . Click Assign . From CLI: Follow the

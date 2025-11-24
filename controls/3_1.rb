@@ -15,7 +15,7 @@ control '3_1' do
 
   desc 'check', <<~CHECK
     From Console: Login to the OCI Console Select compute instance in your compartment. Click
-    
+
     on each instance name. In the Instance Details section, next to Instance metadata service
     make sure Version 2 only is selected. From CLI: Run command: for region in `oci iam
     region-subscription list | jq -r '.data[] | ."region-name"'`; do for compid in `oci iam
@@ -28,7 +28,7 @@ control '3_1' do
 
   desc 'fix', <<~FIX
     From Console: Login to the OCI Console Click on the search box at the top of the console
-    
+
     and search for compute instance name. Click on the instance name, In the Instance Details
     section, next to Instance Metadata Service, click Edit . For the Instance metadata service
     , select the Version 2 only option. Click Save Changes . Note : Disabling IMDSv1 on an

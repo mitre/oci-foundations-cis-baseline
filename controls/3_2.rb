@@ -18,11 +18,11 @@ control '3_2' do
 
   desc 'check', <<~CHECK
     From Console: Login to the OCI Console Select compute instance in your compartment. Click
-    
+
     on each instance name. In the Launch Options section, Check if Secure Boot is Enabled .
-    
+
     From CLI: Run command: for region in `oci iam region-subscription list | jq -r '.data[] |
-    
+
     ."region-name"'`; do for compid in `oci iam compartment list --compartment-id-in-subtree
     TRUE 2>/dev/null | jq -r '.data[] | .id'` do output=`oci compute instance list
     --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |
@@ -33,7 +33,7 @@ control '3_2' do
 
   desc 'fix', <<~FIX
     Note: Secure Boot facility is available on selected VM images and Shapes in OCI. User have
-    
+
     to configure Secured Boot at time of instance creation only. From Console: Navigate to
     https://cloud.oracle.com/compute/instances Select the instance from the Audit Procedure
     Click Terminate . Determine whether or not to permanently delete instance's attached boot
