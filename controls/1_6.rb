@@ -78,7 +78,6 @@ control '1_6' do
     policies.each do |policy|
       describe "Password policy: #{policy['name']}" do
         subject { policy['num-passwords-in-history'] }
-        it { should_not be_nil }
         it { should be >= 24 }
       end
     end
