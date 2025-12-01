@@ -26,9 +26,9 @@ version: 3.0.1
 ###
 
 inputs:
-  # 1.1, 1.2, 1.3
-  - name: root_compartment_OCID
-    description: ""
+  # 1.1, 1.2, 1.3, 1.16, 4.1, 4.14, 4.18, 6.1, 6.2
+  - name: tenancy_ocid
+    description: "The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool"
     type: string
     value: ""
 
@@ -55,12 +55,6 @@ inputs:
     description: ""
     type: array
     value: []
-
-  # 1.16, 4.1, 4.14, 4.18, 6.1, 6.2
-  - name: tenancy_ocid
-    description: "The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool"
-    type: string
-    value: ""
 
   # 1.16, 1.17?
   - name: identity_domain_endpoint

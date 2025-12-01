@@ -67,4 +67,14 @@ control '1_2' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+  cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i 'to manage all-resources in tenancy'"
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure permissions on all resources are given only to the tenancy administrator group' do
+    subject { output.to_s }
+    it { should match(/allow group administrators to manage all-resources in tenancy/i) }
+  end
 end
