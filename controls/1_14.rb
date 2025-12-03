@@ -15,7 +15,7 @@ control '1_14' do
 
   desc 'check', <<~CHECK
     From Console (Dynamic Groups): Go to https://cloud.oracle.com/identity/domains/ Select a
-    
+
     Compartment Click on a Domain Click on Dynamic groups Click on the Dynamic Group Check if
     the Matching Rules includes the instances accessing your OCI resources. From Console
     (request.principal): Go to https://cloud.oracle.com/identity/policies Select a Compartment
@@ -25,7 +25,7 @@ control '1_14' do
     allow any-user to <verb> <resource> in compartment <compartment-name> where ALL
     {request.principal.type='<resource_type>',
     request.principal.compartment.id='<compartment_OCID>'} From CLI (request.principal):
-    
+
     Execute the following for each compartment_OCID: oci iam policy list --compartment-id
     <compartment_OCID> | grep request.principal Ensure that the condition includes the
     instances accessing your OCI resources
@@ -33,7 +33,7 @@ control '1_14' do
 
   desc 'fix', <<~FIX
     From Console (Dynamic Groups): Go to https://cloud.oracle.com/identity/domains/ Select a
-    
+
     Compartment Click on the Domain Click on Dynamic groups Click Create Dynamic Group. Enter
     a Name Enter a Description Enter Matching Rules to that includes the instances accessing
     your OCI resources. Click Create.

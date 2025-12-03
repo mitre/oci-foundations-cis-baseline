@@ -89,6 +89,10 @@ control '1_5' do
     'IA-5 (8)'
   ]
 
+  describe 'Ensure IAM password policy expires passwords within 365 days' do
+    skip 'The check for this control needs to be done manually'
+  end
+
   # Get tenancy ID from OCI config file
   tenancy_id = input('tenancy_id')
   domain_url =  `oci iam domain list --compartment-id #{tenancy_id} --query "data[0].url" --raw-output`.strip

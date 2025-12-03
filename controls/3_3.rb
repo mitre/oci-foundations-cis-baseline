@@ -12,7 +12,7 @@ control '3_3' do
 
   desc 'check', <<~CHECK
     From Console: Go to https://cloud.oracle.com/compute/instances Select compute instance in
-    
+
     your compartment. Click on each instance name. Click on Boot volume on the bottom left.
     Under the In-transit encryption column make sure it is Enabled From CLI: Execute the
     following: for region in `oci iam region-subscription list | jq -r '.data[] |
@@ -25,7 +25,7 @@ control '3_3' do
 
   desc 'fix', <<~FIX
     From Console: Navigate to https://cloud.oracle.com/compute/instances Select the instance
-    
+
     from the Audit Procedure Click Terminate . Determine whether or not to permanently delete
     instance's attached boot volume. Click Terminate instance . Click on Create Instance .
     Fill in the details as per requirements. In the Boot volume section ensure Use in-transit

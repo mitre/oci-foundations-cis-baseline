@@ -12,7 +12,7 @@ control '4_5' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles IAM Group
     Changes Click the Edit Rule button and verify that the Rule Conditions section contains a
     condition for the Service Identity and Event Types: Group – Create , Group – Delete and
@@ -23,7 +23,7 @@ control '4_5' do
     table List the details of a specific Event Rule based on the OCID of the rule. oci events
     rule get --rule-id <rule-id> In the JSON output locate the Conditions key value pair and
     verify that the following Conditions are present:
-    
+
     com.oraclecloud.identitycontrolplane.creategroup
     com.oraclecloud.identitycontrolplane.deletegroup
     com.oraclecloud.identitycontrolplane.updategroup Verify the value of the is-enabled
@@ -34,7 +34,7 @@ control '4_5' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Identity in the Service Name Drop-down
     and selecting Group – Create , Group – Delete and Group – Update In the Actions section
@@ -46,9 +46,9 @@ control '4_5' do
     [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.identitycontrolplane.creategroup\",\"com.oraclecloud.identitycontrolplane.deletegroup\",\"com.oraclecloud.identitycontrolplane.updategroup\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

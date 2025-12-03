@@ -16,7 +16,7 @@ control '5_2_2' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
-    
+
     Advanced Resource Query and click enter. Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query in the query box: query bootvolume
     resources For each boot volume returned click on the link under Display name Ensure
@@ -31,7 +31,7 @@ control '5_2_2' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each Boot Volume in the returned
-    
+
     results, click the Boot Volume name Click Assign next to Encryption Key Select the Vault
     Compartment and Vault Select the Master Encryption Key Compartment and Master Encryption
     key Click Assign From CLI: Follow the audit procedure. For each boot volume identified get

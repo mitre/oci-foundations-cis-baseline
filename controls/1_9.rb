@@ -12,7 +12,7 @@ control '1_9' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Customer
     Secret Keys in the lower left-hand corner of the page. Ensure the date of the Customer
@@ -22,7 +22,7 @@ control '1_9' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Customer
     Secret Keys in the lower left-hand corner of the page. Delete any Access Keys with a date
@@ -74,4 +74,8 @@ control '1_9' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+
+  describe 'Ensure user customer secret keys rotate every 90 days' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

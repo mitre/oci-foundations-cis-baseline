@@ -29,14 +29,14 @@ control '1_2' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI console. Go to Identity -> Policies , In the compartment
-    
+
     dropdown, choose the root compartment. Open each policy to view the policy statements.
     Remove any policy statement that allows any group other than Administrators or any service
     access to manage all resources in the tenancy. From CLI: The policies can also be updated
     via OCI CLI, SDK and API, with an example of the CLI commands below: Delete a policy via
     the CLI: oci iam policy delete --policy-id <policy-ocid> Update a policy via the CLI: oci
     iam policy update --policy-id <policy-ocid> --statements <json-array-of-statements> Note:
-    
+
     You should generally not delete the policy that allows the Administrators group the
     ability to manage all resources in the tenancy.
   FIX
@@ -70,4 +70,14 @@ control '1_2' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+  cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i 'to manage all-resources in tenancy'"
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure permissions on all resources are given only to the tenancy administrator group' do
+    subject { output.to_s }
+    it { should match(/allow group administrators to manage all-resources in tenancy/i) }
+  end
 end

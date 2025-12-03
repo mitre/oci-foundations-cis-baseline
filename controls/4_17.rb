@@ -10,7 +10,7 @@ control '4_17' do
 
   desc 'check', <<~CHECK
     From Console: Log into the OCI console. Select Storage from the Services, and click on
-    
+
     Buckets . Click on the individual Bucket under the Name heading. Click Logs from the
     Resource menu on the left. Click on the slider under Enable Log in row labeled Write
     Access Events . Select the Compartment. Select the Log Group. Enter a Log Name . Select a
@@ -25,7 +25,7 @@ control '4_17' do
 
   desc 'fix', <<~FIX
     From Console: First, if a log group for holding these logs has not already been created,
-    
+
     create a log group by the following steps: Go to the Log Groups page Click the Create Log
     Groups button in the middle of the screen. Select the relevant compartment to place these
     logs. Type a name for the log group in the Name box. Add an optional description in the
@@ -41,7 +41,7 @@ control '4_17' do
     logging log-group create --compartment-id <compartment-id> --display-name "<display-name>"
     --description "<description>" The output of the command gives you a work request id. You
     can query the work request to see the status of the job by issuing the following command:
-    
+
     oci logging work-request get --work-request-id <work-request-id> Look for status filed to
     be SUCCEEDED . Second, enable Object Storage write log logging for your bucket(s) by the
     following steps: Get the Log group ID needed for creating the Log: oci logging log-group

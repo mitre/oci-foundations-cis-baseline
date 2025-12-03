@@ -12,7 +12,7 @@ control '1_10' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Ensure the date of the Auth Token under
@@ -21,7 +21,7 @@ control '1_10' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Delete any auth token with a date older
@@ -73,4 +73,8 @@ control '1_10' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+
+  describe 'Ensure user auth tokens rotate within 90 days or less' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

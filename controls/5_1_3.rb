@@ -14,7 +14,7 @@ control '5_1_3' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Storage from the Services menu. Select Buckets
-    
+
     from under the Object Storage & Archive Storage section. Click on an individual bucket
     under the Name heading. Ensure that the Object Versioning is set to Enabled. Repeat for
     each compartment From CLI: Execute the following command: for region in $(oci iam
@@ -30,7 +30,7 @@ control '5_1_3' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each bucket in the returned results,
-    
+
     click the Bucket Display Name Click Edit next to Object Versioning: Disabled Click Enable
     Versioning From CLI: Follow the audit procedure For each of the buckets identified,
     execute the following command: oci os bucket update --bucket-name <bucket name>
@@ -46,4 +46,25 @@ control '5_1_3' do
   tag stig_id: '5.1.3'
   tag gtitle: '<GroupDescription></GroupDescription>'
   tag 'documentable'
+
+  cmd = <<~CMD
+    (
+      for region in $(oci iam region-subscription list --all | jq -r '.data[] | ."region-name"'); do
+        for compid in $(oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'); do
+          for bkt in $(oci os bucket list --compartment-id "$compid" --region "$region" 2>/dev/null | jq -r '.data[] | .name'); do
+            oci os bucket get --bucket-name "$bkt" --region "$region" 2>/dev/null |
+              jq -r 'select(.data.versioning == "Disabled") | .data.name'
+          done
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure Versioning is Enabled for Object Storage Buckets' do
+    subject { output }
+    it { should be_empty }
+  end
 end

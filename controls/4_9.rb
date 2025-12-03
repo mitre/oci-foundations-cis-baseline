@@ -12,7 +12,7 @@ control '4_9' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles Route Table
     Changes (if any) Click the Edit Rule button and verify that the RuleConditions section
     contains a condition for the Service Networking and Event Types: Route Table – Change
@@ -24,7 +24,7 @@ control '4_9' do
     a specific Event Rule based on the OCID of the rule. oci events rule get --rule-id
     <rule-id> In the JSON output locate the Conditions key value pair and verify that the
     following Conditions are present:
-    
+
     com.oraclecloud.virtualnetwork.changeroutetablecompartment
     com.oraclecloud.virtualnetwork.createroutetable
     com.oraclecloud.virtualnetwork.deleteroutetable
@@ -36,7 +36,7 @@ control '4_9' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Networking in the Service Name Drop-down
     and selecting Route Table – Change Compartment , Route Table – Create , Route Table -
@@ -49,7 +49,7 @@ control '4_9' do
     JSON file to be used when creating the Event Rule. Replace topic id, display name,
     description and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS",
     "isEnabled": true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.virtualnetwork.changeroutetablecompartment\",\"com.oraclecloud.virtualnetwork.createroutetable\",\"com.oraclecloud.virtualnetwork.deleteroutetable\",\"com.oraclecloud.virtualnetwork.updateroutetable\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

@@ -12,7 +12,7 @@ control '4_8' do
 
   desc 'check', <<~CHECK
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles VCN Changes (if
     any) Click the Edit Rule button and verify that the RuleConditions section contains a
     condition for the Service Networking and Event Types: VCN – Create , VCN - Delete and VCN
@@ -31,22 +31,22 @@ control '4_8' do
 
   desc 'fix', <<~FIX
     From Console: Go to the Events Service page: https://cloud.oracle.com/events/rules Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Networking in the Service Name Drop-down
     and selecting VCN – Create , VCN - Delete and VCN – Update In the Actions section select
     Notifications as Action Type Select the Compartment that hosts the Topic to be used.
     Select the Topic to be used Optionally add Tags to the Rule Click Create Rule From CLI:
-    
+
     Find the topic-id of the topic the Event Rule should use for sending Notifications by
     using the topic name and Compartment OCID oci ons topic list --compartment-id
     <compartment-ocid> --all --query "data
     [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.virtualnetwork.createvcn\",\"com.oraclecloud.virtualnetwork.deletevcn\",\"com.oraclecloud.virtualnetwork.updatevcn\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

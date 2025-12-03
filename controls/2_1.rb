@@ -10,7 +10,7 @@ control '2_1' do
 
   desc 'check', <<~CHECK
     From Console: Login to the OCI Console. Click the search bar at the top of the screen.
-    
+
     Type Advanced Resource Query and hit enter . Click the Advanced Resource Query button in
     the upper right corner of the screen. Enter the following query in the query box: query
     SecurityList resources where (IngressSecurityRules.source = '0.0.0.0/0' &&
@@ -38,13 +38,13 @@ control '2_1' do
     detector-recipe-detector-rule update --detector-recipe-id <insert detector recipe ocid>
     --detector-rule-id SECURITY_LISTS_OPEN_SOURCE --details '{"configurations":[{ "configKey"
     : "securityListsOpenSourceConfig", "name" : "Restricted Protocol:Ports List", "value" :
-    
+
     "TCP:[22], UDP:[22]", "dataType" : null, "values" : null }]}'
   CHECK
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each security list in the returned
-    
+
     results, click the security list name Either edit the ingress rule to be more restrictive,
     delete the ingress rule or click on the VCN and terminate the security list as
     appropriate. From CLI: Follow the audit procedure. For each of the security lists
@@ -101,7 +101,7 @@ control '2_1' do
 
   cmd = %q{oci search resource structured-search --query-text "query SecurityList resources where (IngressSecurityRules.source = '0.0.0.0/0' && IngressSecurityRules.protocol = 6 && IngressSecurityRules.tcpOptions.destinationPortRange.max >= 22 && IngressSecurityRules.tcpOptions.destinationPortRange.min <= 22)"}
   json_output = json(command: cmd)
-  output = json_output.params.dig('data','items')
+  output = json_output.params.dig('data', 'items')
 
   describe 'Ensure no security lists allow ingress from 0.0.0.0/0 to port 22' do
     subject { output }

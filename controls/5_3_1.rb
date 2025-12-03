@@ -15,14 +15,14 @@ control '5_3_1' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
-    
+
     Advanced Resource Query and click enter. Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query in the query box: query filesystem
     resources For each file storage system returned click on the link under Display name
     Ensure Encryption Key does not say Oracle-managed key Repeat for other subscribed regions
-    
+
     From CLI: Execute the following command: for region in `oci iam region list | jq -r
-    
+
     '.data[] | .name'`; do for fssid in `oci search resource structured-search --region
     $region --query-text "query filesystem resources" 2>/dev/null | jq -r '.data.items[] |
     .identifier'` do output=`oci fs file-system get --file-system-id $fssid --region $region
@@ -32,11 +32,11 @@ control '5_3_1' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each File Storage System in the
-    
+
     returned results, click the File System Storage Click Edit next to Encryption Key Select
     Encrypt using customer-managed keys Select the Vault Compartment and Vault Select the
     Master Encryption Key Compartment and Master Encryption key Click Save Changes From CLI:
-    
+
     Follow the audit procedure. For each File Storage System identified get its OCID. Execute
     the following command: oci bv volume-kms-key update –volume-id <volume OCID> --kms-key-id
     <kms key OCID>

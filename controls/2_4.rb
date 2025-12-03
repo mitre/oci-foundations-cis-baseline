@@ -10,7 +10,7 @@ control '2_4' do
 
   desc 'check', <<~CHECK
     From CLI: Issue the following command, it should not return anything. for region in $(oci
-    
+
     iam region-subscription list | jq -r '.data[] | ."region-name"') do echo "Enumerating
     region $region" for compid in $(oci iam compartment list --include-root
     --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id') do echo "Enumerating
@@ -36,21 +36,21 @@ control '2_4' do
     cloud-guard detector-recipe-detector-rule update --detector-recipe-id <insert detector
     recipe ocid> --detector-rule-id VCN_NSG_INGRESS_RULE_PORTS_CHECK --details
     '{"configurations":[ {"configKey" : "nsgIngressRuleDisallowedPortsConfig", "name" :
-    
+
     "Default disallowed ports", "value" : "TCP:[3389], UDP:[3389]", "dataType" : null,
     "values" : null }]}'
   CHECK
 
   desc 'fix', <<~FIX
     From CLI: Using the details returned from the audit procedure either: Remove the security
-    
+
     rules oci network nsg rules remove --nsg-id=<NSGID from audit output> or Update the
     security rules oci network nsg rules update --nsg-id=<NSGID from audit output>
     --security-rules=<updated security-rules JSON (without the isValid or TimeCreated fields)>
     eg: oci network nsg rules update
     --nsg-id=ocid1.networksecuritygroup.oc1.iad.xxxxxxxxxxxxxxxxxxxxxx --security-rules='[{
     "description": null, "destination": null, "destination-type": null, "direction":
-    
+
     "INGRESS", "icmp-options": null, "id": "709001", "is-stateless": null, "protocol": "6",
     "source": "140.238.154.0/24", "source-type": "CIDR_BLOCK", "tcp-options": {
     "destination-port-range": { "max": 3389, "min": 3389 }, "source-port-range": null },

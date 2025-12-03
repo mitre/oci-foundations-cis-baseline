@@ -13,7 +13,7 @@ control '2_8' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
-    
+
     Advanced Resource Query and hit enter. Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query in the query box: query
     autonomousdatabase resources For each ABD-S database returned click on the link under
@@ -31,7 +31,7 @@ control '2_8' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each ADB-S database in the returned
-    
+
     results, click the ADB-S database name Click Edit next to Access Control Rules Click
     +Another Rule and add rules as required Click Save Changes From CLI: Follow the audit
     procedure. Get the json input format by executing the following command: oci db

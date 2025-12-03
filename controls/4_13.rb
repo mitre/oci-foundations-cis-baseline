@@ -9,7 +9,7 @@ control '4_13' do
 
   desc 'check', <<~CHECK
     From Console (For Logging enabled Flow logs): Go to the Virtual Cloud Network (VCN) page (
-    
+
     https://cloud.oracle.com/networking/vcns ) Select the Compartment Click on the name of
     each VCN Click on each subnet within the VCN Under Resources click on Logs or the
     Monitoring tab Verify that there is a log enabled for the subnet Click the Log Name Verify
@@ -21,13 +21,13 @@ control '4_13' do
     page ( https://cloud.oracle.com/networking/network-command-center ) Click on Flow Logs
     Click on the Flow log Name Click Edit Verify Sampling rate is 100% Click Cancel Verify
     there is a in the Rules list that is: Enabled, Traffic disposition: All, Include/Exclude:
-    
+
     Include, Source CIDR: Any, Destination CIDR: Any, IP Protocol: All
   CHECK
 
   desc 'fix', <<~FIX
     From Console: First, if a Capture filter has not already been created, create a Capture
-    
+
     Filter by the following steps: Go to the Network Command Center page (
     https://cloud.oracle.com/networking/network-command-center ) Click 'Capture filters' Click
     'Create Capture filter' Type a name for the Capture filter in the Name box. Select 'Flow
@@ -107,4 +107,8 @@ control '4_13' do
     'SI-4 c 1',
     'SI-4 g'
   ]
+
+  describe 'Ensure VCN flow logging is enabled for all subnets' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

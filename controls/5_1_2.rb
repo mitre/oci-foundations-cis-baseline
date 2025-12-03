@@ -11,7 +11,7 @@ control '5_1_2' do
 
   desc 'check', <<~CHECK
     From Console: Go to https://cloud.oracle.com/object-storage/buckets Click on an individual
-    
+
     bucket under the Name heading. Ensure that the Encryption Key is not set to Oracle managed
     key . Repeat for each compartment From CLI: Execute the following command oci os bucket
     get --bucket-name <bucket-name> Ensure kms-key-id is not null Cloud Guard To Enable Cloud
@@ -31,7 +31,7 @@ control '5_1_2' do
 
   desc 'fix', <<~FIX
     From Console: Go to https://cloud.oracle.com/object-storage/buckets Click on an individual
-    
+
     bucket under the Name heading. Click Assign next to Encryption Key: Oracle managed key .
     Select a Vault Select a Master Encryption Key Click Assign From CLI: Execute the following
     command oci os bucket update --bucket-name <bucket-name> --kms-key-id

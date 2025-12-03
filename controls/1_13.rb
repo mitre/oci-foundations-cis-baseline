@@ -13,7 +13,7 @@ control '1_13' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Ensure a valid and
     current email address is next to Email and Recovery email.
@@ -21,7 +21,7 @@ control '1_13' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI Console. Select Identity & Security from the Services menu.
-    
+
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on each non-complaint user. Click on Edit User . Enter a valid and
     current email address in the Email and Recovery Email text boxes. Click Save Changes
@@ -60,4 +60,8 @@ control '1_13' do
     'RA-5 d',
     'RA-5 b 1'
   ]
+
+  describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

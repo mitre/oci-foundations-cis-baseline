@@ -24,7 +24,7 @@ control '1_15' do
 
   desc 'check', <<~CHECK
     From Console: Login to OCI console. Go to Identity -> Policies, In the compartment
-    
+
     dropdown, choose the compartment. Open each policy to view the policy statements. Verify
     the policies to ensure that the policy statements that grant access to storage
     service-level administrators have a condition that excludes access to delete the service
@@ -40,7 +40,7 @@ control '1_15' do
 
   desc 'fix', <<~FIX
     From Console: Login to OCI console. Go to Identity -> Policies, In the compartment
-    
+
     dropdown, choose the compartment. Open each policy to view the policy statements. Add the
     appropriate where condition to any policy statement that allows the storage service-level
     to manage the storage service.

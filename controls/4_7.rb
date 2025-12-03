@@ -12,7 +12,7 @@ control '4_7' do
 
   desc 'check', <<~CHECK
     From Console: Using the search box to navigate to events Navigate to the rules page Select
-    
+
     the Compartment that hosts the rules Find and click the Rule that handles IAM User Changes
     Click the Edit Rule button and verify that the Rule Conditions section contains a
     condition for the Service Identity and Event Types: User – Create , User – Delete , User –
@@ -35,7 +35,7 @@ control '4_7' do
 
   desc 'fix', <<~FIX
     From Console: Using the search box to navigate to events Navigate to the rules page Select
-    
+
     the compartment that should host the rule Click Create Rule Provide a Display Name and
     Description Create a Rule Condition by selecting Identity in the Service Name Drop-down
     and selecting: User – Create , User – Delete , User – Update , User Capabilities – Update
@@ -47,9 +47,9 @@ control '4_7' do
     [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
-    
+
     true, "topicId": "<topic-id>" }] }, "condition":
-    
+
     "{\"eventType\":[\"com.oraclecloud.identitycontrolplane.createuser\",\"com.oraclecloud.identitycontrolplane.deleteuser\",\"com.oraclecloud.identitycontrolplane.updateuser\",\"com.oraclecloud.identitycontrolplane.updateusercapabilities\",\"com.oraclecloud.identitycontrolplane.updateuserstate\"],\"data\":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule

@@ -14,13 +14,13 @@ control '2_7' do
 
   desc 'check', <<~CHECK
     From Console: 1 Login into the OCI Console 2. Click in the search bar, top of the screen.
-    
+
     3. Type Advanced Resource Query and hit enter. 4. Click the Advanced Resource Query button
     in the upper right of the screen. 5. Enter the following query in the query box: query
     analyticsinstance resources For each OAC Instance returned click on the link under Display
     name . Ensure Access Control Rules IP Address/CIDR Block as well as Virtual Cloud Networks
     are correct. Repeat for other subscribed regions. From CLI: Execute the following command:
-    
+
     for region in `oci iam region list | jq -r '.data[] | .name'`; do for compid in `oci iam
     compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'` do
     output=`oci analytics analytics-instance list --compartment-id $compid --region $region
@@ -31,7 +31,7 @@ control '2_7' do
 
   desc 'fix', <<~FIX
     From Console: Follow the audit procedure above. For each OAC instance in the returned
-    
+
     results, click the OAC Instance name Click Edit next to Access Control Rules Click
     +Another Rule and add rules as required From CLI: Follow the audit procedure. Get the json
     input format by executing the below command: oci analytics analytics-instance

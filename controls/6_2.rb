@@ -11,12 +11,12 @@ control '6_2' do
 
   desc 'check', <<~CHECK
     From Console: Login into the OCI Console. Click in the search bar, top of the screen. Type
-    
+
     Advance Resource Query and hit enter . Click the Advanced Resource Query button in the
     upper right of the screen. Enter the following query into the query box: query VCN,
     instance, bootvolume, volume, filesystem, bucket, autonomousdatabase, database, dbsystem
     resources where compartmentId = '<tenancy-id>' Ensure query returns no results. From CLI:
-    
+
     Execute the following command: oci search resource structured-search --query-text "query
     VCN, instance, volume, bootvolume, filesystem, bucket, autonomousdatabase, database,
     dbsystem resources where compartmentId = '<tenancy-id>'" Ensure query return no results.
@@ -24,7 +24,7 @@ control '6_2' do
 
   desc 'fix', <<~FIX
     From Console: Follow audit procedure above. For each item in the returned results, click
-    
+
     the item name. Then select Move Resource or More Actions then Move Resource . Select a
     compartment that is not the root compartment in CHOOSE NEW COMPARTMENT . Click Move
     Resource . From CLI: Follow the audit procedure above. For each bucket item execute the
@@ -63,4 +63,15 @@ control '6_2' do
     'SA-12 (8)',
     'AC-8 b'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = "oci search resource structured-search --query-text \"query VCN, instance, volume, bootvolume, filesystem, bucket, autonomousdatabase, database, dbsystem resources where compartmentId = '#{tenancy_ocid}'\""
+  json_output = json(command: cmd)
+  output = json_output.params.dig('data', 'items')
+
+  describe 'Create at least one compartment in your tenancy to store cloud resources' do
+    subject { output }
+    it { should be_empty }
+  end
 end
