@@ -17,13 +17,13 @@ control '1_2' do
 
   desc 'check', <<~CHECK
     From CLI: Run OCI CLI command providing the root compartment OCID to get the list of
-    groups having access to manage all resources in your tenancy. 
-    
+    groups having access to manage all resources in your tenancy.#{' '}
+
     oci iam policy list --compartment-id <root_compartment_OCID> | grep -i "to manage all-resources in tenancy"
 
     Verify the results to ensure only the Administrators group has access to manage all
-    resources in tenancy. 
-    
+    resources in tenancy.#{' '}
+
     "Allow group Administrators to manage all-resources in tenancy"
   CHECK
 

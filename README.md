@@ -1,4 +1,5 @@
 # CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0
+
 This InSpec Profile was created to facilitate testing and auditing of `CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0`
 infrastructure and applications when validating compliancy with [Center for Internet Security (CIS) Benchmark](https://www.cisecurity.org/cis-benchmarks)
 requirements.
@@ -6,7 +7,6 @@ requirements.
 - Profile Version: **3.0.0.1.0**
 - Benchmark Date: **05 Nov 2025**
 - Benchmark Version: **Version 3.0.0 Release 1 (V3.0.0R1)**
-
 
 This profile was developed to reduce the time it takes to perform a security checks based upon the
 CIS Benchmark Guidance from the Center for Internet Security (CIS).
@@ -21,18 +21,20 @@ and Continuous Authority to Operate (cATO) processes.
 
 Table of Contents
 =================
+
 * [CIS Benchmark  Information](#benchmark-information)
-* [Getting Started](#getting-started)
-    * [Intended Usage](#intended-usage)
-    * [Tailoring to Your Environment](#tailoring-to-your-environment)
-    * [Testing the Profile Controls](#testing-the-profile-controls)
-* [Running the Profile](#running-the-profile)
-    * [Directly from Github](#directly-from-github)
-    * [Using a local Archive copy](#using-a-local-archive-copy)
-    * [Different Run Options](#different-run-options)
-* [Using Heimdall for Viewing Test Results](#using-heimdall-for-viewing-test-results)
+- [Getting Started](#getting-started)
+  - [Intended Usage](#intended-usage)
+  - [Tailoring to Your Environment](#tailoring-to-your-environment)
+  - [Testing the Profile Controls](#testing-the-profile-controls)
+- [Running the Profile](#running-the-profile)
+  - [Directly from Github](#directly-from-github)
+  - [Using a local Archive copy](#using-a-local-archive-copy)
+  - [Different Run Options](#different-run-options)
+- [Using Heimdall for Viewing Test Results](#using-heimdall-for-viewing-test-results)
 
 ## Benchmark Information
+
 The Center for Internet Security, Inc. (CIS®) creates and maintains a set of Critical Security Controls (CIS Controls) for applications, computer systems and networks
 connected to the Department of Defense (DoD). These guidelines are the primary security standards
 used by the DoD agencies. In addition to defining security guidelines, the CISs also stipulate
@@ -50,13 +52,16 @@ validation to the defined DoD requirements, the guidance can provide insight for
 to enhance their security posture and can be tailored easily for use in your organization.
 
 [top](#table-of-contents)
+
 ## Getting Started
+
 ### InSpec (CINC-auditor) setup
+
 For maximum flexibility/accessibility `cinc-auditor`, the open-source packaged binary version of Chef InSpec should be used,
 compiled by the CINC (CINC Is Not Chef) project in coordination with Chef using Chef's always-open-source InSpec source code.
 For more information see [CINC Home](https://cinc.sh/)
 
-It is intended and recommended that CINC-auditor and this profile executed from a __"runner"__ host
+It is intended and recommended that CINC-auditor and this profile executed from a **"runner"** host
 (such as a DevOps orchestration server, an administrative management system, or a developer's workstation/laptop)
 against the target. This can be any Unix/Linux/MacOS or Windows runner host, with access to the Internet.
 
@@ -64,16 +69,19 @@ against the target. This can be any Unix/Linux/MacOS or Windows runner host, wit
 > **For the best security of the runner, always install on the runner the latest version of CINC-auditor and any other supporting language components.**
 
 To install CINC-auditor on a UNIX/Linux/MacOS platform use the following command:
+
 ```bash
 curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-auditor
 ```
 
 To install CINC-auditor on a Windows platform (Powershell) use the following command:
+
 ```powershell
 . { iwr -useb https://omnitruck.cinc.sh/install.ps1 } | iex; install -project cinc-auditor
 ```
 
 To confirm successful install of cinc-auditor:
+
 ```
 cinc-auditor -v
 ```
@@ -81,7 +89,9 @@ cinc-auditor -v
 Latest versions and other installation options are available at [CINC Auditor](https://cinc.sh/start/auditor/) site.
 
 [top](#table-of-contents)
+
 ### Intended Usage
+
 1. The latest `released` version of the profile is intended for use in A&A testing, as well as
     providing formal results to Authorizing Officials and Identity and Access Management (IAM)s.
     Please use the `released` versions of the profile in these types of workflows.
@@ -91,7 +101,9 @@ Latest versions and other installation options are available at [CINC Auditor](h
     release of the profile, and _is not intended_ be used for formal and ongoing testing on systems.
 
 [top](#table-of-contents)
+
 ### Tailoring to Your Environment
+
 This profile uses InSpec Inputs to provide flexibility during testing. Inputs allow for
 customizing the behavior of Chef InSpec profiles.
 
@@ -105,18 +117,18 @@ modifying the `inspec.yml` file itself (see [Using Customized Inputs](#using-cus
 The following inputs are permitted to be configured in an inputs `.yml` file (often named inputs.yml)
 for the profile to run correctly on a specific environment, while still complying with the security
 guidance document intent. This is important to prevent confusion when test results are passed downstream
-to different stakeholders under the *security guidance name used by this profile repository*
+to different stakeholders under the _security guidance name used by this profile repository_
 
-For changes beyond the inputs cited in this section, users can create an *organizationally-named overlay repository*.
+For changes beyond the inputs cited in this section, users can create an _organizationally-named overlay repository_.
 For more information on developing overlays, reference the [MITRE SAF Training](https://mitre-saf-training.netlify.app/courses/beginner/10.html)
 
-#### Example of tailoring Inputs *While Still Complying* with the security guidance document for the profile:
+#### Example of tailoring Inputs _While Still Complying_ with the security guidance document for the profile
 
 ```yaml
   # This file specifies the attributes for the configurable controls
   # used by the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile.
 
-  #tenancy_id used by 1_5, 1_6
+  #tenancy_ocid used by 1_5, 1_6
   tenancy_ocid: [your tenancy id]
 
   #compartment ocid
@@ -142,6 +154,7 @@ For more information on developing overlays, reference the [MITRE SAF Training](
  They are declared (defined) and given a default value in the `inspec.yml` file.
 
 #### Using Customized Inputs
+
 Customized inputs may be used at the CLI by providing an input file or a flag at execution time.
 
 1. Using the `--input` flag
@@ -156,15 +169,19 @@ Customized inputs may be used at the CLI by providing an input file or a flag at
 > For additional information about `input` file examples reference the [MITRE SAF Training](https://mitre.github.io/saf-training/courses/beginner/06.html#input-file-example)
 
 Chef InSpec Resources:
+
 - [InSpec Profile Documentation](https://docs.chef.io/inspec/profiles/).
 - [InSpec Inputs](https://docs.chef.io/inspec/profiles/inputs/).
 - [inspec.yml](https://docs.chef.io/inspec/profiles/inspec_yml/).
 
-
 [top](#table-of-contents)
+
 ### Testing the Profile Controls
+
 The Gemfile provided contains all the necessary ruby dependencies for checking the profile controls.
+
 #### Requirements
+
 All action are conducted using `ruby` (gemstone/programming language). Currently `inspec`
 commands have been tested with ruby version 3.1.2. A higher version of ruby is not guaranteed to
 provide the expected results. Any modern distribution of Ruby comes with Bundler preinstalled by default.
@@ -173,6 +190,7 @@ Install ruby based on the OS being used, see [Installing Ruby](https://www.ruby-
 
 After installing `ruby` install the necessary dependencies by invoking the bundler command
 (must be in the same directory where the Gemfile is located):
+
 ```bash
 bundle install
 ```
@@ -180,6 +198,7 @@ bundle install
 #### Testing Commands
 
 Linting and validating controls:
+
 ```bash
   bundle exec rake [inspec or cinc-auditor]:check # Validate the InSpec Profile
   bundle exec rake lint                           # Run RuboCop Linter
@@ -188,14 +207,17 @@ Linting and validating controls:
 ```
 
 Ensure the controls are ready to be committed into the repo:
+
 ```bash
   bundle exec rake pre_commit_checks
 ```
 
-
 [top](#table-of-contents)
+
 ## Running the Profile
+
 ### Directly from Github
+
 This option is best used when network connectivity is available and policies permit
 access to the hosting repository.
 
@@ -208,7 +230,9 @@ bundle exec [inspec or cinc-auditor] exec https://github.com/mitre/cis-oracle-cl
 ```
 
 [top](#table-of-contents)
+
 ### Using a local Archive copy
+
 If your runner is not always expected to have direct access to the profile's hosted location,
 use the following steps to create an archive bundle of this overlay and all of its dependent tests:
 
@@ -246,12 +270,15 @@ bundle exec [inspec or cinc-auditor] exec <name of generated archive> --target w
 ```
 
 [top](#table-of-contents)
+
 ## Different Run Options
 
 [Full exec options](https://docs.chef.io/inspec/cli/#options-3)
 
 [top](#table-of-contents)
+
 ## Using Heimdall for Viewing Test Results
+
 The JSON results output file can be loaded into **[Heimdall-Lite](https://heimdall-lite.mitre.org/)**
 or **[Heimdall-Server](https://github.com/mitre/heimdall2)** for a user-interactive, graphical view of the profile scan results.
 
@@ -267,7 +294,9 @@ of Heimdall-Lite via the `saf view:heimdall` command.
 Additionally both Heimdall applications can be deployed via docker, kubernetes, or the installation packages.
 
 [top](#table-of-contents)
+
 ## Authors
+
 [Center for Internet Security (CIS)](https://www.cisecurity.org/)
 
 [MITRE Security Automation Framework Team](https://saf.mitre.org)
@@ -291,4 +320,5 @@ No other use other than that granted to the U. S. Government, or to those acting
 For further information, please contact The MITRE Corporation, Contracts Management Office, 7515 Colshire Drive, McLean, VA  22102-7539, (703) 983-6000.
 
 ## NOTICE
+
 [CIS Benchmarks are published by Center for Internet Security](https://www.cisecurity.org/cis-benchmarks)
