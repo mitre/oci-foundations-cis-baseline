@@ -89,4 +89,35 @@ control '4_2' do
     'AU-7 a',
     'AU-3 (1)'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = "oci iam compartment list --compartment-id '#{tenancy_ocid}' --compartment-id-in-subtree true --all"
+  compartments = json(command: cmd)
+
+  compartment_ids = compartments['data'].select { |field| field['lifecycle-state'] == 'ACTIVE' }.map { |field| field['id'] }
+
+  active_subs = []
+
+  compartment_ids.each do |compartment_id|
+    topics_cmd = "oci ons topic list --compartment-id '#{compartment_id}' --all"
+    topics = json(command: topics_cmd)
+    topic_data = topics['data'] || []
+    active_topics = topic_data.select { |field| field['lifecycle-state'] == 'ACTIVE' }
+
+    active_topics.each do |topic|
+      topic_id = topic['topic-id']
+      subs_cmd = "oci ons subscription list --compartment-id '#{compartment_id}' --topic-id '#{topic_id}' --all"
+      subs = json(command: subs_cmd)
+      subs_data = subs['data'] || []
+      topic_active_subs = subs_data.select { |field| field['lifecycle-state'] == 'ACTIVE' }
+
+      active_subs.concat(topic_active_subs) if topic_active_subs.any?
+    end
+  end
+
+  describe 'Create at least one notification topic and subscription to receive monitoring alerts' do
+    subject { active_subs }
+    it { should_not be_empty }
+  end
 end
