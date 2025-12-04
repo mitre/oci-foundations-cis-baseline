@@ -61,8 +61,8 @@ control '4_1' do
   ]
 
   tenancy_ocid = input('tenancy_ocid')
-  
-  cmd = "oci iam tag-default list --compartment-id='" + tenancy_ocid + "' --query=\"data[?\\\"lifecycle-state\\\"=='ACTIVE'].{\\\"name\\\":\\\"tag-definition-name\\\",\\\"value\\\":value}\""
+
+  cmd = "oci iam tag-default list --compartment-id='#{tenancy_ocid}' --query=\"data[?\\\"lifecycle-state\\\"=='ACTIVE'].{\\\"name\\\":\\\"tag-definition-name\\\",\\\"value\\\":value}\""
 
   json_output = json(command: cmd)
   output = json_output.params
