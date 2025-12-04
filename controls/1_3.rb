@@ -9,9 +9,9 @@ control '1_3' do
   DESC
 
   desc 'check', <<~CHECK
-    From CLI: Run the following OCI CLI commands providing the root_compartment_OCID oci iam
-
-    policy list --compartment-id <root_compartment_OCID> | grep -i " to use users in tenancy"
+    From CLI: Run the following OCI CLI commands providing the root_compartment_OCID 
+    
+    oci iam policy list --compartment-id <root_compartment_OCID> | grep -i " to use users in tenancy"
 
     oci iam policy list --compartment-id <root_compartment_OCID> | grep -i " to use groups in
     tenancy" 

@@ -112,4 +112,11 @@ control '1_1' do
     'AC-2 d 3',
     'AC-2 c'
   ]
+
+  oci iam group list --compartment-id <root_compartment_OCID> | grep name
+  oci iam policy list --compartment-id <root_compartment_OCID> | grep "in tenancy"
+  oci iam policy list --compartment-id <root_compartment_OCID> | grep "in compartment"
+  oci iam policy list --compartment-id <child_compartment_OCID> | grep "in compartment"
+
+
 end

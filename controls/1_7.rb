@@ -108,4 +108,26 @@ control '1_7' do
     'SI-2 a',
     'SI-2 d'
   ]
+
+  tenancy_ocid=`oci iam compartment list --raw-output --query
+    "data[?contains(\"compartment-id\",'.tenancy.')].\"compartment-id\" | [0]"` 
+    for id_domain_url in `oci iam domain list --compartment-id $tenancy_ocid --all | jq -r
+    '.data[] | .url'` 
+    do 
+      oci identity-domains users list --endpoint $id_domain_url 2>/dev/null | jq -r '.data.resources[] |
+    select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")'
+    2>/dev/null | jq -r '.ocid' 
+    
+    end
+    for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`; 
+      do 
+        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE --all 2>/dev/null | jq -r '.data[] | .id'` 
+          do 
+            for id_domain_url in `oci iam domain list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] | .url'` 
+              do 
+                oci identity-domains users list --endpoint id_domain_url 2>/dev/null | jq -r '.data.resources[] | 
+                select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")'2>/dev/null | jq -r '.ocid' 
+              end
+          end
+      end
 end

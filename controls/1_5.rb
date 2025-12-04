@@ -78,7 +78,7 @@ control '1_5' do
     'CM-9 a',
     'SC-7 a',
     'SC-7 c',
-    'SC- 7 b',
+    'SC-7 b',
     'AC-2 a',
     'AC-2 a',
     'AC-2 b',
@@ -89,9 +89,6 @@ control '1_5' do
     'IA-5 (8)'
   ]
 
-  describe 'Ensure IAM password policy expires passwords within 365 days' do
-    skip 'The check for this control needs to be done manually'
-  end
 
   # Get tenancy ID from OCI config file
   tenancy_id = input('tenancy_id')

@@ -117,7 +117,10 @@ For more information on developing overlays, reference the [MITRE SAF Training](
   # used by the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile.
 
   #tenancy_id used by 1_5, 1_6
-  tenancy_id: [your tenancy id]
+  tenancy_ocid: [your tenancy id]
+
+  #compartment ocid
+  compartment_ocid: [your compartment id]
 
   # Disable controls that are known to consistently have long run times
   disable_slow_controls: [true or false]
