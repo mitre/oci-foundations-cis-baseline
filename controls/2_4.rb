@@ -99,7 +99,7 @@ control '2_4' do
     'CM-7 a'
   ]
 
-    cmd = <<~CMD
+  cmd = <<~CMD
     (
       for region in $(oci iam region-subscription list | jq -r '.data[] |."region-name"')
       do
