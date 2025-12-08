@@ -86,4 +86,25 @@ control '2_6' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      do
+        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
+        do
+          output=`oci integration integration-instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |select(."network-endpoint-details"."network-endpoint-type" == null)'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
+    subject { output }
+    it { should be_empty }
+  end
 end

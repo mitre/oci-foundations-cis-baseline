@@ -72,4 +72,25 @@ control '5_3_1' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      do
+        for fssid in `oci search resource structured-search --region $region --query-text "query filesystem resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
+        do
+          output=`oci fs file-system get --file-system-id $fssid --region $region 2>/dev/null | jq -r '.data | select(."kms-key-id" == "").id'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure no network security groups allow ingress from 0.0.0.0/0 to port 22' do
+    subject { output }
+    it { should be_empty }
+  end
 end

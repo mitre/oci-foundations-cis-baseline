@@ -68,4 +68,43 @@ control '5_1_2' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartments = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  buckets_missing_cmk = []
+
+  regions.each do |region|
+    compartments.each do |compartment_id|
+      buckets_response = json(
+        command: %(oci os bucket list --compartment-id "#{compartment_id}" --region "#{region}" 2>/dev/null)
+      )
+      buckets = buckets_response.params.fetch('data', [])
+
+      buckets.each do |bucket|
+        bucket_name = bucket['name']
+        bucket_details = json(
+          command: %(oci os bucket get --bucket-name "#{bucket_name}" --region "#{region}" 2>/dev/null)
+        )
+        kms_key_id = bucket_details.params.dig('data', 'kms-key-id')
+
+        next unless kms_key_id.to_s.strip.empty?
+
+        buckets_missing_cmk << {
+          'name' => bucket_name,
+          'region' => region
+        }
+      end
+    end
+  end
+
+  describe 'Ensure Object Storage Buckets are encrypted with a Customer Managed Key (CMK)' do
+    subject { buckets_missing_cmk }
+    it { should be_empty }
+  end
 end

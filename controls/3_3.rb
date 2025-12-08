@@ -68,4 +68,25 @@ control '3_3' do
     'CM-6 b',
     'CM-9 a'
   ]
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
+      do
+        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
+        do
+          output=`oci compute instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] | select(."launch-options"."is-pv-encryption-in-transit-enabled" == false )'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure In-transit Encryption is enabled on Compute Instance' do
+    subject { output }
+    it { should be_empty }
+  end
 end

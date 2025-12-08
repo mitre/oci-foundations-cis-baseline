@@ -98,4 +98,28 @@ control '2_4' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+    cmd = <<~CMD
+    (
+      for region in $(oci iam region-subscription list | jq -r '.data[] |."region-name"')
+      do
+        for compid in $(oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id')
+        do
+          for nsgid in $(oci network nsg list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] | .id')
+          do
+            output=$(oci network nsg rules list --nsg-id=$nsgid --all2>/dev/null | jq -r '.data[] | select(.source == "0.0.0.0/0" and .direction== "INGRESS" and ((."tcp-options"."destination-port-range".max >= 3389 and."tcp-options"."destination-port-range".min <= 3389) or ."tcp-options"."destination-port-range" == null))')
+            if [ ! -z "$output" ]; then echo "NSGID: ", $nsgid, "SecurityRules: ", $output; fi
+          done
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure no network security groups allow ingress from 0.0.0.0/0 to port 3389' do
+    subject { output }
+    it { should be_empty }
+  end
 end
