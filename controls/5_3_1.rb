@@ -89,7 +89,7 @@ control '5_3_1' do
   json_output = json(command: cmd)
   output = json_output.params
 
-  describe 'Ensure no network security groups allow ingress from 0.0.0.0/0 to port 22' do
+  describe 'Ensure File Storage Systems are encrypted with Customer Managed Keys (CMK)' do
     subject { output }
     it { should be_empty }
   end

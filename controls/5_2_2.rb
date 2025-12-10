@@ -69,4 +69,25 @@ control '5_2_2' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      do
+        for bvid in `oci search resource structured-search --region $region --query-text "query bootvolume resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
+        do
+          output=`oci bv boot-volume get --boot-volume-id $bvid 2>/dev/null| jq -r '.data | select(."kms-key-id" == null).id'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure boot volumes are encrypted with Customer Managed Key (CMK)' do
+    subject { output }
+    it { should be_empty }
+  end
 end

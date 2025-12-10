@@ -96,4 +96,15 @@ control '4_14' do
     'AU-7 a',
     'AU-3 (1)'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = "oci cloud-guard configuration get --compartment-id '#{tenancy_ocid}'"
+  json_output = json(command: cmd)
+  cloud_guard_status = json_output.params.dig('data', 'status')
+
+  describe 'Ensure Cloud Guard is enabled in the root compartment of the tenancy' do
+    subject { cloud_guard_status }
+    it { should cmp 'ENABLED' }
+  end
 end

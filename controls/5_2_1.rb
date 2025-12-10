@@ -19,18 +19,19 @@ control '5_2_1' do
   desc 'check', <<~CHECK
     From Console: Login to the OCI Console. Click the search bar at the top of the screen.
 
-    Type 'Advanced Resource Query' and press return. Click Advanced resource query . Enter the
+    Type 'Advanced Resource Query' and press return. Click Advanced resource query. Enter the
     following query in the query box: query volume resources For each block volume returned,
-    click the link under Display name . Ensure the value for Encryption Key is not
-    Oracle-managed key . Repeat for other subscribed regions. From CLI: Execute the following
-    command: for region in $(oci iam region-subscription list --all| jq -r '.data[] |
-    ."region-name"') do echo "Enumerating region: $region" for compid in `oci iam compartment
-    list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'` do echo
-    "Enumerating compartment: $compid" for bvid in `oci bv volume list --compartment-id
-    $compid --region $region 2>/dev/null | jq -r '.data[] | select(."kms-key-id" == null).id'`
-    do output=`oci bv volume get --volume-id $bvid --region $region
-    --query=data.{"name:\"display-name\","id:id""} --output table 2>/dev/null` if [ ! -z
-    "$output" ]; then echo $output; fi done done done Ensure the query returns no results.
+    click the link under Display name. Ensure the value for Encryption Key is not
+    Oracle-managed key. Repeat for other subscribed regions.
+
+    From CLI: Execute the following command:
+    for region in $(oci iam region-subscription list --all | jq -r '.data[] | ."region-name"'); do
+      for volid in $(oci search resource structured-search --region $region --query-text "query volume resources" --limit 1000 2>/dev/null | jq -r '.data.items[]?.identifier'); do
+        oci bv volume get --volume-id $volid --region $region 2>/dev/null |
+          jq -r '.data | select(."kms-key-id" == null and ."lifecycle-state" != "TERMINATED") | .id'
+      done
+    done
+    Ensure the query returns no results.
   CHECK
 
   desc 'fix', <<~FIX
@@ -39,8 +40,8 @@ control '5_2_1' do
     link under Display name. If the value for Encryption Key is Oracle-managed key , click
     Assign next to Oracle-managed key . Select a Vault Compartment and Vault . Select a Master
     Encryption Key Compartment and Master Encryption key . Click Assign . From CLI: Follow the
-    audit procedure. For each boot volume identified, get the OCID. Execute the following
-    command: oci bv volume-kms-key update –volume-id <volume OCID> --kms-key-id <kms key OCID>
+    audit procedure. For each block volume identified, get the OCID. Execute the following
+    command: oci bv volume-kms-key update --volume-id <volume OCID> --kms-key-id <kms key OCID>
   FIX
 
   desc 'potential_impacts', <<~POTENTIAL_IMPACTS
@@ -73,4 +74,39 @@ control '5_2_1' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  # regions_response = json(command: 'oci iam region-subscription list --all')
+  # regions_data = regions_response.params.fetch('data', [])
+  # regions = regions_data.map { |region| region['region-name'] }.compact
+
+  # volumes_missing_cmk = []
+
+  # regions.each do |region|
+  #   search_cmd = %(oci search resource structured-search --region "#{region}" --query-text "query volume resources" --limit 1000 2>/dev/null)
+  #   search_response = json(command: search_cmd)
+  #   volume_ids = search_response.params.fetch('data', {}).fetch('items', []).map { |item| item['identifier'] }.compact
+
+  #   volume_ids.each do |volume_id|
+  #     volume_details = json(command: %(oci bv volume get --volume-id "#{volume_id}" --region "#{region}" 2>/dev/null))
+  #     volume_data = volume_details.params.fetch('data', {})
+
+  #     next if volume_data.empty?
+  #     puts volume_data
+  #     lifecycle_state = volume_data['lifecycle-state']
+  #     kms_key_id = volume_data['kms-key-id']
+
+  #     next if lifecycle_state.to_s.casecmp('TERMINATED').zero?
+  #     next unless kms_key_id.to_s.empty?
+
+  #     volumes_missing_cmk << {
+  #       'display-name' => volume_data['display-name'],
+  #       'region' => region
+  #     }.compact
+  #   end
+  # end
+
+  # describe 'Ensure Block Volumes are encrypted with Customer Managed Keys (CMK).' do
+  #   subject { volumes_missing_cmk }
+  #   it { should be_empty }
+  # end
 end

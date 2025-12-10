@@ -36,7 +36,7 @@ inputs:
   - name: detector_recipe_ocid
     description: ""
     type: string
-    value: "hello"
+    value: ""
 
   # 1.14
   - name: compartment_name
