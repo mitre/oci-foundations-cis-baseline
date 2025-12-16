@@ -62,32 +62,57 @@ inputs:
     type: string
     value: ""
   
-  # 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.15, 4.18
-  - name: display_name
-    description: ""
-    type: array
-    value: []
-
-  # 4.16
-  - name: topic_name
-    description: ""
-    type: array
-    value: []
-
-  # 4.16
-  - name: management_endpoint_url
-    description: ""
+  # 4.3
+  - name: identity_provider_notification_topic
+    description: "ONS topic that contains a rule that captures Identity Provider events"
     type: string
-    value: ""
 
-  # 4.17
-  - name: log_group_name
-    description: ""
-    type: array
-    value: []
+  # 4.4
+  - name: group_mapping_notification_topic
+    description: "ONS topic that contains a rule that captures security list events"
+    type: string
 
-  # 5.1.2
-  - name: bucket_name
-    description: ""
-    type: array
-    value: []
+  # 4.5
+  - name: iam_group_notification_topic
+    description: "ONS topic that contains a rule that IAM group events"
+    type: string
+
+  # 4.6
+  - name: iam_policy_notification_topic
+    description: "ONS topic that contains a rule that IAM policy events"
+    type: string
+
+  # 4.7
+  - name: user_notification_topic
+    description: "ONS topic that contains a rule that captures user events"
+    type: string
+
+  # 4.8
+  - name: vcn_list_notification_topic
+    description: "ONS topic that contains a rule that captures VCN list events"
+    type: string
+
+  # 4.9
+  - name: route_table_notification_topic
+    description: "ONS topic that contains a rule that captures route table events"
+    type: string
+
+  # 4.10
+  - name: security_list_notification_topic
+    description: "ONS topic that contains a rule that captures security list events"
+    type: string
+
+  # 4.11
+  - name: network_security_notification_topic
+    description: "ONS topic that contains a rule that captures network security events"
+    type: string
+
+  # 4.12
+  - name: network_gateway_notification_topic
+    description: "ONS topic that contains a rule that captures network gateway events"
+    type: string
+
+  # 4.15
+  - name: cloud_guard_notification_topic
+    description: "ONS topic that contains a rule that captures Cloud Guard events"
+    type: string
