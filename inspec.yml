@@ -66,53 +66,64 @@ inputs:
   - name: identity_provider_notification_topic
     description: "ONS topic that contains a rule that captures Identity Provider events"
     type: string
+    value: ""
 
   # 4.4
   - name: group_mapping_notification_topic
     description: "ONS topic that contains a rule that captures security list events"
     type: string
+    value: ""
 
   # 4.5
   - name: iam_group_notification_topic
     description: "ONS topic that contains a rule that IAM group events"
     type: string
+    value: ""
 
   # 4.6
   - name: iam_policy_notification_topic
     description: "ONS topic that contains a rule that IAM policy events"
     type: string
+    value: ""
 
   # 4.7
   - name: user_notification_topic
     description: "ONS topic that contains a rule that captures user events"
     type: string
+    value: ""
 
   # 4.8
   - name: vcn_list_notification_topic
     description: "ONS topic that contains a rule that captures VCN list events"
     type: string
+    value: ""
 
   # 4.9
   - name: route_table_notification_topic
     description: "ONS topic that contains a rule that captures route table events"
     type: string
+    value: ""
 
   # 4.10
   - name: security_list_notification_topic
     description: "ONS topic that contains a rule that captures security list events"
     type: string
+    value: ""
 
   # 4.11
   - name: network_security_notification_topic
     description: "ONS topic that contains a rule that captures network security events"
     type: string
+    value: ""
 
   # 4.12
   - name: network_gateway_notification_topic
     description: "ONS topic that contains a rule that captures network gateway events"
     type: string
+    value: ""
 
   # 4.15
   - name: cloud_guard_notification_topic
     description: "ONS topic that contains a rule that captures Cloud Guard events"
     type: string
+    value: ""
