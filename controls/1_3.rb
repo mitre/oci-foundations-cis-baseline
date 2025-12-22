@@ -13,8 +13,9 @@ control '1_3' do
 
     policy list --compartment-id <root_compartment_OCID> | grep -i " to use users in tenancy"
     oci iam policy list --compartment-id <root_compartment_OCID> | grep -i " to use groups in
-    tenancy" Verify the results to ensure that the policy statements that grant access to use
-    or manage users or groups in the tenancy have a condition that excludes access to
+    tenancy" Replace "use" with "manage" in the above commands to review manage statements as
+    well. Verify the results to ensure that the policy statements that grant access to use or
+    manage users or groups in the tenancy have a condition that excludes access to
     Administrators group or to users in the Administrators group.
   CHECK
 
@@ -81,15 +82,24 @@ control '1_3' do
     'SA-12 (8)'
   ]
 
-  
-tenancy_ocid = input('tenancy_ocid')
+  tenancy_ocid = input('tenancy_ocid')
 
-cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | jq -r '.data[] | select(.statements[] | contains(\"to use users in tenancy\") or contains(\"to use groups in tenancy\")) | .statements[] | select(contains(\"to use\"))'"
-policies_output = command(cmd)
-policies = policies_output.stdout
+  cmd_users = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i ' to use users in tenancy' | jq -nR '[inputs]'"
+  cmd_groups = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i ' to use groups in tenancy' | jq -nR '[inputs]'"
 
-describe 'Ensure IAM administrators cannot update tenancy Administrators group' do
-  subject { policies }
-  it { should match(/where target\.group\.name != ['"]?Administrators['"]?/i) }
-end
+  users_output = json(command: cmd_users)
+  users_params = users_output.params
+
+  groups_output = json(command: cmd_groups)
+  groups_params = groups_output.params
+
+  policy_statements = [users_params,groups_params].flatten.compact.map { |stmt| stmt.to_s.strip }.reject(&:empty?)
+
+  exclusion_regex = /where .*target\.group\.name\s*!=\s*['"]?Administrators['"]?/i
+  non_excluded_policies = policy_statements.reject { |policy| policy.match?(exclusion_regex) }
+
+  describe 'Ensure IAM administrators cannot update tenancy Administrators group' do
+    subject { non_excluded_policies }
+    it { should be_empty }
+  end
 end
