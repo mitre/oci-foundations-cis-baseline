@@ -23,9 +23,16 @@ control '1_4' do
   DESC
 
   desc 'check', <<~CHECK
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    your Domain to review is in Click on the Domain to review Click on Settings Click on
-    Password policy Click each Password policy in the domain Ensure Password length (minimum)
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/#{' '}
+    Select the Compartment your Domain to review is in#{' '}
+
+    Click on the Domain to review#{' '}
+
+    Click on Settings#{' '}
+
+    Click on Password policy#{' '}
+
+    Click each Password policy in the domain Ensure Password length (minimum)
     is greater than or equal to 14 Under The The following criteria apply to passwords
     section, ensure that the number given in Numeric (minimum) setting is 1 , or the Special
     (minimum) setting is 1 . The following criteria apply to passwords: 6. Ensure that 1 or
@@ -34,13 +41,21 @@ control '1_4' do
     tenancy. For more information about enabling Cloud Guard, please look at the instructions
     included in "Ensure Cloud Guard is enabled in the root compartment of the tenancy"
     Recommendation in the "Logging and Monitoring" section. From Console: Type Cloud Guard
-    into the Search box at the top of the Console. Click Cloud Guard from the “Services”
-    submenu. Click Detector Recipes in the Cloud Guard menu. Click OCI Configuration Detector
+    into the Search box at the top of the Console.#{' '}
+
+    Click Cloud Guard from the “Services”
+    submenu.#{' '}
+
+    Click Detector Recipes in the Cloud Guard menu.#{' '}
+
+    Click OCI Configuration Detector
     Recipe (Oracle Managed) under the Recipe Name column. Find Password policy does not meet
     complexity requirements in the Detector Rules column. Select the vertical ellipsis icon
     and chose Edit on the Password policy does not meet complexity requirements row. In the
     Edit Detector Rule window, find the Input Setting box and verify/change the Required
-    password length setting to 14. Click the Save button. From CLI: Update the Password policy
+    password length setting to 14.#{' '}
+
+    Click the Save button. From CLI: Update the Password policy
     does not meet complexity requirements Detector Rule in Cloud Guard to generate Problems if
     IAM password policy isn’t configured to enforce a password length of at least 14
     characters with the following command: oci cloud-guard detector-recipe-detector-rule

@@ -24,16 +24,23 @@ control '1_5' do
   DESC
 
   desc 'check', <<~CHECK
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    your Domain to review is in Click on the Domain to review Click on Settings Click on
-    Password policy Click each Password policy in the domain Ensure Expires after (days) is
-    less than or equal to 365 days
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
+    Select the Compartment your Domain to review is in.
+    Click on the Domain to review.
+    Click on Settings.
+    Click on Password policy.
+    Click each Password policy in the domain and ensure Expires after (days) is
+    less than or equal to 365 days.
   CHECK
 
   desc 'fix', <<~FIX
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on
-    Password policy to remediate Click Edit password rules Change Expires after (days) to 365
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
+    Select the Compartment the Domain to remediate is in.
+    Click on the Domain to remediate.
+    Click on Settings.
+    Click on Password policy to remediate.
+    Click Edit password rules.
+    Change Expires after (days) to 365.
   FIX
 
   impact 0.5
@@ -82,7 +89,76 @@ control '1_5' do
     'IA-5 (8)'
   ]
 
-  describe 'Ensure IAM password policy expires passwords within 365 days' do
-    skip 'The check for this control needs to be done manually'
+  # Get tenancy ID from OCI config file
+  # tenancy_ocid = input('tenancy_ocid')
+  
+  # # Get all domains in the tenancy
+  # domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
+  # domain_urls = `#{domains_cmd}`.strip.split("\n")
+
+  # all_policies = []
+  
+  # # Loop through each domain and get active password policies
+  # domain_urls.each do |domain_url|
+  #   cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
+  #   json_output = json(command: cmd)
+  #   policies_from_domain = json_output.params.dig('data', 'resources')
+  #   all_policies.concat(policies_from_domain) if policies_from_domain
+  # end
+
+  # # Prepare policies for testing
+  # policies = all_policies
+
+  # describe 'Ensure IAM password policy expires passwords within 365 days' do
+  #       subject { policies }
+  #       it { should be <= 365 }
+  # end
+
+
+
+#  domain_url = `oci iam domain list --compartment-id #{tenancy_ocid} --query "data[0].url" --raw-output`.strip
+
+#   cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
+#   json_output = json(command: cmd)
+#   policies = json_output.params.dig('data', 'resources')
+
+# describe 'Ensure IAM password policy expires passwords within 365 days' do
+#     subject { policies }
+#     it { should be <= 365 }
+#end
+
+
+ # Get tenancy ID from OCI config file
+  tenancy_ocid =input('tenancy_ocid')
+  
+  domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
+  domain_urls = `#{domains_cmd}`.strip.split("\n")
+
+  all_policies = []
+  
+  domain_urls.each do |domain_url|
+    cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
+    json_output = json(command: cmd)
+    policies_from_domain = json_output.params.dig('data', 'resources')
+    all_policies.concat(policies_from_domain) if policies_from_domain
   end
+
+  policies = all_policies
+
+  all_expiry = policies.map do |p|
+    next unless p.is_a?(Hash)
+    value = p['expires-after']/i || p['expires after']/i || p['expiresafter']/i
+    value.to_i if value
+  end.compact.max || 0
+
+  describe 'Ensure IAM password policy expires passwords within 365 days' do
+    subject { max_expiry }
+    it { should be <= 365 }
+  end
+
+
+
+
+
+
 end

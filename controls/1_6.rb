@@ -11,16 +11,27 @@ control '1_6' do
 
   desc 'check', <<~CHECK
     Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    your Domain to review is in Click on the Domain to review Click on Settings Click on
-    Password policy Click each Password policy in the domain Ensure Previous passwords
-    remembered is set 24 or greater
+    your Domain to review is in#{' '}
+
+    Click on the Domain to review#{' '}
+
+    Click on Settings#{' '}
+
+    Click on Password policy#{' '}
+
+    Click each Password policy in the domain Ensure Previous passwords remembered is set 24 or greater
   CHECK
 
   desc 'fix', <<~FIX
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
-    the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on
-    Password policy to remediate Click Edit password rules Update the number of remembered
-    passwords in Previous passwords remembered setting to 24 or greater.
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment the Domain to remediate is in#{' '}
+
+    Click on the Domain to remediate#{' '}
+
+    Click on Settings#{' '}
+
+    Click on Password policy to remediate#{' '}
+
+    Click Edit password rules Update the number of remembered passwords in Previous passwords remembered setting to 24 or greater.
   FIX
 
   impact 0.5
@@ -53,7 +64,20 @@ control '1_6' do
     'IA-5 (8)'
   ]
 
+  # Get tenancy ID from OCI config file
+  tenancy_ocid = input('tenancy_ocid')
+  domain_url = `oci iam domain list --compartment-id #{tenancy_ocid} --query "data[0].url" --raw-output`.strip
+  # cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all"
+  cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
+  json_output = json(command: cmd)
+  policies = json_output.params.dig('data', 'resources')
+
   describe 'Ensure IAM password policy prevents password reuse' do
-    skip 'The check for this control needs to be done manually'
+    policies.each do |policy|
+      describe "Password policy: #{policy['name']}" do
+        subject { policy['num-passwords-in-history'] }
+        it { should be >= 24 }
+      end
+    end
   end
 end
