@@ -88,8 +88,7 @@ control '1_5' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
-
-  tenancy_ocid =input('tenancy_ocid')
+ tenancy_ocid =input('tenancy_ocid')
   
   domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
   domain_urls = `#{domains_cmd}`.strip.split("\n")
@@ -114,5 +113,5 @@ control '1_5' do
   describe 'Ensure IAM password policy expires passwords within 365 days' do
     subject { max_expiry }
     it { should be <= 365 }
-  end
+  end 
 end
