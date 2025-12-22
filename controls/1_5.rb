@@ -81,33 +81,30 @@ control '1_5' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
-  # made updates and it still technically works but instead of iterating 
-  # through all domains it's just started testing the policies from the 
-  # other domain that it wasn't testing before and it takes forever to run
- tenancy_ocid =input('tenancy_ocid')
-  
-  domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
-  domain_urls = `#{domains_cmd}`.strip.split("\n")
 
-  all_policies = []
-  
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --query 'data[].url' --raw-output)
+  domain_urls = command(cmd).stdout.split("\n").map(&:strip).reject(&:empty?)
+  puts domain_urls
+
+  expires_after_values = []
+
   domain_urls.each do |domain_url|
-    cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
-    json_output = json(command: cmd)
-    policies_from_domain = json_output.params.dig('data', 'resources')
-    all_policies.concat(policies_from_domain) if policies_from_domain
+    policy_cmd = %(oci identity-domains password-policies list --endpoint "#{domain_url}" --all)
+    policies = json(command: policy_cmd).params.dig('data', 'resources') || []
+
+    policies.each do |policy|
+      value = policy['password-expires-after']
+      expires_after_values << (value.nil? ? nil : value.to_i)
+    end
   end
 
-  policies = all_policies
-
-  all_expiry = policies.map do |p|
-    next unless p.is_a?(Hash)
-    value = p['expires-after']/i || p['expires after']/i || p['expiresafter']/i
-    value.to_i if value
-  end.compact.max || 0
-
   describe 'Ensure IAM password policy expires passwords within 365 days' do
-    subject { max_expiry }
-    it { should be <= 365 }
-  end 
+    subject { expires_after_values }
+
+    it { should_not be_empty }
+    it { should_not include(nil) }
+    it { should all(be <= 365) }
+  end
 end

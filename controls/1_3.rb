@@ -93,7 +93,7 @@ control '1_3' do
   groups_output = json(command: cmd_groups)
   groups_params = groups_output.params
 
-  policy_statements = [users_params,groups_params].flatten.compact.map { |stmt| stmt.to_s.strip }.reject(&:empty?)
+  policy_statements = [users_params, groups_params].flatten.compact.map { |policy| policy.to_s.strip }.reject(&:empty?)
 
   exclusion_regex = /where .*target\.group\.name\s*!=\s*['"]?Administrators['"]?/i
   non_excluded_policies = policy_statements.reject { |policy| policy.match?(exclusion_regex) }
