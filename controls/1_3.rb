@@ -84,6 +84,7 @@ control '1_3' do
     'SA-12 (8)'
   ]
 
+  
 tenancy_ocid = input('tenancy_ocid')
 
 cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | jq -r '.data[] | select(.statements[] | contains(\"to use users in tenancy\") or contains(\"to use groups in tenancy\")) | .statements[] | select(contains(\"to use\"))'"

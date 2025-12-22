@@ -89,46 +89,6 @@ control '1_5' do
     'IA-5 (8)'
   ]
 
-  # Get tenancy ID from OCI config file
-  # tenancy_ocid = input('tenancy_ocid')
-  
-  # # Get all domains in the tenancy
-  # domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
-  # domain_urls = `#{domains_cmd}`.strip.split("\n")
-
-  # all_policies = []
-  
-  # # Loop through each domain and get active password policies
-  # domain_urls.each do |domain_url|
-  #   cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
-  #   json_output = json(command: cmd)
-  #   policies_from_domain = json_output.params.dig('data', 'resources')
-  #   all_policies.concat(policies_from_domain) if policies_from_domain
-  # end
-
-  # # Prepare policies for testing
-  # policies = all_policies
-
-  # describe 'Ensure IAM password policy expires passwords within 365 days' do
-  #       subject { policies }
-  #       it { should be <= 365 }
-  # end
-
-
-
-#  domain_url = `oci iam domain list --compartment-id #{tenancy_ocid} --query "data[0].url" --raw-output`.strip
-
-#   cmd = "oci identity-domains password-policies list --endpoint #{domain_url} --all | ruby -rjson -e 'data = JSON.parse(STDIN.read); resources = data.dig(\"data\", \"resources\").select { |r| r[\"priority\"] || r[\"id\"] == \"PasswordPolicy\" }; puts JSON.pretty_generate({\"data\" => {\"resources\" => resources}})'"
-#   json_output = json(command: cmd)
-#   policies = json_output.params.dig('data', 'resources')
-
-# describe 'Ensure IAM password policy expires passwords within 365 days' do
-#     subject { policies }
-#     it { should be <= 365 }
-#end
-
-
- # Get tenancy ID from OCI config file
   tenancy_ocid =input('tenancy_ocid')
   
   domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
@@ -155,10 +115,4 @@ control '1_5' do
     subject { max_expiry }
     it { should be <= 365 }
   end
-
-
-
-
-
-
 end
