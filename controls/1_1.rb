@@ -114,6 +114,7 @@ control '1_1' do
   ]
 
 
+  
 tenancy_ocid = input('tenancy_ocid')
 
 cmd_groups = "oci iam group list --compartment-id '#{tenancy_ocid}' | jq -r '.data[].name'"
