@@ -24,23 +24,16 @@ control '1_5' do
   DESC
 
   desc 'check', <<~CHECK
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
-    Select the Compartment your Domain to review is in.
-    Click on the Domain to review.
-    Click on Settings.
-    Click on Password policy.
-    Click each Password policy in the domain and ensure Expires after (days) is
-    less than or equal to 365 days.
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
+    your Domain to review is in Click on the Domain to review Click on Settings Click on
+    Password policy Click each Password policy in the domain Ensure Expires after (days) is
+    less than or equal to 365 days
   CHECK
 
   desc 'fix', <<~FIX
-    Go to Identity Domains: https://cloud.oracle.com/identity/domains/
-    Select the Compartment the Domain to remediate is in.
-    Click on the Domain to remediate.
-    Click on Settings.
-    Click on Password policy to remediate.
-    Click Edit password rules.
-    Change Expires after (days) to 365.
+    Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select the Compartment
+    the Domain to remediate is in Click on the Domain to remediate Click on Settings Click on
+    Password policy to remediate Click Edit password rules Change Expires after (days) to 365
   FIX
 
   impact 0.5

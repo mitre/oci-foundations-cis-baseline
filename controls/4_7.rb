@@ -91,4 +91,54 @@ control '4_7' do
     'CP-9 (d)',
     'SC-28'
   ]
+
+  required_rule_conditions = [
+    'com.oraclecloud.identitycontrolplane.createuser',
+    'com.oraclecloud.identitycontrolplane.deleteuser',
+    'com.oraclecloud.identitycontrolplane.updateuser',
+    'com.oraclecloud.identitycontrolplane.updateusercapabilities',
+    'com.oraclecloud.identitycontrolplane.updateuserstate'
+  ]
+
+  tenancy_ocid = input('tenancy_ocid')
+  user_notification_topic = input('user_notification_topic')
+
+  regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
+
+  findings = regions.each_with_object([]) do |region, missing|
+    rules = json(command: %(oci events rule list --compartment-id "#{tenancy_ocid}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
+
+    rule_present = rules.any? do |rule|
+      rule_details = json(command: %(oci events rule get --rule-id "#{rule['id']}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
+
+      next false unless rule_details['is-enabled']
+
+      condition_data = begin
+        json(content: rule_details['condition'].to_s).params
+      rescue StandardError
+        {}
+      end
+
+      event_types = condition_data['eventType']
+      next false unless (required_rule_conditions - event_types).empty?
+
+      actions = rule_details.dig('actions', 'actions') || []
+      actions.any? do |action|
+        next false unless action['action-type'] == 'ONS' && action['is-enabled']
+
+        topic_id = action['topic-id']
+        next false if topic_id.to_s.strip.empty?
+
+        topic = json(command: %(oci ons topic get --topic-id "#{topic_id}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
+        topic['name'] == user_notification_topic && topic['lifecycle-state'] == 'ACTIVE'
+      end
+    end
+
+    missing << { region: region, issue: 'Missing enabled user change notification rule(s)' } unless rule_present
+  end
+
+  describe 'Ensure a notification is configured for user changes' do
+    subject { findings }
+    it { should be_empty }
+  end
 end

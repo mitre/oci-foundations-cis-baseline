@@ -17,25 +17,15 @@ control '1_7' do
 
   desc 'check', <<~CHECK
     From Console: Go to Identity Domains: https://cloud.oracle.com/identity/domains/ Select
-    the Compartment your Domain to review is in 
-    
-    Click on the Domain to review 
-    
-    Click on Security 
-    
-    Click Sign-on policies 
-    
-    Select the sign-on policy to review Under the sign-on rules header, click the 
-    three dots on the rule with the highest priority. 
-    
-    Select Edit sign-on rule 
 
-    Verify that allow access is selected and prompt for an additional factor is
+    the Compartment your Domain to review is in Click on the Domain to review Click on
+    Security Click Sign-on policies Select the sign-on policy to review Under the sign-on
+    rules header, click the three dots on the rule with the highest priority. Select Edit
+    sign-on rule Verify that allow access is selected and prompt for an additional factor is
     enabled This requires users to enable MFA when they next login next however, to determine
-    users have enabled MFA use the below CLI. 
-    
-    From the CLI: This CLI command checks which users have enabled MFA for their accounts Execute the below: 
-    tenancy_ocid=`oci iam compartment list --raw-output --query
+    users have enabled MFA use the below CLI. From the CLI: This CLI command checks which
+    users have enabled MFA for their accounts Execute the below: tenancy_ocid=`oci iam
+    compartment list --raw-output --query
     "data[?contains(\"compartment-id\",'.tenancy.')].\"compartment-id\" | [0]"` for
     id_domain_url in `oci iam domain list --compartment-id $tenancy_ocid --all | jq -r
     '.data[] | .url'` do oci identity-domains users list --endpoint $id_domain_url 2>/dev/null
@@ -108,26 +98,4 @@ control '1_7' do
     'SI-2 a',
     'SI-2 d'
   ]
-
- # tenancy_ocid=`oci iam compartment list --raw-output --query
-#    "data[?contains(\"compartment-id\",'.tenancy.')].\"compartment-id\" | [0]"` 
-#    for id_domain_url in `oci iam domain list --compartment-id $tenancy_ocid --all | jq -r
-#    '.data[] | .url'` 
-#    do 
-      # oci identity-domains users list --endpoint $id_domain_url 2>/dev/null | jq -r '.data.resources[] |
-    # select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")'
-    # 2>/dev/null | jq -r '.ocid' 
-    
-    # end
-    # for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`; 
-    #   do 
-    #     for compid in `oci iam compartment list --compartment-id-in-subtree TRUE --all 2>/dev/null | jq -r '.data[] | .id'` 
-    #       do 
-    #         for id_domain_url in `oci iam domain list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] | .url'` 
-    #           do 
-    #             oci identity-domains users list --endpoint id_domain_url 2>/dev/null | jq -r '.data.resources[] | 
-    #             select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")'2>/dev/null | jq -r '.ocid' 
-    #           end
-    #       end
-    #   end
 end

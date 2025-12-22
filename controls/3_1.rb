@@ -73,4 +73,25 @@ control '3_1' do
     'CM-7 b',
     'CM-7 b'
   ]
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
+      do
+        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
+        do
+          output=`oci compute instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r'.data[]|select(."instance-options"."are-legacy-imds-endpoints-disabled" == false )'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure Compute Instance Legacy Metadata service endpoint is disabled' do
+    subject { output }
+    it { should be_empty }
+  end
 end
