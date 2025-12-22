@@ -83,4 +83,15 @@ control '1_3' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+tenancy_ocid = input('tenancy_ocid')
+
+cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | jq -r '.data[] | select(.statements[] | contains(\"to use users in tenancy\") or contains(\"to use groups in tenancy\")) | .statements[] | select(contains(\"to use\"))'"
+policies_output = command(cmd)
+policies = policies_output.stdout
+
+describe 'Ensure IAM administrators cannot update tenancy Administrators group' do
+  subject { policies }
+  it { should match(/where target\.group\.name != ['"]?Administrators['"]?/i) }
+end
 end

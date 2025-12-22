@@ -113,10 +113,19 @@ control '1_1' do
     'AC-2 c'
   ]
 
-  #oci iam group list --compartment-id <root_compartment_OCID> | grep name
-  #oci iam policy list --compartment-id <root_compartment_OCID> | grep "in tenancy"
-  #oci iam policy list --compartment-id <root_compartment_OCID> | grep "in compartment"
-  #oci iam policy list --compartment-id <child_compartment_OCID> | grep "in compartment"
 
+tenancy_ocid = input('tenancy_ocid')
 
+cmd_groups = "oci iam group list --compartment-id '#{tenancy_ocid}' | jq -r '.data[].name'"
+groups = command(cmd_groups).stdout
+
+cmd_policies = "oci iam policy list --compartment-id '#{tenancy_ocid}' | jq -r '.data[].statements[]' | grep -i 'manage.*-family in'"
+policies = command(cmd_policies).stdout
+
+describe 'Ensure service level admins are created to manage resources of particular service' do
+  it 'should have service-level admin groups and manage policies' do
+    expect(groups).to match(/admin/i)
+    expect(policies).to match(/manage.*(instance|volume|virtual-network|database|object)-family in (tenancy|compartment)/i)
+  end
+end
 end
