@@ -88,6 +88,9 @@ control '1_5' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
+  # made updates and it still technically works but instead of iterating 
+  # through all domains it's just started testing the policies from the 
+  # other domain that it wasn't testing before and it takes forever to run
  tenancy_ocid =input('tenancy_ocid')
   
   domains_cmd = "oci iam domain list --compartment-id #{tenancy_ocid} --query 'data[].url' --raw-output"
