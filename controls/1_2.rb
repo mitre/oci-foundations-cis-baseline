@@ -69,12 +69,21 @@ control '1_2' do
   ]
 
   tenancy_ocid = input('tenancy_ocid')
-  cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i 'to manage all-resources in tenancy'"
-  json_output = json(command: cmd)
-  output = json_output.params
+
+  cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i 'to manage all-resources in tenancy' | jq -nR '[inputs]'"
+
+  output = json(command: cmd)
+  policies = Array(output.params).map { |policy| policy.to_s.strip }.reject(&:empty?)
+  puts policies
+
+  admin_regex = /allow group administrators to manage all-resources in tenancy/i
+  admin_policies = policies.select { |policy| policy.match?(admin_regex) }
+  non_admin_policies = policies.reject { |policy| policy.match?(admin_regex) }
 
   describe 'Ensure permissions on all resources are given only to the tenancy administrator group' do
-    subject { output.to_s }
-    it { should match(/allow group administrators to manage all-resources in tenancy/i) }
+    it 'allows only Administrators to manage all resources' do
+      expect(admin_policies).not_to be_empty
+      expect(non_admin_policies).to be_empty
+    end
   end
 end

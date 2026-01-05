@@ -32,6 +32,18 @@ inputs:
     type: string
     value: ""
 
+  # 1.1
+  - name: tenancy_level_policy_statements
+    description: "A list of expected tenancy level policy statements"
+    type: array
+    value: []
+
+  # 1.1
+  - name: compartment_level_policy_statements
+    description: "A list of expected compartment level policy statements"
+    type: array
+    value: []
+
   # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
   - name: detector_recipe_ocid
     description: ""

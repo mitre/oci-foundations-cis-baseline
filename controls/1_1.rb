@@ -112,4 +112,59 @@ control '1_1' do
     'AC-2 d 3',
     'AC-2 c'
   ]
+
+  tenancy_ocid = input('tenancy_ocid')
+  tenancy_level_policy_statements = input('tenancy_level_policy_statements')
+  compartment_level_policy_statements = input('compartment_level_policy_statements')
+
+  tenancy_level_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .statements[]? | select(test("in tenancy"; "i"))]')
+  tenancy_level_policy_output = json(command: tenancy_level_cmd).params
+
+  compartment_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .statements[]? | select(test("in compartment"; "i"))]')
+  compartment_policy_output = json(command: compartment_cmd).params
+
+  tenancy_level_policy_statements_normalized = tenancy_level_policy_statements.map(&:downcase)
+  tenancy_level_policy_output_normalized = tenancy_level_policy_output.map(&:downcase)
+
+  tenancy_missing = tenancy_level_policy_statements.reject do |policy|
+    tenancy_level_policy_output_normalized.include?(policy.downcase)
+  end
+  tenancy_extra = tenancy_level_policy_output.reject do |policy|
+    tenancy_level_policy_statements_normalized.include?(policy.downcase)
+  end
+  tenancy_ok = tenancy_missing.empty? && tenancy_extra.empty?
+
+  tenancy_missing_lines = tenancy_missing.empty? ? '  - none' : tenancy_missing.map { |statement| "  - #{statement}" }.join("\n")
+  tenancy_extra_lines = tenancy_extra.empty? ? '  - none' : tenancy_extra.map { |statement| "  - #{statement}" }.join("\n")
+  tenancy_failure_details = ["Missing statements:\n#{tenancy_missing_lines}", "Extra statements:\n#{tenancy_extra_lines}"].join("\n")
+
+  compartment_level_policy_statements_normalized = compartment_level_policy_statements.map(&:downcase)
+  compartment_policy_output_normalized = compartment_policy_output.map(&:downcase)
+
+  compartment_missing = compartment_level_policy_statements.reject do |policy|
+    compartment_policy_output_normalized.include?(policy.downcase)
+  end
+  compartment_extra = compartment_policy_output.reject do |policy|
+    compartment_level_policy_statements_normalized.include?(policy.downcase)
+  end
+  compartment_ok = compartment_missing.empty? && compartment_extra.empty?
+
+  compartment_missing_lines = compartment_missing.empty? ? '  - none' : compartment_missing.map { |statement| "  - #{statement}" }.join("\n")
+  compartment_extra_lines = compartment_extra.empty? ? '  - none' : compartment_extra.map { |statement| "  - #{statement}" }.join("\n")
+  compartment_failure_details = [
+    "Missing statements:\n#{compartment_missing_lines}",
+    "Extra statements:\n#{compartment_extra_lines}"
+  ].join("\n")
+
+  describe 'Expected Tenancy level policy statements' do
+    it 'were found' do
+      expect(tenancy_ok).to eq(true), tenancy_failure_details
+    end
+  end
+
+  describe 'Expected Compartment level policy statements' do
+    it 'were found' do
+      expect(compartment_ok).to eq(true), compartment_failure_details
+    end
+  end
 end

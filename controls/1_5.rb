@@ -82,7 +82,30 @@ control '1_5' do
     'IA-5 (8)'
   ]
 
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
+  domain_urls = json(command: cmd).params || []
+
+  expires_after_values = []
+
+  domain_urls.each do |domain_url|
+    policy_cmd = %(oci identity-domains password-policies list --endpoint "#{domain_url}" --all)
+    policies = json(command: policy_cmd).params.dig('data', 'resources') || []
+
+    policies.each do |policy|
+      next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
+
+      value = policy['password-expires-after']
+      expires_after_values << (value.nil? ? nil : value.to_i)
+    end
+  end
+
   describe 'Ensure IAM password policy expires passwords within 365 days' do
-    skip 'The check for this control needs to be done manually'
+    subject { expires_after_values }
+
+    it { should_not be_empty }
+    it { should_not include(nil) }
+    it { should all(be <= 365) }
   end
 end
