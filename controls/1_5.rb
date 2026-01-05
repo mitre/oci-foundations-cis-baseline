@@ -84,9 +84,8 @@ control '1_5' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --query 'data[].url' --raw-output)
-  domain_urls = command(cmd).stdout.split("\n").map(&:strip).reject(&:empty?)
-  puts domain_urls
+  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
+  domain_urls = json(command: cmd).params || []
 
   expires_after_values = []
 
@@ -95,6 +94,8 @@ control '1_5' do
     policies = json(command: policy_cmd).params.dig('data', 'resources') || []
 
     policies.each do |policy|
+      next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
+
       value = policy['password-expires-after']
       expires_after_values << (value.nil? ? nil : value.to_i)
     end
