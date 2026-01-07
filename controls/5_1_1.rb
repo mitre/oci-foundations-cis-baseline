@@ -86,4 +86,28 @@ control '5_1_1' do
     subject { output }
     it { should be_empty }
   end
+
+  cloud_guard_check = input('cloud_guard_check')
+  detector_recipe_ocid = input('detector_recipe_ocid')
+
+  if cloud_guard_check
+    tenancy_ocid = input('tenancy_ocid')
+    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+    cloud_guard_status = cloud_guard.status
+    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK')
+  end
+
+  describe 'Cloud Guard' do
+    if cloud_guard_check
+      it 'is enabled' do
+        expect(cloud_guard_status).to cmp 'ENABLED'
+      end
+
+      it 'detector rule "Bucket is public" is enabled' do
+        expect(cloud_guard_rule_enabled).to cmp true
+      end
+    else
+      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
+    end
+  end
 end

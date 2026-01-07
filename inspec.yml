@@ -45,8 +45,14 @@ inputs:
     value: []
 
   # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
+  - name: cloud_guard_check
+    description: "Toggle Cloud Guard validation (set false to skip Cloud Guard-specific checks)"
+    type: boolean
+    value: true
+
+  # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
   - name: detector_recipe_ocid
-    description: ""
+    description: "OCID of the detector recipe named 'OCI Configuration Detector Recipe (Oracle Managed)'"
     type: string
     value: ""
 

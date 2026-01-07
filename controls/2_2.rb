@@ -110,4 +110,34 @@ control '2_2' do
     subject { output }
     it { should be_empty }
   end
+
+  cloud_guard_check = input('cloud_guard_check')
+  detector_recipe_ocid = input('detector_recipe_ocid')
+
+  if cloud_guard_check
+    tenancy_ocid = input('tenancy_ocid')
+    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+    cloud_guard_status = cloud_guard.status
+    cloud_guard_output = cloud_guard.detector_rule_value(rule_id: 'SECURITY_LISTS_OPEN_SOURCE', config_key: 'securityListsOpenSourceConfig')
+    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'SECURITY_LISTS_OPEN_SOURCE')
+  end
+
+  describe 'Cloud Guard' do
+    if cloud_guard_check
+      it 'is enabled' do
+        expect(cloud_guard_status).to cmp 'ENABLED'
+      end
+
+      it 'detector rule "VCN Security list allows traffic to non-public port from all sources (0.0.0.0/0)" is enabled' do
+        expect(cloud_guard_rule_enabled).to cmp true
+      end
+
+      it 'detector rule "VCN Security list allows traffic to non-public port from all sources (0.0.0.0/0)" includes TCP and UDP port 3389' do
+        expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'TCP', port: 3389)).to cmp true
+        expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'UDP', port: 3389)).to cmp true
+      end
+    else
+      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
+    end
+  end
 end
