@@ -65,7 +65,48 @@ control '2_5' do
     'CM-7 a'
   ]
 
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartments = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  security_list_findings = []
+
+  regions.each do |region|
+    compartments.each do |compartment_id|
+      vcns_response = json(
+        command: %(oci network vcn list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+      )
+      vcns = vcns_response.params.fetch('data', [])
+
+      vcns.each do |vcn|
+        security_list_id = vcn['default-security-list-id']
+        next if security_list_id.to_s.strip.empty?
+
+        security_list_check_cmd = %(
+          oci network security-list get --security-list-id "#{security_list_id}" --region "#{region}" |
+          jq '{ bad_ingress: [.data["ingress-security-rules"][]? | select(.source=="0.0.0.0/0")],
+                bad_egress:  [.data["egress-security-rules"][]? | select(.destination=="0.0.0.0/0" and (.protocol|ascii_downcase)=="all")] }'
+        )
+        security_list_check = json(command: security_list_check_cmd).params
+        bad_ingress = security_list_check['bad_ingress'] || []
+        bad_egress = security_list_check['bad_egress'] || []
+
+        next if bad_ingress.empty? && bad_egress.empty?
+
+        security_list_findings << {
+          'vcn_name' => vcn['display-name'],
+          'region' => region
+        }
+      end
+    end
+  end
+
   describe 'Ensure the default security list of every VCN restricts all traffic except ICMP within VCN' do
-    skip 'The check for this control needs to be done manually'
+    subject { security_list_findings }
+    it { should be_empty }
   end
 end
