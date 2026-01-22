@@ -96,6 +96,7 @@ control '1_8' do
   now = Time.now.utc
   cutoff_time = now - (90 * 24 * 60 * 60)
   stale_api_keys = []
+  total_api_keys = 0
   domain_urls.uniq!
 
   domain_urls.each do |domain_url|
@@ -112,6 +113,7 @@ control '1_8' do
       api_keys_cmd = %(oci identity-domains api-keys list --endpoint "#{domain_url}" --all --filter 'user.ocid eq "#{user_ocid}"')
       api_keys_response = json(command: api_keys_cmd).params
       api_keys = api_keys_response.dig('data', 'resources') || []
+      total_api_keys += api_keys.length
 
       api_keys.each do |api_key|
         created_at = api_key.dig('meta', 'created')
@@ -134,10 +136,10 @@ control '1_8' do
     end
   end
 
-  if domain_urls.empty?
+  if total_api_keys.zero?
     impact 0.0
     describe 'Ensure user API keys rotate within 90 days' do
-      skip 'No identity domains found in tenancy.'
+      skip 'No API keys found in tenancy.'
     end
   else
     describe 'Ensure user API keys rotate within 90 days' do
