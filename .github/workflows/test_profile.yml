@@ -13,7 +13,7 @@ jobs:
     name: Validate my profile
     runs-on: ubuntu-latest
     env:
-      INPUTS_FILE: example.inputs.yml
+      INPUT_FILE: example.inputs.yml
       RESULTS_FILE: inspec_results.json
       THRESHOLD_FILE: example.threshold.yml
       HEIMDALL_URL: https://heimdall-demo.mitre.org
