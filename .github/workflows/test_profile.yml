@@ -21,7 +21,7 @@ jobs:
       OCI_CLI_TENANCY: ${{ secrets.SAF_OCI_CLI_TENANCY }}
       OCI_CLI_FINGERPRINT: ${{ secrets.SAF_OCI_CLI_FINGERPRINT }}
       OCI_CLI_KEY_CONTENT: ${{ secrets.SAF_OCI_CLI_KEY_CONTENT }}
-      OCI_CLI_REGION: ${{ env.SAF_OCI_CLI_REGION }}
+      OCI_CLI_REGION: ${{ vars.SAF_OCI_CLI_REGION }}
     steps:
       - name: add needed packages
         run: sudo apt-get install -y jq curl
