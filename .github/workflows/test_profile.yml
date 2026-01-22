@@ -1,0 +1,95 @@
+---
+name: CIS AWS Foundations v2.0.0
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+
+jobs:
+  my-job:
+    name: Validate my profile
+    runs-on: ubuntu-latest
+    env:
+      INPUTS_FILE: example.inputs.yml
+      RESULTS_FILE: inspec_results.json
+      THRESHOLD_FILE: example.threshold.yml
+      HEIMDALL_URL: https://heimdall-demo.mitre.org
+      OCI_CLI_USER: ${{ secrets.SAF_OCI_CLI_USER }}
+      OCI_CLI_TENANCY: ${{ secrets.SAF_OCI_CLI_TENANCY }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.SAF_OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.SAF_OCI_CLI_KEY_CONTENT }}
+      OCI_CLI_REGION: ${{ secrets.SAF_OCI_CLI_REGION }}
+    steps:
+      - name: add needed packages
+        run: sudo apt-get install -y jq curl
+
+      - name: Install OCI
+        run: |
+            curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Clone full repository so we can push
+        run: git fetch --prune --unshallow
+
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+
+      - name: Confirm git commit SHA output
+        run: echo ${{ env.COMMIT_SHORT_SHA }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.0"
+
+      - name: Disable ri and rdoc
+        run: 'echo "gem: --no-document" >> ~/.gemrc'
+
+      - name: Bundle Install
+        run: bundle install
+
+      - name: Installed Inspec
+        run: bundle exec inspec version
+
+      - name: Vendor the InSpec Profile
+        run: bundle exec inspec vendor --overwrite
+
+      - name: Lint the Inspec profile
+        run: bundle exec inspec check .
+
+      - name: Run the Profile
+        run: |
+          bundle exec inspec exec . \
+            --input-file=${{ env.INPUT_FILE }} 
+            --input tenancy_ocid=${{ secrets.SAF_OCI_TENANCY_OCID }} \
+            --input detector_recipe_ocid=${{ secrets.SAF_OCI_TENANCY_OCID }} \
+            --reporter cli json:${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} --enhanced-outcomes --filter-empty-profiles || true
+
+      - name: Save Test Result JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.workflow }}-${{ env.COMMIT_SHORT_SHA }}-results
+          path: |
+            ./${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }}
+
+      - name: Upload to Heimdall
+        run: |
+          curl -# -s -F data=@${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} -F "filename=${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE}}" -F "public=true" -F "evaluationTags=${{ env.COMMIT_SHORT_SHA }},${{ github.repository }},${{ github.workflow }}" -H "Authorization: Api-Key ${{ secrets.SAF_HEIMDALL_UPLOAD_KEY }}" "${{ env.SAF_HEIMDALL_URL }}/evaluations"
+
+      - name: Display our ${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} results summary
+        uses: mitre/saf_action@v1
+        with:
+          command_string: "view summary -i ${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }}"
+
+      - name: Ensure ${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} meets our results threshold
+        uses: mitre/saf_action@v1
+        with:
+          command_string: "validate threshold -i ${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} -F ${{ env.THRESHOLD_FILE }}"
