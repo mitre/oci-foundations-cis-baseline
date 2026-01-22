@@ -107,6 +107,49 @@ control '1_4' do
     'IA-5 (8)'
   ]
 
+  tenancy_ocid = input('tenancy_ocid')
+
+  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
+  domain_urls = json(command: cmd).params || []
+
+  min_length_values = []
+  min_numeric_values = []
+  min_special_values = []
+
+  domain_urls.each do |domain_url|
+    policy_cmd = %(oci identity-domains password-policies list --endpoint "#{domain_url}" --all)
+    policies = json(command: policy_cmd).params.dig('data', 'resources') || []
+
+    policies.each do |policy|
+      next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
+
+      length_value = policy.fetch('min-length', nil)
+      min_length_values << (length_value.nil? ? nil : length_value.to_i)
+
+      numeric_value = policy.fetch('min-numerals', nil)
+      min_numeric_values << (numeric_value.nil? ? nil : numeric_value.to_i)
+
+      special_value = policy.fetch('min-special-chars', nil)
+      min_special_values << (special_value.nil? ? nil : special_value.to_i)
+    end
+  end
+
+  describe 'Ensure IAM password policy requires at least 1 numeric or special character' do
+    it 'is enabled' do
+      per_policy_pass = min_numeric_values.zip(min_special_values).map do |min_numerals, min_special|
+        (min_numerals.to_i >= 1) || (min_special.to_i >= 1)
+      end
+      expect(per_policy_pass).to all(eq(true))
+    end
+  end
+
+  describe 'Ensure IAM password policy enforces a minimum password length of 14 characters' do
+    subject { min_length_values }
+    it { should_not be_empty }
+    it { should_not include(nil) }
+    it { should all(be >= 14) }
+  end
+
   cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')
 
