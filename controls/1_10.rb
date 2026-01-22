@@ -16,7 +16,7 @@ control '1_10' do
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Ensure the date of the Auth Token under
-    the Created column of the Customer Secret Key is no more than 90 days old.
+    the Created column of the Auth Token is no more than 90 days old.
   CHECK
 
   desc 'fix', <<~FIX
@@ -25,7 +25,7 @@ control '1_10' do
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Delete any auth token with a date older
-    than 90 days under the Created column of the Customer Secret Keys.
+    than 90 days under the Created column of the Auth Tokens.
   FIX
 
   impact 0.5
@@ -74,7 +74,72 @@ control '1_10' do
     'IA-5 (8)'
   ]
 
-  describe 'Ensure user auth tokens rotate within 90 days or less' do
-    skip 'The check for this control needs to be done manually'
+  require 'time'
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  domain_urls = []
+
+  compartment_ids.each do |compartment_id|
+    domains_response = json(command: %(oci iam domain list --compartment-id "#{compartment_id}" --all))
+    domains_data = domains_response.params.fetch('data', [])
+    domain_urls.concat(domains_data.map { |domain| domain['url'] }.compact)
+  end
+
+  now = Time.now.utc
+  cutoff_time = now - (90 * 24 * 60 * 60)
+  stale_auth_tokens = []
+  total_auth_tokens = 0
+  domain_urls.uniq!
+
+  domain_urls.each do |domain_url|
+    next if domain_url.to_s.empty?
+
+    users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all)
+    users_response = json(command: users_cmd).params
+    users = users_response.dig('data', 'resources') || []
+
+    users.each do |user|
+      user_ocid = user['ocid']
+      user_name = user['user-name']
+
+      auth_tokens_cmd = %(oci identity-domains auth-tokens list --endpoint "#{domain_url}" --all --filter 'user.ocid eq "#{user_ocid}"')
+      auth_tokens_response = json(command: auth_tokens_cmd).params
+      auth_tokens = auth_tokens_response.dig('data', 'resources') || []
+      total_auth_tokens += auth_tokens.length
+
+      auth_tokens.each do |auth_token|
+        created_at = auth_token.dig('meta', 'created')
+
+        token_details = {
+          'user_name' => user_name,
+          'domain_url' => domain_url,
+          'auth_token_id' => auth_token['ocid'],
+          'user_ocid' => user_ocid,
+          'created' => created_at
+        }
+
+        created_time = Time.parse(created_at.to_s).utc
+
+        next unless created_time < cutoff_time
+
+        age_days = ((now - created_time) / 86_400).floor
+        stale_auth_tokens << token_details.merge('age_days' => age_days)
+      end
+    end
+  end
+
+  if total_auth_tokens.zero?
+    impact 0.0
+    describe 'Ensure user auth tokens rotate within 90 days or less' do
+      skip 'No auth tokens found in tenancy.'
+    end
+  else
+    describe 'Ensure user auth tokens rotate within 90 days or less' do
+      subject { stale_auth_tokens }
+      it { should be_empty }
+    end
   end
 end
