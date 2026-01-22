@@ -74,7 +74,7 @@ control '1_9' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
-  
+
   require 'time'
 
   compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
@@ -117,7 +117,7 @@ control '1_9' do
         key_details = {
           'user_name' => user_name,
           'domain_url' => domain_url,
-          'customer_secret_key_id' => secret_key['ocid'],
+          'customer_secret_key_id' => secret_key['id'],
           'user_ocid' => user_ocid,
           'created' => created_at
         }
@@ -140,7 +140,7 @@ control '1_9' do
   else
     describe 'Ensure user customer secret keys rotate every 90 days' do
       subject { stale_customer_secret_keys }
-      it { should be_empty }
+      it { should cmp [] }
     end
   end
 end

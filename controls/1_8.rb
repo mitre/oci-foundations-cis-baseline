@@ -121,7 +121,7 @@ control '1_8' do
         key_details = {
           'user_name' => user_name,
           'domain_url' => domain_url,
-          'api_key_id' => api_key['ocid'],
+          'api_key_id' => api_key['id'],
           'user_ocid' => user_ocid,
           'created' => created_at
         }
@@ -144,7 +144,7 @@ control '1_8' do
   else
     describe 'Ensure user API keys rotate within 90 days' do
       subject { stale_api_keys }
-      it { should be_empty }
+      it { should cmp [] }
     end
   end
 end

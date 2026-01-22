@@ -116,7 +116,7 @@ control '1_10' do
         token_details = {
           'user_name' => user_name,
           'domain_url' => domain_url,
-          'auth_token_id' => auth_token['ocid'],
+          'auth_token_id' => auth_token['id'],
           'user_ocid' => user_ocid,
           'created' => created_at
         }
@@ -139,7 +139,7 @@ control '1_10' do
   else
     describe 'Ensure user auth tokens rotate within 90 days or less' do
       subject { stale_auth_tokens }
-      it { should be_empty }
+      it { should cmp [] }
     end
   end
 end
