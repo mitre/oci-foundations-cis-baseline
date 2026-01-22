@@ -3,4 +3,9 @@
 source 'https://rubygems.org'
 gem 'syslog'
 gem 'csv'
-gem 'inspec-bin'
+
+source 'https://rubygems.cinc.sh/' do
+  gem 'chef-config'
+  gem 'chef-utils'
+  gem 'cinc-auditor-bin'
+end
