@@ -57,17 +57,17 @@ jobs:
         run: bundle install
 
       - name: Installed Inspec
-        run: bundle exec cinc-auditor --version
+        run: bundle exec inspec --version
 
       - name: Vendor the InSpec Profile
-        run: bundle exec cinc-auditor vendor --overwrite
+        run: bundle exec inspec vendor --overwrite
 
       - name: Lint the Inspec profile
-        run: bundle exec cinc-auditor check .
+        run: bundle exec inspec check .
 
       - name: Run the Profile
         run: |
-          bundle exec cinc-auditor exec . \
+          bundle exec inspec exec . \
             --input-file=${{ env.INPUT_FILE }} \
             --input tenancy_ocid=${{ secrets.SAF_OCI_CLI_TENANCY }} \
             --input detector_recipe_ocid=${{ secrets.SAF_OCI_DETECTOR_RECIPE_OCID }} \
