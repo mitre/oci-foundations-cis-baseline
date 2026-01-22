@@ -106,7 +106,7 @@ control '1_4' do
     'IA-5 (1) (a)',
     'IA-5 (8)'
   ]
-
+  
 tenancy_ocid = input('tenancy_ocid')
 
   cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
