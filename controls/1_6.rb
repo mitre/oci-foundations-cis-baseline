@@ -53,9 +53,6 @@ control '1_6' do
     'IA-5 (8)'
   ]
 
-
-  #"num-passwords-in-history"
-
   tenancy_ocid = input('tenancy_ocid')
 
   cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
@@ -77,13 +74,8 @@ control '1_6' do
 
   describe 'Ensure IAM password policy prevents password reuse' do
     subject { history_values }
-
     it { should_not be_empty }
     it { should_not include(nil) }
     it { should all(be >= 24) }
   end
-
-  # describe 'Ensure IAM password policy prevents password reuse' do
-  #   skip 'The check for this control needs to be done manually'
-  # end
 end
