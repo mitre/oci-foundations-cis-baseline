@@ -1,4 +1,4 @@
-tenancy_ocid: # provide this one as a --input at cli or some other secret method
+tenancy_ocid: '' # provide this one as a --input at cli or some other secret method
 identity_provider_notification_topic: "saf-notification-topic-1"
 group_mapping_notification_topic: "saf-notification-topic-1"
 iam_group_notification_topic: "saf-notification-topic-1"
@@ -11,7 +11,7 @@ network_security_notification_topic: "saf-notification-topic-2"
 network_gateway_notification_topic: "saf-notification-topic-2"
 cloud_guard_notification_topic: "saf-notification-topic-2"
 cloud_guard_check: true
-detector_recipe_ocid: "" # provide this one as a --input at cli or some other secret method
+detector_recipe_ocid: '' # provide this one as a --input at cli or some other secret method
 tenancy_level_policy_statements: [
   "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
   "allow service cloudguard to read vaults in tenancy",
