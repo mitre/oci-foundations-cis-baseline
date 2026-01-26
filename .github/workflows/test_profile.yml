@@ -1,5 +1,5 @@
 ---
-name: CIS AWS Foundations v2.0.0
+name: CIS OCI Foundations v3.0.0
 
 on:
   push:
@@ -23,12 +23,12 @@ jobs:
       OCI_CLI_KEY_CONTENT: ${{ secrets.SAF_OCI_CLI_KEY_CONTENT }}
       OCI_CLI_REGION: ${{ vars.SAF_OCI_CLI_REGION }}
     steps:
-      - name: add needed packages
+      - name: Install needed packages
         run: sudo apt-get install -y jq curl
 
       - name: Install OCI
         run: |
-            curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
 
       - name: Check out repository
         uses: actions/checkout@v4
@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload to Heimdall
         run: |
-          curl -# -s -F data=@${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} -F "filename=${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE}}" -F "public=true" -F "evaluationTags=${{ env.COMMIT_SHORT_SHA }},${{ github.repository }},${{ github.workflow }}" -H "Authorization: Api-Key ${{ secrets.SAF_HEIMDALL_UPLOAD_KEY }}" "${{ env.SAF_HEIMDALL_URL }}/evaluations"
+          curl -# -s -F data=@${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} -F "filename=${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE}}" -F "public=true" -F "evaluationTags=${{ env.COMMIT_SHORT_SHA }},${{ github.repository }},${{ github.workflow }}" -H "Authorization: Api-Key ${{ secrets.SAF_HEIMDALL_UPLOAD_KEY }}" "${{ env.HEIMDALL_URL }}/evaluations"
 
       - name: Display our ${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} results summary
         uses: mitre/saf_action@v1
