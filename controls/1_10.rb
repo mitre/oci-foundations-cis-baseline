@@ -16,7 +16,7 @@ control '1_10' do
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Ensure the date of the Auth Token under
-    the Created column of the Auth Token is no more than 90 days old.
+    the Created column of the Customer Secret Key is no more than 90 days old.
   CHECK
 
   desc 'fix', <<~FIX
@@ -25,7 +25,7 @@ control '1_10' do
     Select Domains from the Identity menu. For each domain listed, click on the name and
     select Users . Click on an individual user under the Username heading. Click on Auth
     Tokens in the lower left-hand corner of the page. Delete any auth token with a date older
-    than 90 days under the Created column of the Auth Tokens.
+    than 90 days under the Created column of the Customer Secret Keys.
   FIX
 
   impact 0.5
