@@ -107,7 +107,7 @@ control '1_4' do
     'IA-5 (8)'
   ]
 
-tenancy_ocid = input('tenancy_ocid')
+  tenancy_ocid = input('tenancy_ocid')
 
   cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
   domain_urls = json(command: cmd).params || []
@@ -126,7 +126,7 @@ tenancy_ocid = input('tenancy_ocid')
       length_value = policy.fetch('min-length', nil)
       min_length_values << (length_value.nil? ? nil : length_value.to_i)
 
-      numeric_value = policy.fetch("min-numerals", nil)
+      numeric_value = policy.fetch('min-numerals', nil)
       min_numeric_values << (numeric_value.nil? ? nil : numeric_value.to_i)
 
       special_value = policy.fetch('min-special-chars', nil)
@@ -149,7 +149,6 @@ tenancy_ocid = input('tenancy_ocid')
     it { should_not include(nil) }
     it { should all(be >= 14) }
   end
-
 
   cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')

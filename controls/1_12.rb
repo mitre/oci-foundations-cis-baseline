@@ -64,7 +64,63 @@ control '1_12' do
     'AC-2 i 1'
   ]
 
-  describe 'Ensure API keys are not created for tenancy administrator users' do
-    skip 'The check for this control needs to be done manually'
+  tenancy_ocid = input('tenancy_ocid')
+
+  domains_response = json(command: %(oci iam domain list --compartment-id "#{tenancy_ocid}" --display-name "Default" --all))
+  domains_data = domains_response.params.fetch('data', [])
+  domain_urls = domains_data.map { |domain| domain['url'] }.compact
+
+  admins_with_api_keys = []
+  admin_user_count = 0
+  domain_urls.uniq!
+
+  domain_urls.each do |domain_url|
+    next if domain_url.to_s.empty?
+
+    groups_cmd = %(oci identity-domains groups list --endpoint "#{domain_url}" --all --filter 'displayName eq "Administrators"')
+    groups_response = json(command: groups_cmd).params
+    groups = groups_response.dig('data', 'resources') || []
+
+    groups.each do |group|
+      group_id = group['id']
+      next if group_id.to_s.empty?
+
+      users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all --filter 'groups.value eq "#{group_id}"')
+      users_response = json(command: users_cmd).params
+      users = users_response.dig('data', 'resources') || []
+
+      users.each do |user|
+        user_ocid = user['ocid']
+        user_name = user['user-name']
+        next if user_ocid.to_s.empty?
+
+        admin_user_count += 1
+
+        api_keys_cmd = %(oci identity-domains api-keys list --endpoint "#{domain_url}" --all --filter 'user.ocid eq "#{user_ocid}"')
+        api_keys_response = json(command: api_keys_cmd).params
+        api_keys = api_keys_response.dig('data', 'resources') || []
+
+        api_keys.each do |api_key|
+          admins_with_api_keys << {
+            'user_name' => user_name,
+            'user_ocid' => user_ocid,
+            'api_key_id' => api_key['id'],
+            'domain_url' => domain_url
+          }
+        end
+      end
+    end
+  end
+  
+  if admin_user_count.zero?
+    impact 0.0
+    describe 'Ensure API keys are not created for tenancy administrator users' do
+      skip 'No Administrators group members found in the Default identity domain.'
+    end
+  else
+    describe 'Ensure API keys are not created for tenancy administrator users' do
+      subject { admins_with_api_keys }
+      it { should cmp [] }
+    end
   end
 end
