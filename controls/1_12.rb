@@ -111,7 +111,7 @@ control '1_12' do
       end
     end
   end
-  
+
   if admin_user_count.zero?
     impact 0.0
     describe 'Ensure API keys are not created for tenancy administrator users' do

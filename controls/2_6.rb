@@ -89,9 +89,9 @@ control '2_6' do
 
   cmd = <<~CMD
     (
-      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      for region in `oci iam region-subscription list --all| jq -r '.data[] | ."region-name"'`;
       do
-        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
+        for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
         do
           output=`oci integration integration-instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |select(."network-endpoint-details"."network-endpoint-type" == null)'`
           if [ ! -z "$output" ]; then echo $output; fi

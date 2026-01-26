@@ -72,7 +72,7 @@ control '5_2_2' do
 
   cmd = <<~CMD
     (
-      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
       do
         for bvid in `oci search resource structured-search --region $region --query-text "query bootvolume resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
         do
