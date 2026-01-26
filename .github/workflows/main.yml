@@ -10,11 +10,11 @@ on:
 
 jobs:
   my-job:
-    name: Validate my profile
+    name: Validate Profile
     runs-on: ubuntu-latest
     env:
       INPUT_FILE: example.inputs.yml
-      RESULTS_FILE: inspec_results.json
+      RESULTS_FILE: oci_results.json
       THRESHOLD_FILE: example.threshold.yml
       HEIMDALL_URL: https://heimdall-demo.mitre.org
       OCI_CLI_USER: ${{ secrets.SAF_OCI_CLI_USER }}
