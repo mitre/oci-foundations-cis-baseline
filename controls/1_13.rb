@@ -92,8 +92,7 @@ control '1_13' do
       total_users += 1
 
       emails = user.dig('emails') || []
-
-      # Check for verified primary email and verified recovery email
+      
       has_verified_primary = emails.any? { |email| email['primary'] == true && email['verified'] == true }
       has_verified_recovery = emails.any? { |email| email['type'] == 'recovery' && email['verified'] == true }
 
