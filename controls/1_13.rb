@@ -61,7 +61,62 @@ control '1_13' do
     'RA-5 b 1'
   ]
 
-  describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
-    skip 'The check for this control needs to be done manually'
+
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  domain_urls = []
+
+  compartment_ids.each do |compartment_id|
+    domains_response = json(command: %(oci iam domain list --compartment-id "#{compartment_id}" --all))
+    domains_data = domains_response.params.fetch('data', [])
+    domain_urls.concat(domains_data.map { |domain| domain['url'] }.compact)
+  end
+
+  users_without_valid_emails = []
+  total_users = 0
+  domain_urls.uniq!
+
+  domain_urls.each do |domain_url|
+    next if domain_url.to_s.empty?
+
+    users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all)
+    users_response = json(command: users_cmd).params
+    users = users_response.dig('data', 'resources') || []
+
+    users.each do |user|
+      user_ocid = user['ocid']
+      user_name = user['user-name']
+      total_users += 1
+
+      emails = user.dig('emails') || []
+      
+      has_verified_primary = emails.any? { |email| email['primary'] == true && email['verified'] == true }
+      has_verified_recovery = emails.any? { |email| email['type'] == 'recovery' && email['verified'] == true }
+
+      unless !has_verified_primary && has_verified_recovery
+        users_without_valid_emails << {
+          'user_name' => user_name,
+          'user_ocid' => user_ocid,
+          'domain_url' => domain_url,
+          'has_verified_primary' => has_verified_primary,
+          'has_verified_recovery' => has_verified_recovery
+        }
+      end
+    end
+  end
+
+  if total_users.zero?
+    impact 0.0
+    describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
+      skip 'No users found in tenancy.'
+    end
+  else
+    describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
+      subject { users_without_valid_emails }
+      it { should cmp [] }
+    end
   end
 end
