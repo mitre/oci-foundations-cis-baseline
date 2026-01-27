@@ -75,7 +75,7 @@ control '5_3_1' do
 
   cmd = <<~CMD
     (
-      for region in `oci iam region list | jq -r '.data[] | .name'`;
+      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
       do
         for fssid in `oci search resource structured-search --region $region --query-text "query filesystem resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
         do
