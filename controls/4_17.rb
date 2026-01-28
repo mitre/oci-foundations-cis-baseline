@@ -93,4 +93,95 @@ control '4_17' do
     'AU-12 c',
     'AU-2 c'
   ]
+
+  regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
+  compartments = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null').params.fetch('data', []).map { |compartment| compartment['id'] }.compact
+
+  buckets = []
+  regions.each do |region|
+    compartments.each do |compartment_id|
+      buckets_response = json(
+        command: %(oci os bucket list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+      )
+      buckets_response.params.fetch('data', []).each do |bucket|
+        buckets << bucket.merge('region' => region, 'compartment-id' => compartment_id)
+      end
+    end
+  end
+
+  if buckets.empty?
+    impact 0.0
+    describe 'Ensure write level Object Storage logging is enabled for all buckets' do
+      skip 'No Object Storage buckets found in tenancy.'
+    end
+  else
+    logs_by_resource = Hash.new { |hash, key| hash[key] = [] }
+
+    regions.each do |region|
+      compartments.each do |compartment_id|
+        log_groups = json(
+          command: %(oci logging log-group list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+        ).params.fetch('data', [])
+
+        log_groups.each do |log_group|
+          log_group_id = log_group['id'].to_s
+          next if log_group_id.empty?
+
+          logs = json(
+            command: %(oci logging log list --log-group-id "#{log_group_id}" --log-type SERVICE --region "#{region}" --all 2>/dev/null)
+          ).params.fetch('data', [])
+
+          logs.each do |log|
+            source = log.dig('configuration', 'source') || {}
+            resource_name = source['resource'].to_s
+            next if resource_name.empty?
+
+            logs_by_resource["#{region}|#{resource_name}"] << log.merge('region' => region, 'log-group-id' => log_group_id)
+          end
+        end
+      end
+    end
+
+    findings = []
+
+    buckets.each do |bucket|
+      bucket_name = bucket['name'].to_s
+      bucket_region = bucket['region'].to_s
+      bucket_logs = logs_by_resource["#{bucket_region}|#{bucket_name}"]
+
+      enabled_logs = bucket_logs.select do |log|
+        log['lifecycle-state'] == 'ACTIVE' && log['is-enabled'] == true
+      end
+
+      compliant_log = enabled_logs.any? do |log|
+        puts log
+        source = log.dig('configuration', 'source') || {}
+        service = source['service'].to_s.strip.downcase
+        category = source['category'].to_s.strip.downcase
+        service == 'objectstorage' && category == 'write'
+      end
+
+      next if compliant_log
+
+      issue = if bucket_logs.empty?
+                'No log found for bucket'
+              elsif enabled_logs.empty?
+                'Log found but not enabled or active'
+              else
+                'No enabled write log found for bucket'
+              end
+
+      findings << {
+        'bucket_name' => bucket_name,
+        'region' => bucket_region,
+        'compartment_id' => bucket['compartment-id'],
+        'issue' => issue
+      }
+    end
+
+    describe 'Ensure write level Object Storage logging is enabled for all buckets' do
+      subject { findings }
+      it { should cmp [] }
+    end
+  end
 end
