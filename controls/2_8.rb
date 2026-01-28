@@ -106,7 +106,6 @@ control '2_8' do
       instances = instances_response.params.fetch('data', [])
 
       instances.each do |instance|
-        puts instance
         next if instance['is-dedicated']
 
         total_adb_instances += 1

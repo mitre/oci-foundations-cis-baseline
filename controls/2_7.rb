@@ -112,7 +112,6 @@ control '2_7' do
         total_oac_instances += 1
         endpoint_type = instance.dig('network-endpoint-details', 'network-endpoint-type')
         endpoint_type_normalized = endpoint_type.to_s.strip.downcase
-        puts endpoint_type_normalized
 
         next if allowed_network_endpoint_types.include?(endpoint_type_normalized)
 
