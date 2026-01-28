@@ -154,7 +154,6 @@ control '4_17' do
       end
 
       compliant_log = enabled_logs.any? do |log|
-        puts log
         source = log.dig('configuration', 'source') || {}
         service = source['service'].to_s.strip.downcase
         category = source['category'].to_s.strip.downcase
