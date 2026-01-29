@@ -74,7 +74,6 @@ control '1_2' do
 
   output = json(command: cmd)
   policies = Array(output.params).map { |policy| policy.to_s.strip }.reject(&:empty?)
-  puts policies
 
   admin_regex = /allow group administrators to manage all-resources in tenancy/i
   admin_policies = policies.select { |policy| policy.match?(admin_regex) }

@@ -61,3 +61,9 @@ inputs:
     description: "Allowed Oracle Analytics Cloud network endpoint types (e.g., PUBLIC, PRIVATE)"
     type: array
     value: ["PUBLIC"]
+
+  # 2.8
+  - name: allowed_adb_whitelisted_ips
+    description: "Allowed Autonomous Database shared whitelist IPs/CIDRs for public endpoints"
+    type: array
+    value: []

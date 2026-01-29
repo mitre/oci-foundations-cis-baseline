@@ -59,7 +59,7 @@ class ControlFormatter
     # Build formatted output
     @output_lines << "control '#{control_id}' do"
     @output_lines << "  title '#{escape_single_quotes(title)}'"
-    @output_lines << ""
+    @output_lines << ''
 
     add_desc_block('desc', desc) if desc
     add_desc_block('check', desc_check) if desc_check
@@ -67,11 +67,11 @@ class ControlFormatter
     add_desc_block('potential_impacts', desc_impacts) if desc_impacts
 
     @output_lines << "  impact #{impact}"
-    @output_lines << ""
+    @output_lines << ''
 
     add_tags(tags)
 
-    @output_lines << "end"
+    @output_lines << 'end'
   end
 
   def extract_quoted_value(regex)
@@ -113,8 +113,8 @@ class ControlFormatter
         tags[tag_line.gsub(/["']/, '')] = true
       elsif tag_line =~ /^(\w+):\s*(.+)$/
         # tag check_id: "C-1_1"
-        key = $1
-        value = $2.strip
+        key = ::Regexp.last_match(1)
+        value = ::Regexp.last_match(2).strip
 
         # Parse array or single value
         if value.start_with?('[')
@@ -134,21 +134,21 @@ class ControlFormatter
   def add_desc_block(type, content)
     return unless content
 
-    if type == 'desc'
-      @output_lines << "  desc <<~DESC"
-    else
-      @output_lines << "  desc '#{type}', <<~#{type.upcase}"
-    end
+    @output_lines << if type == 'desc'
+                       '  desc <<~DESC'
+                     else
+                       "  desc '#{type}', <<~#{type.upcase}"
+                     end
 
     wrapped_lines = wrap_text(content)
     wrapped_lines.each { |line| @output_lines << "    #{line}" }
 
-    if type == 'desc'
-      @output_lines << "  DESC"
-    else
-      @output_lines << "  #{type.upcase}"
-    end
-    @output_lines << ""
+    @output_lines << if type == 'desc'
+                       '  DESC'
+                     else
+                       "  #{type.upcase}"
+                     end
+    @output_lines << ''
   end
 
   def wrap_text(text)
@@ -156,7 +156,7 @@ class ControlFormatter
     text = text.gsub(/\s+/, ' ').strip
 
     lines = []
-    current_line = ""
+    current_line = ''
 
     text.split(' ').each do |word|
       test_line = current_line.empty? ? word : "#{current_line} #{word}"
@@ -177,11 +177,11 @@ class ControlFormatter
       formatted_lines << line
 
       # Add blank line after certain patterns
-      if line.match?(/:\s*$/) || # Ends with colon
-         line.match?(/^(From CLI|From Console|Note:|Example)/i) || # Section headers
-         (idx < lines.length - 1 && lines[idx + 1].match?(/^(From CLI|From Console|Note:|Example)/i))
-        formatted_lines << ""
-      end
+      next unless line.match?(/:\s*$/) || # Ends with colon
+                  line.match?(/^(From CLI|From Console|Note:|Example)/i) || # Section headers
+                  (idx < lines.length - 1 && lines[idx + 1].match?(/^(From CLI|From Console|Note:|Example)/i))
+
+      formatted_lines << ''
     end
 
     formatted_lines
@@ -207,6 +207,7 @@ class ControlFormatter
     tag_order = %w[check_id severity gid rid stig_id gtitle]
     tag_order.each do |key|
       next unless hash_tags[key]
+
       @output_lines << "  tag #{key}: '#{hash_tags[key]}'"
       hash_tags.delete(key)
     end
@@ -221,7 +222,7 @@ class ControlFormatter
       @output_lines << "  tag '#{tag}'"
     end
 
-    @output_lines << "" unless array_tags.empty?
+    @output_lines << '' unless array_tags.empty?
 
     # Add array tags
     array_tags.each do |key, values|
@@ -230,12 +231,12 @@ class ControlFormatter
         comma = idx < values.length - 1 ? ',' : ''
         @output_lines << "    '#{val}'#{comma}"
       end
-      @output_lines << "  ]"
-      @output_lines << "" # Blank line after each array tag
+      @output_lines << '  ]'
+      @output_lines << '' # Blank line after each array tag
     end
 
     # Remove trailing blank line if present
-    @output_lines.pop if @output_lines.last == ""
+    @output_lines.pop if @output_lines.last == ''
   end
 
   def escape_single_quotes(text)
@@ -243,10 +244,10 @@ class ControlFormatter
   end
 
   def write_output
-    File.write(@file_path, @output_lines.join("\n") + "\n")
+    File.write(@file_path, "#{@output_lines.join("\n")}\n")
     puts "✓ Formatted: #{@file_path}"
     true
-  rescue => e
+  rescue StandardError => e
     puts "✗ Error formatting #{@file_path}: #{e.message}"
     nil
   end
@@ -273,12 +274,12 @@ def format_files(path)
       end
     end
 
-    puts "\n" + "=" * 60
-    puts "Summary:"
+    puts "\n#{'=' * 60}"
+    puts 'Summary:'
     puts "  ✓ Formatted: #{formatted_count} files"
     puts "  ⊘ Skipped:   #{skipped_count} files (already formatted)"
     puts "  ✗ Errors:    #{error_count} files" if error_count > 0
-    puts "=" * 60
+    puts '=' * 60
   elsif File.file?(path)
     ControlFormatter.new(path).format
   else
