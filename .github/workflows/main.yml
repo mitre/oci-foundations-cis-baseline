@@ -46,6 +46,7 @@ jobs:
           region=$OCI_CLI_REGION
           key_file=~/.oci/oci_api_key.pem
           EOF
+          chmod 600 ~/.oci/config
 
       - name: Verify OCI CLI auth
         run: |
@@ -53,6 +54,7 @@ jobs:
           test -s ~/.oci/config
           test -s ~/.oci/oci_api_key.pem
           oci iam user get --user-id "$OCI_CLI_USER"
+          oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all --output json
 
       - name: Check OCI CLI version
         run: oci --version
