@@ -28,7 +28,13 @@ jobs:
 
       - name: Install OCI
         run: |
-          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+          bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
+
+      - name: Check OCI CLI version
+        run: oci --version
+
+      - name: Check Python version
+        run: python3 --version
 
       - name: Check out repository
         uses: actions/checkout@v4
