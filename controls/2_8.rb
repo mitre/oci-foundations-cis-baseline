@@ -83,4 +83,79 @@ control '2_8' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+  allowed_adb_whitelisted_ips = input('allowed_adb_whitelisted_ips')
+  allowed_adb_whitelisted_ips = allowed_adb_whitelisted_ips.map { |value| value.to_s.strip.downcase }.reject(&:empty?)
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  whitelist_findings = []
+  total_adb_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(
+        command: %(oci db autonomous-database list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+      )
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        next if instance['is-dedicated']
+
+        total_adb_instances += 1
+        next unless instance['nsg-ids'].nil?
+
+        instance_id = instance['id'].to_s
+        next if instance_id.empty?
+
+        details_response = json(
+          command: %(oci db autonomous-database get --autonomous-database-id "#{instance_id}" --region "#{region}" 2>/dev/null)
+        )
+        details = details_response.params.fetch('data', {})
+        whitelisted_ips = details['whitelisted-ips'].map { |ip| ip.to_s.strip.downcase }.reject(&:empty?)
+
+        if whitelisted_ips.empty?
+          whitelist_findings << {
+            'name' => instance['display-name'],
+            'id' => instance_id,
+            'region' => region,
+            'compartment_id' => compartment_id,
+            'whitelisted_ips' => whitelisted_ips,
+            'issue' => 'whitelisted-ips is empty or unset'
+          }
+          next
+        end
+
+        unauthorized_ips = whitelisted_ips.reject { |ip| allowed_adb_whitelisted_ips.include?(ip) }
+        next if unauthorized_ips.empty?
+
+        whitelist_findings << {
+          'name' => instance['display-name'],
+          'id' => instance_id,
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'whitelisted_ips' => whitelisted_ips,
+          'unauthorized_ips' => unauthorized_ips
+        }
+      end
+    end
+  end
+
+  if total_adb_instances.zero?
+    impact 0.0
+    describe 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
+      skip 'No Oracle Autonomous Databases found in tenancy.'
+    end
+  else
+    describe 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
+      subject { whitelist_findings }
+      it { should cmp [] }
+    end
+  end
 end

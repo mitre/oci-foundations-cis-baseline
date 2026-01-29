@@ -84,4 +84,57 @@ control '2_7' do
     'CM-6 b',
     'CM-7 a'
   ]
+
+  allowed_network_endpoint_types = input('allowed_network_endpoint_types')
+  allowed_network_endpoint_types = allowed_network_endpoint_types.map { |value| value.to_s.strip.downcase }.reject(&:empty?)
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  endpoint_type_findings = []
+  total_oac_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(
+        command: %(oci analytics analytics-instance list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+      )
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        next unless instance['lifecycle-state'] == 'ACTIVE'
+
+        total_oac_instances += 1
+        endpoint_type = instance.dig('network-endpoint-details', 'network-endpoint-type')
+        endpoint_type_normalized = endpoint_type.to_s.strip.downcase
+
+        next if allowed_network_endpoint_types.include?(endpoint_type_normalized)
+
+        endpoint_type_findings << {
+          'name' => instance['name'],
+          'id' => instance['id'],
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'network_endpoint_type' => endpoint_type
+        }
+      end
+    end
+  end
+
+  if total_oac_instances.zero?
+    impact 0.0
+    describe 'Ensure Oracle Analytics Cloud (OAC) access is restricted to allowed sources or deployed within a Virtual Cloud Network.' do
+      skip 'No Oracle Analytics Cloud instances found in tenancy.'
+    end
+  else
+    describe 'Ensure Oracle Analytics Cloud (OAC) access is restricted to allowed sources or deployed within a Virtual Cloud Network.' do
+      subject { endpoint_type_findings }
+      it { should cmp [] }
+    end
+  end
 end

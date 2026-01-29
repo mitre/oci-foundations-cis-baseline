@@ -92,7 +92,7 @@ control '4_2' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = "oci iam compartment list --compartment-id '#{tenancy_ocid}' --compartment-id-in-subtree true --all"
+  cmd = "oci iam compartment list --compartment-id '#{tenancy_ocid}' --include-root --compartment-id-in-subtree true --all"
   compartments = json(command: cmd)
 
   compartment_ids = compartments['data'].select { |field| field['lifecycle-state'] == 'ACTIVE' }.map { |field| field['id'] }
