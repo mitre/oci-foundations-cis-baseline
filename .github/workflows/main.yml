@@ -16,12 +16,13 @@ jobs:
       INPUT_FILE: example.inputs.yml
       RESULTS_FILE: oci_results.json
       THRESHOLD_FILE: example.threshold.yml
-      HEIMDALL_URL: https://heimdall-demo.mitre.org
-      OCI_CLI_USER: ${{ secrets.SAF_OCI_CLI_USER }}
-      OCI_CLI_TENANCY: ${{ secrets.SAF_OCI_CLI_TENANCY }}
-      OCI_CLI_FINGERPRINT: ${{ secrets.SAF_OCI_CLI_FINGERPRINT }}
-      OCI_CLI_KEY_CONTENT: ${{ secrets.SAF_OCI_CLI_KEY_CONTENT }}
+      HEIMDALL_URL: ${{ vars.SAF_HEIMDALL_URL }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
       OCI_CLI_REGION: ${{ vars.SAF_OCI_CLI_REGION }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+
     steps:
       - name: Install needed packages
         run: sudo apt-get install -y jq curl
