@@ -26,14 +26,32 @@ jobs:
       - name: Install needed packages
         run: sudo apt-get install -y jq curl
 
-      - name: Check Python version
-        run: python3 --version
-
       - name: Install OCI
         run: |
           curl -L -o install.sh https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
           bash install.sh --accept-all-defaults
           echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Configure OCI CLI
+        run: |
+          mkdir -p ~/.oci
+          printf "%s" "$OCI_CLI_KEY_CONTENT" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          cat > ~/.oci/config <<EOF
+          [DEFAULT]
+          user=$OCI_CLI_USER
+          fingerprint=$OCI_CLI_FINGERPRINT
+          tenancy=$OCI_CLI_TENANCY
+          region=$OCI_CLI_REGION
+          key_file=~/.oci/oci_api_key.pem
+          EOF
+
+      - name: Verify OCI CLI auth
+        run: |
+          set -euo pipefail
+          test -s ~/.oci/config
+          test -s ~/.oci/oci_api_key.pem
+          oci iam user get --user-id "$OCI_CLI_USER"
 
       - name: Check OCI CLI version
         run: oci --version
