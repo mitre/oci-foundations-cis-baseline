@@ -96,6 +96,8 @@ jobs:
 
       - name: Run the Profile
         run: |
+          set -euo pipefail
+          oci iam user get --user-id "$OCI_CLI_USER"
           bundle exec cinc-auditor exec . \
             --input-file=${{ env.INPUT_FILE }} \
             --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" \
