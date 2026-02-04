@@ -101,6 +101,11 @@ jobs:
           echo "INPUT_FILE=$INPUT_FILE"
           echo "Contents of $INPUT_FILE:"
           cat "$INPUT_FILE"
+          echo "Tenancy name (sanity check):"
+          oci iam tenancy get --tenancy-id "$OCI_CLI_TENANCY" --query 'data.name' --raw-output || true
+          echo "Tenancy policy statements containing 'in tenancy' (same command used by control 1_1):"
+          oci iam policy list --compartment-id "$OCI_CLI_TENANCY" --all --output json \
+            | jq -r '.data[] | .statements[]? | select(test("in tenancy"; "i"))' || true
           bundle exec cinc-auditor exec . \
             --input-file=${{ env.INPUT_FILE }} \
             --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" \
