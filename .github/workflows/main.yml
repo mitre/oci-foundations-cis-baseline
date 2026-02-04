@@ -98,6 +98,9 @@ jobs:
         run: |
           set -euo pipefail
           oci iam user get --user-id "$OCI_CLI_USER"
+          echo "INPUT_FILE=$INPUT_FILE"
+          echo "Contents of $INPUT_FILE:"
+          cat "$INPUT_FILE"
           bundle exec cinc-auditor exec . \
             --input-file=${{ env.INPUT_FILE }} \
             --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" \
