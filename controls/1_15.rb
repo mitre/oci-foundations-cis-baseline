@@ -83,4 +83,40 @@ control '1_15' do
     'AC-2 d 3',
     'AC-2 c'
   ]
+
+  cmd = <<~CMD
+    (for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`#{' '}
+      do#{' '}
+        for policy in `oci iam policy list --compartment-id $compid 2>/dev/null | jq -r '.data[] | .id'`#{' '}
+          do#{' '}
+            output=`oci iam policy list --compartment-id $compid 2>/dev/null | jq -r '.data[] | .id, .name, .statements'`#{' '}
+            if [ ! -z "$output" ]; then echo $output; fi#{' '}
+          done
+      done#{' '}
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+
+  policies = json_output.params || []
+
+  storage_resources = %w[volumes volume-backups file-systems mount-targets export-sets objects buckets]
+  violations = []
+
+  policies.each do |policy|
+    statements = policy['statements'] || []
+    statements.each do |statement|
+      stmt = statement.to_s.downcase
+
+      next unless stmt.match?(/allow .* to .*manage .* (#{storage_resources.join('|')})/) || stmt.match?(/allow .* to .* (#{storage_resources.join('|')}) in /)
+
+      violations << { policy: policy['name'] || policy['id'], statement: statement } unless stmt.include?('where') && stmt.match?(/request\.permission\s*!=\s*['"][^'"]*_delete['"]/)
+    end
+  end
+
+  describe 'Ensure storage service-level admins cannot delete resources they manage' do
+    it 'does not contain policy statements that allow managing storage resources without excluding delete permissions' do
+      expect(violations).to be_empty, "Found policies/statements without proper delete exclusion: #{violations.inspect}"
+    end
+  end
 end
