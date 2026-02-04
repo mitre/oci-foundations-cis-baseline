@@ -61,8 +61,6 @@ control '1_13' do
     'RA-5 b 1'
   ]
 
-
-
   compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
   compartments_data = compartments_response.params.fetch('data', [])
   compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
@@ -91,20 +89,20 @@ control '1_13' do
       user_name = user['user-name']
       total_users += 1
 
-      emails = user.dig('emails') || []
-      
+      emails = user['emails'] || []
+
       has_verified_primary = emails.any? { |email| email['primary'] == true && email['verified'] == true }
       has_verified_recovery = emails.any? { |email| email['type'] == 'recovery' && email['verified'] == true }
 
-      unless !has_verified_primary && has_verified_recovery
-        users_without_valid_emails << {
-          'user_name' => user_name,
-          'user_ocid' => user_ocid,
-          'domain_url' => domain_url,
-          'has_verified_primary' => has_verified_primary,
-          'has_verified_recovery' => has_verified_recovery
-        }
-      end
+      next if has_verified_primary && has_verified_recovery
+
+      users_without_valid_emails << {
+        'user_name' => user_name,
+        'user_ocid' => user_ocid,
+        'domain_url' => domain_url,
+        'has_verified_primary' => has_verified_primary,
+        'has_verified_recovery' => has_verified_recovery
+      }
     end
   end
 
