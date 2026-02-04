@@ -75,38 +75,51 @@ control '5_2_1' do
     'SA-12 (8)'
   ]
 
-  # regions_response = json(command: 'oci iam region-subscription list --all')
-  # regions_data = regions_response.params.fetch('data', [])
-  # regions = regions_data.map { |region| region['region-name'] }.compact
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  # volumes_missing_cmk = []
+  findings = []
+  total_block_volumes = 0
 
-  # regions.each do |region|
-  #   search_cmd = %(oci search resource structured-search --region "#{region}" --query-text "query volume resources" --limit 1000 2>/dev/null)
-  #   search_response = json(command: search_cmd)
-  #   volume_ids = search_response.params.fetch('data', {}).fetch('items', []).map { |item| item['identifier'] }.compact
+  regions.each do |region|
+    search_response = json(command: %(oci search resource structured-search --region "#{region}" --query-text "query volume resources" --limit 1000 2>/dev/null))
+    items = search_response.params.dig('data', 'items') || []
+    volume_ids = items.map { |item| item['identifier'] }.compact
 
-  #   volume_ids.each do |volume_id|
-  #     volume_details = json(command: %(oci bv volume get --volume-id "#{volume_id}" --region "#{region}" 2>/dev/null))
-  #     volume_data = volume_details.params.fetch('data', {})
+    volume_ids.each do |volume_id|
+      volume_response = json(command: %(oci bv volume get --volume-id "#{volume_id}" --region "#{region}" 2>/dev/null))
+      volume = volume_response.params.fetch('data', {})
+      next if volume.empty?
 
-  #     next if volume_data.empty?
-  #     puts volume_data
-  #     lifecycle_state = volume_data['lifecycle-state']
-  #     kms_key_id = volume_data['kms-key-id']
+      lifecycle_state = volume['lifecycle-state']
+      next if lifecycle_state == 'TERMINATED'
 
-  #     next if lifecycle_state.to_s.casecmp('TERMINATED').zero?
-  #     next unless kms_key_id.to_s.empty?
+      total_block_volumes += 1
+      kms_key_id = volume['kms-key-id'].to_s.strip
+      next unless kms_key_id.empty?
 
-  #     volumes_missing_cmk << {
-  #       'display-name' => volume_data['display-name'],
-  #       'region' => region
-  #     }.compact
-  #   end
-  # end
+      findings << {
+        'name' => volume['display-name'],
+        'id' => volume['id'],
+        'region' => region,
+        'compartment_id' => volume['compartment-id'],
+        'lifecycle_state' => lifecycle_state,
+        'issue' => 'kms-key-id is unset (Oracle-managed key)'
+      }
+    end
+  end
 
-  # describe 'Ensure Block Volumes are encrypted with Customer Managed Keys (CMK).' do
-  #   subject { volumes_missing_cmk }
-  #   it { should be_empty }
-  # end
+  if total_block_volumes.zero?
+    impact 0.0
+    describe 'Ensure Block Volumes are encrypted with Customer Managed Keys (CMK).' do
+      skip 'No block volumes found in tenancy.'
+    end
+  else
+    describe 'Ensure Block Volumes are encrypted with Customer Managed Keys (CMK).' do
+      subject { findings }
+      it { should cmp [] }
+    end
+  end
+
 end
