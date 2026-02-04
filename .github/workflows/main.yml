@@ -48,16 +48,13 @@ jobs:
           EOF
           chmod 600 ~/.oci/config
 
-      - name: Verify OCI CLI auth
+      - name: Verify OCI CLI auth and version
         run: |
           set -euo pipefail
           test -s ~/.oci/config
           test -s ~/.oci/oci_api_key.pem
-          oci iam user get --user-id "$OCI_CLI_USER"
-          oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all --output json
-
-      - name: Check OCI CLI version
-        run: oci --version
+          oci --version
+          oci iam user get --user-id "$OCI_CLI_USER" --raw-output >/dev/null
 
       - name: Check out repository
         uses: actions/checkout@v4
@@ -96,20 +93,9 @@ jobs:
 
       - name: Run the Profile
         run: |
-          set -euo pipefail
-          oci iam user get --user-id "$OCI_CLI_USER"
-          echo "INPUT_FILE=$INPUT_FILE"
-          echo "Contents of $INPUT_FILE:"
-          cat "$INPUT_FILE"
-          echo "Tenancy name (sanity check):"
-          oci iam tenancy get --tenancy-id "$OCI_CLI_TENANCY" --query 'data.name' --raw-output || true
-          echo "Tenancy policy statements containing 'in tenancy' (same command used by control 1_1):"
-          oci iam policy list --compartment-id "$OCI_CLI_TENANCY" --all --output json \
-            | jq -r '.data[] | .statements[]? | select(test("in tenancy"; "i"))' || true
           bundle exec cinc-auditor exec . \
-            --input-file=${{ env.INPUT_FILE }} \
-            --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" \
-            --input detector_recipe_ocid="${{ secrets.SAF_OCI_DETECTOR_RECIPE_OCID }}" \
+            --input-file="${{ env.INPUT_FILE }}" \
+            --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" detector_recipe_ocid="${{ secrets.SAF_OCI_DETECTOR_RECIPE_OCID }}" \
             --reporter cli json:${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} --enhanced-outcomes --filter-empty-profiles || true
 
       - name: Save Test Result JSON
