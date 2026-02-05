@@ -1,16 +1,4 @@
-identity_provider_notification_topic: "saf-notification-topic-1"
-group_mapping_notification_topic: "saf-notification-topic-1"
-iam_group_notification_topic: "saf-notification-topic-1"
-iam_policy_notification_topic: "saf-notification-topic-1"
-user_notification_topic: "saf-notification-topic-1"
-identity_signon_notification_topic: "saf-notification-topic-1"
-vcn_list_notification_topic: "saf-notification-topic-1"
-route_table_notification_topic: "saf-notification-topic-1"
-security_list_notification_topic: "saf-notification-topic-2"
-network_security_notification_topic: "saf-notification-topic-2"
-network_gateway_notification_topic: "saf-notification-topic-2"
-cloud_guard_notification_topic: "saf-notification-topic-2"
-cloud_guard_check: true
+# 1.1
 tenancy_level_policy_statements: [
   "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
   "allow service cloudguard to read vaults in tenancy",
@@ -42,3 +30,54 @@ tenancy_level_policy_statements: [
   "Allow group IAMAdmins to use users in tenancy where target.group.name != 'Administrators'",
   "Allow group PowerUsers to manage all-resources in tenancy"
 ]
+
+# 1.1
+compartment_level_policy_statements: []
+
+# 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1, 5.1.2
+cloud_guard_check: true
+
+# 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
+detector_recipe_ocid: "ocid1.cloudguarddetectorrecipe.oc1..exampleuniqueid"
+
+# 2.7
+allowed_network_endpoint_types: ["PUBLIC"]
+
+# 2.8
+allowed_adb_whitelisted_ips: []
+
+# 4.3
+identity_provider_notification_topic: "saf-notification-topic-1"
+
+# 4.4
+group_mapping_notification_topic: "saf-notification-topic-1"
+
+# 4.5
+iam_group_notification_topic: "saf-notification-topic-1"
+
+# 4.6
+iam_policy_notification_topic: "saf-notification-topic-1"
+
+# 4.7
+user_notification_topic: "saf-notification-topic-1"
+
+# 4.8
+vcn_list_notification_topic: "saf-notification-topic-1"
+
+# 4.9
+route_table_notification_topic: "saf-notification-topic-1"
+
+# 4.10
+security_list_notification_topic: "saf-notification-topic-2"
+
+# 4.11
+network_security_notification_topic: "saf-notification-topic-2"
+
+# 4.12
+network_gateway_notification_topic: "saf-notification-topic-2"
+
+# 4.15
+cloud_guard_notification_topic: "saf-notification-topic-2"
+
+# 4.18
+identity_signon_notification_topic: "saf-notification-topic-1"
