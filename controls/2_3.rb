@@ -140,7 +140,7 @@ control '2_3' do
 
   describe 'Ensure no network security groups allow ingress from 0.0.0.0/0 to port 22' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 
   cloud_guard_check = input('cloud_guard_check')

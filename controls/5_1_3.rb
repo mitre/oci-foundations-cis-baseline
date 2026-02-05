@@ -65,6 +65,6 @@ control '5_1_3' do
 
   describe 'Ensure Versioning is Enabled for Object Storage Buckets' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

@@ -108,7 +108,79 @@ control '4_13' do
     'SI-4 g'
   ]
 
-  describe 'Ensure VCN flow logging is enabled for all subnets' do
-    skip 'The check for this control needs to be done manually'
+  regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
+  compartments = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null').params.fetch('data', []).map { |compartment| compartment['id'] }.compact
+
+  findings = []
+  any_resource = false
+
+  regions.each do |region|
+    compartments.each do |compartment_id|
+      subnets = json(command: %(oci network subnet list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', []).select { |subnet| subnet['lifecycle-state'] == 'AVAILABLE' }
+
+      next if subnets.empty?
+
+      any_resource = true
+      log_groups = json(command: %(oci logging log-group list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
+
+      logs = log_groups.flat_map do |log_group|
+        json(command: %(oci logging log list --log-group-id "#{log_group['id']}" --log-type SERVICE --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
+      end
+
+      capture_filters = json(command: %(oci network capture-filter list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
+
+      compliant_filter_ids = capture_filters.select do |capture_filter|
+        rules = capture_filter['flow-log-capture-filter-rules'] || []
+        capture_filter['filter-type'].to_s.upcase == 'FLOWLOG' &&
+          capture_filter['lifecycle-state'] == 'AVAILABLE' &&
+          rules.any? do |rule|
+            source_cidr = rule['source-cidr'].to_s.strip
+            destination_cidr = rule['destination-cidr'].to_s.strip
+            protocol = rule['protocol'].to_s.strip
+            rule['is-enabled'] == true &&
+              rule['flow-log-type'].to_s.strip.upcase == 'ALL' &&
+              rule['rule-action'].to_s.strip.upcase == 'INCLUDE' &&
+              (source_cidr.empty? || source_cidr == '0.0.0.0/0') &&
+              (destination_cidr.empty? || destination_cidr == '0.0.0.0/0') &&
+              (protocol.empty? || protocol.casecmp('all').zero?) &&
+              rule['sampling-rate'].to_i == 1
+          end
+      end.map { |capture_filter| capture_filter['id'] }.compact
+
+      compliant_resources = logs.select do |log|
+        capture_filter_id = log.dig('configuration', 'source', 'parameters', 'capture_filter').to_s
+        log['lifecycle-state'] == 'ACTIVE' &&
+          log['is-enabled'] == true &&
+          compliant_filter_ids.include?(capture_filter_id)
+      end.map { |log| log.dig('configuration', 'source', 'resource').to_s }.reject(&:empty?)
+
+      subnets.each do |subnet|
+        subnet_id = subnet['id'].to_s
+        vcn_id = subnet['vcn-id'].to_s
+        covered = compliant_resources.include?(subnet_id) || compliant_resources.include?(vcn_id)
+        next if covered
+
+        findings << {
+          'subnet_name' => subnet['display-name'],
+          'subnet_id' => subnet_id,
+          'vcn_id' => vcn_id,
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'issue' => 'No enabled flow log with compliant capture filter found for subnet or parent VCN'
+        }
+      end
+    end
+  end
+
+  if !any_resource
+    impact 0.0
+    describe 'Ensure VCN flow logging is enabled for all subnets' do
+      skip 'No subnets found in tenancy.'
+    end
+  else
+    describe 'Ensure VCN flow logging is enabled for all subnets' do
+      subject { findings }
+      it { should cmp [] }
+    end
   end
 end

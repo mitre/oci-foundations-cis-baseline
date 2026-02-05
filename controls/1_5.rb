@@ -104,7 +104,7 @@ control '1_5' do
   describe 'Ensure IAM password policy expires passwords within 365 days' do
     subject { expires_after_values }
 
-    it { should_not be_empty }
+    it { should_not cmp [] }
     it { should_not include(nil) }
     it { should all(be <= 365) }
   end

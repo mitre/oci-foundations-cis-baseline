@@ -74,24 +74,50 @@ control '3_1' do
     'CM-7 b'
   ]
 
-  cmd = <<~CMD
-    (
-      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
-      do
-        for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
-        do
-          output=`oci compute instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r'.data[]|select(."instance-options"."are-legacy-imds-endpoints-disabled" == false )'`
-          if [ ! -z "$output" ]; then echo $output; fi
-        done
-      done
-    ) | jq -nR '[inputs]'
-  CMD
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  json_output = json(command: cmd)
-  output = json_output.params
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
 
-  describe 'Ensure Compute Instance Legacy Metadata service endpoint is disabled' do
-    subject { output }
-    it { should be_empty }
+  non_compliant_instances = []
+  total_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(command: %(oci compute instance list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null))
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        total_instances += 1
+        instance_options = instance['instance-options']
+        legacy_imds_disabled = instance_options && instance_options['are-legacy-imds-endpoints-disabled']
+
+        next unless legacy_imds_disabled == false
+
+        non_compliant_instances << {
+          'display_name' => instance['display-name'],
+          'id' => instance['id'],
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'instance_options_present' => !instance_options.nil?,
+          'are_legacy_imds_endpoints_disabled' => legacy_imds_disabled
+        }
+      end
+    end
+  end
+
+  if total_instances.zero?
+    impact 0.0
+    describe 'Ensure Compute Instance Legacy Metadata service endpoint is disabled' do
+      skip 'No compute instances found in tenancy.'
+    end
+  else
+    describe 'Ensure Compute Instance Legacy Metadata service endpoint is disabled' do
+      subject { non_compliant_instances }
+      it { should cmp [] }
+    end
   end
 end

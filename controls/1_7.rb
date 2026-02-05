@@ -99,29 +99,59 @@ control '1_7' do
     'SI-2 d'
   ]
 
-  cmd = <<~CMD
-    (
-      do
-        oci identity-domains users list --endpoint $id_domain_url 2>/dev/null | jq -r '.data.resources[] | select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")' 2>/dev/null | jq -r '.ocid'
-      done
-      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
-      do
-        for compid in `oci iam compartment list --compartment-id-in-subtree TRUE --all 2>/dev/null | jq -r '.data[] | .id'`
-        do
-          for id_domain_url in `oci iam domain list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] | .url'`
-          do
-            oci identity-domains users list --endpoint $id_domain_url 2>/dev/null | jq -r '.data.resources[] | select(."urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user"."mfa-status"!="ENROLLED")' 2>/dev/null | jq -r '.ocid'
-          done
-        done
-      done
-    ) | jq -nR '[inputs]'
-  CMD
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
 
-  json_output = json(command: cmd)
-  output = json_output.params
+  domain_by_url = {}
 
-  describe 'Ensure MFA is enabled for all users with a console password' do
-    subject { output }
-    it { should be_empty }
+  compartment_ids.each do |compartment_id|
+    domains_response = json(command: %(oci iam domain list --compartment-id "#{compartment_id}" --all))
+    domains_data = domains_response.params.fetch('data', [])
+    domains_data.each do |domain|
+      domain_url = domain['url']
+      next if domain_url.to_s.empty?
+
+      domain_by_url[domain_url] = domain['display-name']
+    end
+  end
+
+  non_compliant_users = []
+  total_users = 0
+
+  domain_by_url.each do |domain_url, domain_display_name|
+    next if domain_url.to_s.empty?
+
+    users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all)
+    users_response = json(command: users_cmd).params
+    users = users_response.dig('data', 'resources') || []
+
+    users.each do |user|
+      total_users += 1
+      mfa_extension = user['urn-ietf-params-scim-schemas-oracle-idcs-extension-mfa-user'] || {}
+      mfa_status = mfa_extension['mfa-status']
+
+      next if mfa_status == 'ENROLLED'
+
+      non_compliant_users << {
+        'user_name' => user['user-name'],
+        'user_ocid' => user['ocid'],
+        'domain_display_name' => domain_display_name,
+        'domain_url' => domain_url,
+        'mfa_status' => mfa_status
+      }
+    end
+  end
+
+  if total_users.zero?
+    impact 0.0
+    describe 'Ensure MFA is enabled for all users with a console password' do
+      skip 'No users found in tenancy.'
+    end
+  else
+    describe 'Ensure MFA is enabled for all users with a console password' do
+      subject { non_compliant_users }
+      it { should cmp [] }
+    end
   end
 end

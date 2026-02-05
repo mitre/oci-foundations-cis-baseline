@@ -44,7 +44,7 @@ inputs:
     type: array
     value: []
 
-  # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
+  # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1, 5.1.2
   - name: cloud_guard_check
     description: "Toggle Cloud Guard validation (set false to skip Cloud Guard-specific checks)"
     type: boolean
@@ -67,3 +67,75 @@ inputs:
     description: "Allowed Autonomous Database shared whitelist IPs/CIDRs for public endpoints"
     type: array
     value: []
+
+  # 4.3
+  - name: identity_provider_notification_topic
+    description: "Notification topic name for rule containing Identity Provider changes"
+    type: string
+    value: ""
+
+  # 4.4
+  - name: group_mapping_notification_topic
+    description: "Notification topic name for rule containing Group Mapping changes"
+    type: string
+    value: ""
+
+  # 4.5
+  - name: iam_group_notification_topic
+    description: "Notification topic name for rule containing IAM Group changes"
+    type: string
+    value: ""
+
+  # 4.6
+  - name: iam_policy_notification_topic
+    description: "Notification topic name for rule containing IAM Policy changes"
+    type: string
+    value: ""
+
+  # 4.7
+  - name: user_notification_topic
+    description: "Notification topic name for rule containing User changes"
+    type: string
+    value: ""
+
+  # 4.8
+  - name: vcn_list_notification_topic
+    description: "Notification topic name for rule containing VCN changes"
+    type: string
+    value: ""
+
+  # 4.9
+  - name: route_table_notification_topic
+    description: "Notification topic name for rule containing Route Table changes"
+    type: string
+    value: ""
+
+  # 4.10
+  - name: security_list_notification_topic
+    description: "Notification topic name for rule containing Security List changes"
+    type: string
+    value: ""
+
+  # 4.11
+  - name: network_security_notification_topic
+    description: "Notification topic name for rule containing Network Security Group changes"
+    type: string
+    value: ""
+
+  # 4.12
+  - name: network_gateway_notification_topic
+    description: "Notification topic name for rule containing Network Gateway changes"
+    type: string
+    value: ""
+
+  # 4.15
+  - name: cloud_guard_notification_topic
+    description: "Notification topic name for rule containing Cloud Guard changes"
+    type: string
+    value: ""
+
+  # 4.18
+  - name: identity_signon_notification_topic
+    description: "Notification topic name for rule containing Identity Sign-On changes"
+    type: string
+    value: ""

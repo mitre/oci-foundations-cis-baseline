@@ -100,6 +100,6 @@ control '1_3' do
 
   describe 'Ensure IAM administrators cannot update tenancy Administrators group' do
     subject { non_excluded_policies }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

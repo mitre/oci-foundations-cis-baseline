@@ -88,6 +88,6 @@ control '5_2_2' do
 
   describe 'Ensure boot volumes are encrypted with Customer Managed Key (CMK)' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

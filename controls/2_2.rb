@@ -108,7 +108,7 @@ control '2_2' do
 
   describe 'Ensure no security lists allow ingress from 0.0.0.0/0 to port 3389' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 
   cloud_guard_check = input('cloud_guard_check')

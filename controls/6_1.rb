@@ -70,10 +70,10 @@ control '6_1' do
   cmd = "oci search resource structured-search --query-text \"query compartment resources where (compartmentId='#{tenancy_ocid}' && lifecycleState='ACTIVE')\""
 
   json_output = json(command: cmd)
-  output = json_output.params.dig('data', 'items')
+  output = json_output.params.dig('data', 'items') || []
 
   describe 'Create at least one compartment in your tenancy to store cloud resources' do
     subject { output }
-    it { should_not be_empty }
+    it { should_not cmp [] }
   end
 end
