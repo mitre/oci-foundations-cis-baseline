@@ -84,7 +84,7 @@ control '5_1_1' do
 
   describe 'Ensure no Object Storage buckets are publicly visible' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 
   cloud_guard_check = input('cloud_guard_check')
@@ -94,7 +94,7 @@ control '5_1_1' do
     tenancy_ocid = input('tenancy_ocid')
     cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
     cloud_guard_status = cloud_guard.status
-    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK')
+    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'BUCKET_IS_PUBLIC')
   end
 
   describe 'Cloud Guard' do

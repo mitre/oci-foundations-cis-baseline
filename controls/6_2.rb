@@ -68,7 +68,7 @@ control '6_2' do
 
   cmd = "oci search resource structured-search --query-text \"query VCN, instance, volume, bootvolume, filesystem, bucket, autonomousdatabase, database, dbsystem resources where compartmentId = '#{tenancy_ocid}'\""
   json_output = json(command: cmd)
-  output = json_output.params.dig('data', 'items') || []
+  output = json_output.params.dig('data', 'items')
 
   describe 'Ensure no resources are created in the root compartment' do
     subject { output }
