@@ -21,7 +21,8 @@ control '1_16' do
     add regions Under Query enter the following query in the text box: search
     "<tenancy-ocid>/_Audit_Include_Subcompartment" |
     data.identity.credentials='<tenancy-ocid>/<user-ocid>/<key-fingerprint>' | summarize
-    count() by data.identity.principalId Enter a day range Note each query can only be 14 days
+    count() by data.identity.principalId 
+    Enter a day range Note each query can only be 14 days
     multiple queries will be required to go 45 days Click Search Expand the results If results
     the count is not zero the user has used their API key during that period Repeat steps 8 –
     11 for the 45-day period From CLI: For Passwords: Execute the below: oci identity-domains
@@ -81,4 +82,14 @@ control '1_16' do
     'AC-2 g',
     'SA-8'
   ]
+
+   cmd = <<~CMD
+   (
+     search
+    "<tenancy-ocid>/_Audit_Include_Subcompartment" |
+    data.identity.credentials='<tenancy-ocid>/<user-ocid>/<key-fingerprint>' | summarize
+    count() by data.identity.principalId 
+
+   ) | jq -nR '[inputs]'
+  CMD
 end
