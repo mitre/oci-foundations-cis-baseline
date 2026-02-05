@@ -121,5 +121,4 @@ control '5_2_1' do
       it { should cmp [] }
     end
   end
-
 end
