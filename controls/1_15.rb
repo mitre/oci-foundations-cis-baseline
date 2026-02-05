@@ -85,15 +85,12 @@ control '1_15' do
   ]
 
   cmd = <<~CMD
-    (for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`for compid in `oci iam compartment list --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`#{' '}
-      do#{' '}
-        for policy in `oci iam policy list --compartment-id $compid 2>/dev/null | jq -r '.data[] | .id'`#{' '}
-          do#{' '}
-            output=`oci iam policy list --compartment-id $compid 2>/dev/null | jq -r '.data[] | .id, .name, .statements'`#{' '}
-            if [ ! -z "$output" ]; then echo $output; fi#{' '}
-          done
-      done#{' '}
-    ) | jq -nR '[inputs]'
+    (
+      for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
+      do
+        oci iam policy list --compartment-id "$compid" --all 2>/dev/null | jq -c '.data[]'
+      done
+    ) | jq -s '.'
   CMD
 
   json_output = json(command: cmd)
@@ -108,15 +105,17 @@ control '1_15' do
     statements.each do |statement|
       stmt = statement.to_s.downcase
 
-      next unless stmt.match?(/allow .* to .*manage .* (#{storage_resources.join('|')})/) || stmt.match?(/allow .* to .* (#{storage_resources.join('|')}) in /)
+      next unless stmt.match?(/allow\s+.*\s+to\s+.*manage\s+.*?(#{storage_resources.join('|')})\b/)
 
-      violations << { policy: policy['name'] || policy['id'], statement: statement } unless stmt.include?('where') && stmt.match?(/request\.permission\s*!=\s*['"][^'"]*_delete['"]/)
+      has_condition = stmt.include?('where')
+      has_delete_exclusion = stmt.match?(/request\.permission\s*!=\s*['"][^'"]*_delete['"]/)
+
+      violations << { policy: policy['name'] || policy['id'], statement: statement } unless has_condition && has_delete_exclusion
     end
   end
 
   describe 'Ensure storage service-level admins cannot delete resources they manage' do
-    it 'does not contain policy statements that allow managing storage resources without excluding delete permissions' do
-      expect(violations).to be_empty, "Found policies/statements without proper delete exclusion: #{violations.inspect}"
-    end
+    subject { violations }
+    it { should cmp [] }
   end
 end
