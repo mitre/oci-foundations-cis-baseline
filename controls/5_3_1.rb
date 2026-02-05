@@ -91,6 +91,6 @@ control '5_3_1' do
 
   describe 'Ensure File Storage Systems are encrypted with Customer Managed Keys (CMK)' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

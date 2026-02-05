@@ -107,6 +107,6 @@ control '2_5' do
 
   describe 'Ensure the default security list of every VCN restricts all traffic except ICMP within VCN' do
     subject { security_list_findings }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

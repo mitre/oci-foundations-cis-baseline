@@ -74,7 +74,7 @@ control '1_6' do
 
   describe 'Ensure IAM password policy prevents password reuse' do
     subject { history_values }
-    it { should_not be_empty }
+    it { should_not cmp [] }
     it { should_not include(nil) }
     it { should all(be >= 24) }
   end

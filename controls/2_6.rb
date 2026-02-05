@@ -105,6 +105,6 @@ control '2_6' do
 
   describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
     subject { output }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end

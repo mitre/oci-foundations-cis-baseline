@@ -105,7 +105,7 @@ control '5_1_2' do
 
   describe 'Ensure Object Storage Buckets are encrypted with a Customer Managed Key (CMK)' do
     subject { buckets_missing_cmk }
-    it { should be_empty }
+    it { should cmp [] }
   end
 
   cloud_guard_check = input('cloud_guard_check')

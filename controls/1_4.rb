@@ -145,7 +145,7 @@ control '1_4' do
 
   describe 'Ensure IAM password policy enforces a minimum password length of 14 characters' do
     subject { min_length_values }
-    it { should_not be_empty }
+    it { should_not cmp [] }
     it { should_not include(nil) }
     it { should all(be >= 14) }
   end

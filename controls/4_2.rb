@@ -118,6 +118,6 @@ control '4_2' do
 
   describe 'Create at least one notification topic and subscription to receive monitoring alerts' do
     subject { active_subs }
-    it { should_not be_empty }
+    it { should_not cmp [] }
   end
 end
