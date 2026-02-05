@@ -107,7 +107,8 @@ control '4_15' do
 
   regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
 
-  findings = regions.each_with_object([]) do |region, missing|
+  findings = []
+  regions.each do |region|
     rules = json(command: %(oci events rule list --compartment-id "#{tenancy_ocid}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
 
     rule_present = rules.any? do |rule|
@@ -136,11 +137,11 @@ control '4_15' do
       end
     end
 
-    missing << { region: region, issue: 'Missing enabled Oracle Cloud Guard change notification rule(s)' } unless rule_present
+    findings << { region: region, issue: 'Missing enabled Oracle Cloud Guard change notification rule(s)' } unless rule_present
   end
 
   describe 'Ensure a notification is configured for Oracle Cloud Guard problems detected' do
     subject { findings }
-    it { should be_empty }
+    it { should cmp [] }
   end
 end
