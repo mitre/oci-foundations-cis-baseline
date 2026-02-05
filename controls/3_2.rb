@@ -79,4 +79,51 @@ control '3_2' do
     'CM-6 b',
     'CM-9 a'
   ]
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  non_compliant_instances = []
+  total_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(command: %(oci compute instance list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null))
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        total_instances += 1
+        platform_config = instance['platform-config']
+        secure_boot_enabled = platform_config && platform_config['is-secure-boot-enabled']
+
+        next if platform_config && secure_boot_enabled == true
+
+        non_compliant_instances << {
+          'display_name' => instance['display-name'],
+          'id' => instance['id'],
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'platform_config_present' => !platform_config.nil?,
+          'is_secure_boot_enabled' => secure_boot_enabled
+        }
+      end
+    end
+  end
+
+  if total_instances.zero?
+    impact 0.0
+    describe 'Ensure Secure Boot is enabled on Compute Instance' do
+      skip 'No compute instances found in tenancy.'
+    end
+  else
+    describe 'Ensure Secure Boot is enabled on Compute Instance' do
+      subject { non_compliant_instances }
+      it { should cmp [] }
+    end
+  end
 end
