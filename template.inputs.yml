@@ -16,6 +16,12 @@ cloud_guard_check: true
 # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
 detector_recipe_ocid: ""
 
+# 2.6
+allowed_oic_allowlisted_http_ips: []
+
+# 2.6
+allowed_oic_allowlisted_http_vcns: {}
+
 # 2.7
 allowed_network_endpoint_types: ["PUBLIC"]
 

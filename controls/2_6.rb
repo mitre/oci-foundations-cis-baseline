@@ -87,24 +87,90 @@ control '2_6' do
     'CM-7 a'
   ]
 
-  cmd = <<~CMD
-    (
-      for region in `oci iam region-subscription list --all| jq -r '.data[] | ."region-name"'`;
-      do
-        for compid in `oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null | jq -r '.data[] | .id'`
-        do
-          output=`oci integration integration-instance list --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |select(."network-endpoint-details"."network-endpoint-type" == null)'`
-          if [ ! -z "$output" ]; then echo $output; fi
-        done
-      done
-    ) | jq -nR '[inputs]'
-  CMD
+  allowed_oic_allowlisted_http_ips = input('allowed_oic_allowlisted_http_ips')
+  allowed_oic_allowlisted_http_ips = allowed_oic_allowlisted_http_ips.map { |value| value.to_s.strip.downcase }.reject(&:empty?).uniq
 
-  json_output = json(command: cmd)
-  output = json_output.params
+  allowed_oic_allowlisted_http_vcns = input('allowed_oic_allowlisted_http_vcns')
+  allowed_oic_allowlisted_http_vcns = {} unless allowed_oic_allowlisted_http_vcns.is_a?(Hash)
+  expected_vcn_ip_pairs = allowed_oic_allowlisted_http_vcns.flat_map do |vcn_id, ips|
+    normalized_vcn_id = vcn_id.to_s.strip.downcase
+    next [] if normalized_vcn_id.empty?
 
-  describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
-    subject { output }
-    it { should cmp [] }
+    Array(ips).map do |ip|
+      normalized_ip = ip.to_s.strip.downcase
+      next if normalized_ip.empty?
+
+      { 'vcn_id' => normalized_vcn_id, 'ip' => normalized_ip }
+    end
+  end.compact.uniq
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  oic_access_findings = []
+  total_oic_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(command: %(oci integration integration-instance list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null))
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        next unless instance['lifecycle-state'] == 'ACTIVE'
+
+        total_oic_instances += 1
+        endpoint_details = instance.fetch('network-endpoint-details', {}) || {}
+        allowlisted_ips = Array(endpoint_details['allowlisted-http-ips']).map { |ip| ip.to_s.strip.downcase }.reject(&:empty?).uniq
+        allowlisted_vcns = Array(endpoint_details['allowlisted-http-vcns'])
+        actual_vcn_ip_pairs = allowlisted_vcns.flat_map do |allowlisted_vcn|
+          next [] unless allowlisted_vcn.is_a?(Hash)
+
+          normalized_vcn_id = allowlisted_vcn['id'].to_s.strip.downcase
+          next [] if normalized_vcn_id.empty?
+
+          Array(allowlisted_vcn['allowlisted-ips']).map do |ip|
+            normalized_ip = ip.to_s.strip.downcase
+            next if normalized_ip.empty?
+
+            { 'vcn_id' => normalized_vcn_id, 'ip' => normalized_ip }
+          end
+        end.compact.uniq
+
+        unexpected_ips = allowlisted_ips - allowed_oic_allowlisted_http_ips
+        missing_ips = allowed_oic_allowlisted_http_ips - allowlisted_ips
+        unexpected_vcn_pairs = actual_vcn_ip_pairs - expected_vcn_ip_pairs
+        missing_vcn_pairs = expected_vcn_ip_pairs - actual_vcn_ip_pairs
+
+        next if unexpected_ips.empty? && missing_ips.empty? && unexpected_vcn_pairs.empty? && missing_vcn_pairs.empty?
+
+        oic_access_findings << {
+          'name' => instance['display-name'],
+          'id' => instance['id'],
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'missing_ips' => missing_ips,
+          'unexpected_ips' => unexpected_ips,
+          'missing_vcn_pairs' => missing_vcn_pairs,
+          'unexpected_vcn_pairs' => unexpected_vcn_pairs
+        }
+      end
+    end
+  end
+
+  if total_oic_instances.zero?
+    impact 0.0
+    describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
+      skip 'No Oracle Integration Cloud instances found in tenancy.'
+    end
+  else
+    describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
+      subject { oic_access_findings }
+      it { should cmp [] }
+    end
   end
 end

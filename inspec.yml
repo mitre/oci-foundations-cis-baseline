@@ -60,6 +60,18 @@ inputs:
     type: string
     value: ""
 
+  # 2.6
+  - name: allowed_oic_allowlisted_http_ips
+    description: "Expected values (IPs/CIDRs) for active Oracle Integration instances"
+    type: array
+    value: []
+
+  # 2.6
+  - name: allowed_oic_allowlisted_http_vcns
+    description: "Expected map of VCN OCID to IP/CIDR for active Oracle Integration instances"
+    type: hash
+    value: {}
+
   # 2.7
   - name: allowed_network_endpoint_types
     description: "Allowed Oracle Analytics Cloud network endpoint types (e.g., PUBLIC, PRIVATE)"
