@@ -70,19 +70,53 @@ control '1_2' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i 'to manage all-resources in tenancy' | jq -nR '[inputs]'"
+  policies_response = json(command: %(oci iam policy list --compartment-id "#{tenancy_ocid}" --all))
+  policies = policies_response.params.fetch('data', [])
 
-  output = json(command: cmd)
-  policies = Array(output.params).map { |policy| policy.to_s.strip }.reject(&:empty?)
+  manage_all_resources_regex = /\bto\s+manage\s+all-resources\s+in\s+tenancy\b/i
+  administrators_manage_all_regex = %r{\Aallow\s+group\s+(?:[^[:space:]]+/)?administrators\s+to\s+manage\s+all-resources\s+in\s+tenancy\b}i
 
-  admin_regex = /allow group administrators to manage all-resources in tenancy/i
-  admin_policies = policies.select { |policy| policy.match?(admin_regex) }
-  non_admin_policies = policies.reject { |policy| policy.match?(admin_regex) }
+  manage_all_resources_grants = []
+  findings = []
+
+  policies.each do |policy|
+    policy_name = policy['name']
+    policy_id = policy['id']
+
+    Array(policy['statements']).each do |statement|
+      normalized_statement = statement.to_s.strip.sub(/\A["']/, '').sub(/["']\z/, '').strip
+      next if normalized_statement.empty?
+      next unless normalized_statement.match?(manage_all_resources_regex)
+
+      manage_all_resources_grants << {
+        'policy_name' => policy_name,
+        'policy_id' => policy_id,
+        'statement' => normalized_statement
+      }
+    end
+  end
+
+  administrators_manage_all_grants = manage_all_resources_grants.select do |grant|
+    grant['statement'].match?(administrators_manage_all_regex)
+  end
+
+  if administrators_manage_all_grants.empty?
+    findings << {
+      'issue' => 'No Administrators statement found for manage all-resources in tenancy',
+      'expected_statement_pattern' => 'Allow group Administrators to manage all-resources in tenancy'
+    }
+  end
+
+  non_administrator_manage_all_grants = manage_all_resources_grants.reject do |grant|
+    grant['statement'].match?(administrators_manage_all_regex)
+  end
+
+  non_administrator_manage_all_grants.each do |grant|
+    findings << grant.merge('issue' => 'Statement grants manage all-resources in tenancy to non-Administrators principal')
+  end
 
   describe 'Ensure permissions on all resources are given only to the tenancy administrator group' do
-    it 'allows only Administrators to manage all resources' do
-      expect(admin_policies).not_to be_empty
-      expect(non_admin_policies).to be_empty
-    end
+    subject { findings }
+    it { should cmp [] }
   end
 end
