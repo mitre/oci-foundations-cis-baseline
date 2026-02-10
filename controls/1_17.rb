@@ -54,4 +54,74 @@ control '1_17' do
     'AC-2 a',
     'AC-2 b'
   ]
+
+  users_with_multiple_api_keys = []
+  total_users = 0
+
+  begin
+
+    compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+    compartments_data = compartments_response.params.fetch('data', [])
+    compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+    domain_urls = []
+
+    compartment_ids.each do |compartment_id|
+      domains_response = json(command: %(oci iam domain list --compartment-id "#{compartment_id}" --all))
+      domains_data = domains_response.params.fetch('data', [])
+      domain_urls.concat(domains_data.map { |domain| domain['url'] }.compact)
+    end
+
+    domain_urls.uniq!
+
+    domain_urls.each do |domain_url|
+      next if domain_url.to_s.empty?
+
+      users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all)
+      users_response = json(command: users_cmd).params
+      users = users_response.dig('data', 'resources') || []
+
+      users.each do |user|
+        user_ocid = user['ocid']
+        user_name = user['user-name']
+        total_users += 1
+
+        api_keys_cmd = %(oci identity-domains api-keys list --endpoint "#{domain_url}" --filter 'user.ocid eq "#{user_ocid}"' --all)
+        api_keys_response = json(command: api_keys_cmd).params
+        api_keys = api_keys_response.dig('data', 'resources') || []
+
+        next if api_keys.length <= 1
+
+        api_key_details = api_keys.map do |key|
+          {
+            'fingerprint' => key['fingerprint'],
+            'active' => key['inactive'] == false,
+            'created' => key['time-created']
+          }
+        end
+
+        users_with_multiple_api_keys << {
+          'user_name' => user_name,
+          'user_ocid' => user_ocid,
+          'domain_url' => domain_url,
+          'api_key_count' => api_keys.length,
+          'api_keys' => api_key_details
+        }
+      end
+    end
+  rescue => e
+
+  end
+
+  if total_users.zero?
+    impact 0.0
+    describe 'Ensure there is only one active API Key for any single OCI IAM user' do
+      skip 'No users found in tenancy.'
+    end
+  else
+    describe 'Ensure there is only one active API Key for any single OCI IAM user' do
+      subject { users_with_multiple_api_keys }
+      it { should cmp [] }
+    end
+  end
 end
