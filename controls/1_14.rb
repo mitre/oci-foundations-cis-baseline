@@ -76,19 +76,15 @@ control '1_14' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  # Query Dynamic Groups
   dynamic_groups_cmd = %(oci iam dynamic-group list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[].name' || echo "")
   dynamic_groups_output = command(dynamic_groups_cmd).stdout.strip
 
-  # Query policies for request.principal conditions
   policies_with_principal_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[] | select(.statements[]? | contains("request.principal")) | .name' || echo "")
   policies_with_principal_output = command(policies_with_principal_cmd).stdout.strip
 
-  # Query detailed dynamic group information to check matching rules
   dynamic_groups_details_cmd = %{oci iam dynamic-group list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[] | "\(.name)|\(.matching-rule)"' || echo ""}
   dynamic_groups_details = command(dynamic_groups_details_cmd).stdout.strip
 
-  # Check if dynamic groups exist with instance matching rules
   has_instance_matching_rules = dynamic_groups_details.lines.any? do |line|
     parts = line.split('|')
     parts.length == 2 && (
@@ -98,14 +94,11 @@ control '1_14' do
     )
   end
 
-  # Check if request.principal policies exist
   has_request_principal_policies = !policies_with_principal_output.empty?
 
-  # Query all policies to get detailed statement view
   all_policies_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq '[.data[].statements[]? | select(contains("request.principal"))]' || echo "[]")
   request_principal_statements = json(command: all_policies_cmd).params
 
-  # Overall assessment
   instance_principal_configured = has_instance_matching_rules || has_request_principal_policies
 
   describe 'Instance Principal Authentication Configuration' do
