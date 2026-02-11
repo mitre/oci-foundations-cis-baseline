@@ -81,4 +81,8 @@ control '1_16' do
     'AC-2 g',
     'SA-8'
   ]
+
+  describe 'Ensure OCI IAM credentials unused for 45 days or more are disabled' do
+    skip 'The check for this control needs to be done manually'
+  end
 end

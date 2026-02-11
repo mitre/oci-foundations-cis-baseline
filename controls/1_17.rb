@@ -54,4 +54,67 @@ control '1_17' do
     'AC-2 a',
     'AC-2 b'
   ]
+
+  users_with_multiple_api_keys = []
+  total_users = 0
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  domains = []
+
+  compartment_ids.each do |compartment_id|
+    domains_response = json(command: %(oci iam domain list --compartment-id "#{compartment_id}" --all))
+    domains_data = domains_response.params.fetch('data', [])
+    domains.concat(
+      domains_data.map do |domain|
+        { 'url' => domain['url'], 'name' => domain['display-name'] }
+      end
+    )
+  end
+
+  domains.reject! { |domain| domain['url'].to_s.empty? }
+  domains.uniq! { |domain| domain['url'] }
+
+  domains.each do |domain|
+    domain_url = domain['url']
+    domain_name = domain['name']
+
+    users_cmd = %(oci identity-domains users list --endpoint "#{domain_url}" --all)
+    users_response = json(command: users_cmd).params
+    users = users_response.dig('data', 'resources') || []
+
+    users.each do |user|
+      user_ocid = user['ocid']
+      user_name = user['user-name']
+      total_users += 1
+
+      api_keys_cmd = %(oci identity-domains api-keys list --endpoint "#{domain_url}" --filter 'user.ocid eq "#{user_ocid}"' --all)
+      api_keys_response = json(command: api_keys_cmd).params
+      api_keys = api_keys_response.dig('data', 'resources') || []
+
+      next if api_keys.length <= 1
+
+      users_with_multiple_api_keys << {
+        'user_name' => user_name,
+        'api_key_count' => api_keys.length,
+        'user_ocid' => user_ocid,
+        'domain_name' => domain_name,
+        'domain_url' => domain_url
+      }
+    end
+  end
+
+  if total_users.zero?
+    impact 0.0
+    describe 'Ensure there is only one active API Key for any single OCI IAM user' do
+      skip 'No users found in tenancy.'
+    end
+  else
+    describe 'Ensure there is only one active API Key for any single OCI IAM user' do
+      subject { users_with_multiple_api_keys }
+      it { should cmp [] }
+    end
+  end
 end

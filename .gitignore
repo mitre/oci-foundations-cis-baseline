@@ -1,7 +1,7 @@
 *.lock
 *.gem
 *.rbc
-*results.json
+*results*.json
 inputs.yml
 attestation.json
 results_attested.json

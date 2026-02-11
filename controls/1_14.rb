@@ -73,4 +73,65 @@ control '1_14' do
     'CP-12',
     'SA-12 (8)'
   ]
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact.uniq
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id']
+    next if compartment_id.to_s.empty?
+
+    map[compartment_id] = compartment['name']
+  end
+
+  request_principal_statements = []
+
+  compartment_ids.each do |compartment_id|
+    policies_response = json(command: %(oci iam policy list --compartment-id "#{compartment_id}" --all 2>/dev/null))
+    policies = policies_response.params.fetch('data', [])
+
+    policies.each do |policy|
+      policy_name = policy['name']
+      policy_id = policy['id']
+
+      Array(policy['statements']).each do |statement|
+        normalized_statement = statement.to_s.strip
+        next if normalized_statement.empty?
+        next unless normalized_statement.match?(/request\.principal/i)
+
+        request_principal_statements << {
+          'compartment_id' => compartment_id,
+          'compartment_name' => compartment_names_by_id[compartment_id],
+          'policy_id' => policy_id,
+          'policy_name' => policy_name,
+          'statement' => normalized_statement
+        }
+      end
+    end
+  end
+
+  findings = []
+
+  malformed_statements = request_principal_statements.reject do |entry|
+    statement = entry['statement']
+    has_type = statement.match?(/request\.principal\.type/i)
+    has_identifier = statement.match?(/request\.principal\.(?:id|compartment\.id)/i)
+    has_type && has_identifier
+  end
+
+  malformed_statements.each do |entry|
+    findings << entry.merge('issue' => 'Statement includes request.principal but is missing request.principal.type and/or request.principal.id/request.principal.compartment.id')
+  end
+
+  if request_principal_statements.empty?
+    impact 0.0
+    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
+      skip 'No IAM policy statements with request.principal were found.'
+    end
+  else
+    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
+      subject { findings }
+      it { should cmp [] }
+    end
+  end
 end
