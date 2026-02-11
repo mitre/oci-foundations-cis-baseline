@@ -83,13 +83,12 @@ control 'oci-foundations-1.12' do
         api_keys = api_keys_response.dig('data', 'resources') || []
 
         api_keys.each do |api_key|
-          admins_with_api_keys << "Username: #{user_name}\n\t  User OCID: #{user_ocid}\n\t  API Key ID: #{api_key['id']}\n\t  Domain URL: #{domain_url}\n"
-          # admins_with_api_keys << {
-          #    'user_name' => user_name,
-          #    'user_ocid' => user_ocid,
-          #    'api_key_id' => api_key['id'],
-          #    'domain_url' => domain_url
-          # }
+          admins_with_api_keys << <<~ENTRY.chomp
+            Username: #{user_name}
+            User OCID: #{user_ocid}
+            API Key ID: #{api_key['id']}
+            Domain URL: #{domain_url}
+          ENTRY
         end
       end
     end
@@ -101,13 +100,17 @@ control 'oci-foundations-1.12' do
       skip 'No Administrators group members found in the Default identity domain.'
     end
   else
-    # describe 'Ensure API keys are not created for tenancy administrator users' do
-    #   subject { admins_with_api_keys }
-    #   it { should cmp [] }
-    # end
+    numbered_findings = admins_with_api_keys.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
     describe 'Tenancy administrator users' do
       it 'should not have API keys associated with their accounts' do
-        expect(admins_with_api_keys).to be_empty, "Admins with keys:\n\t- #{admins_with_api_keys.join("\n\t- ")}"
+        expect(admins_with_api_keys).to be_empty, <<~MSG
+          Admins with keys:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
       end
     end
   end
