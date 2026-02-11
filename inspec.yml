@@ -34,7 +34,7 @@ inputs:
     description: "The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool"
     type: string
     required: true
-    value: ""
+    # don't provide a default for this one to force the user to provide it
 
   # 1.1
   - name: tenancy_level_policy_statements
