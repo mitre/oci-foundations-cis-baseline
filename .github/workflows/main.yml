@@ -20,7 +20,7 @@ jobs:
       OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
       OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
       OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
-      OCI_CLI_REGION: ${{ vars.SAF_OCI_CLI_REGION }}
+      OCI_CLI_REGION: ${{ vars.OCI_CLI_REGION }}
       OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
 
     steps:
@@ -95,7 +95,7 @@ jobs:
         run: |
           bundle exec cinc-auditor exec . \
             --input-file="${{ env.INPUT_FILE }}" \
-            --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" detector_recipe_ocid="${{ secrets.SAF_OCI_DETECTOR_RECIPE_OCID }}" \
+            --input tenancy_ocid="${{ secrets.OCI_CLI_TENANCY }}" detector_recipe_ocid="${{ secrets.OCI_DETECTOR_RECIPE_OCID }}" \
             --reporter cli json:${{ env.COMMIT_SHORT_SHA }}-${{ env.RESULTS_FILE }} --enhanced-outcomes --filter-empty-profiles || true
 
       - name: Save Test Result JSON
