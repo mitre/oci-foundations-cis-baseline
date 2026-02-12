@@ -59,20 +59,14 @@ control 'oci-foundations-4.18' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.18'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[8.11]
 
-  tag cci: [
-    'CCI-000133',
-    'CCI-000134',
-    'CCI-001875',
-    'CCI-000135'
-  ]
+  tag cci: %w[CCI-000133]
 
-  tag nist: [
-    'AU-3 d',
-    'AU-3 e',
-    'AU-7 a',
-    'AU-3 (1)'
-  ]
+  tag nist: ['AU-6']
 
   required_rule_conditions = [
     'com.oraclecloud.identitysignon.interactivelogin'

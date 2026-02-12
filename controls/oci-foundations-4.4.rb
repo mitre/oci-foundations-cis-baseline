@@ -65,26 +65,13 @@ control 'oci-foundations-4.4' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.4'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
 
-  tag cci: [
-    'CCI-002323',
-    'CCI-000364',
-    'CCI-000366',
-    'CCI-000381',
-    'CCI-001199',
-    'CCI-000540',
-    'CCI-002472'
-  ]
+  tag cci: []
 
-  tag nist: [
-    'AC-18 a',
-    'CM-6 a',
-    'CM-6 b',
-    'CM-7 a',
-    'SC-28',
-    'CP-9 (d)',
-    'SC-28'
-  ]
+  tag nist: []
 
   required_rule_conditions = [
     'com.oraclecloud.identitycontrolplane.addidpgroupmapping',

@@ -57,50 +57,14 @@ control 'oci-foundations-4.13' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.13'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[8.2 8.5 13.6]
 
-  tag cci: [
-    'CCI-000011',
-    'CCI-002124',
-    'CCI-002123',
-    'CCI-002121',
-    'CCI-000123',
-    'CCI-000169',
-    'CCI-000172',
-    'CCI-000126',
-    'CCI-000130',
-    'CCI-000131',
-    'CCI-000132',
-    'CCI-000172',
-    'CCI-002110',
-    'CCI-002111',
-    'CCI-002122',
-    'CCI-001253',
-    'CCI-002641',
-    'CCI-001255',
-    'CCI-002654'
-  ]
+  tag cci: %w[CCI-000123 CCI-000130 CCI-001253]
 
-  tag nist: [
-    'AC-2 f',
-    'AC-2 h 2',
-    'AC-2 h 1',
-    'AC-2 f',
-    'AU-2 a',
-    'AU-12 a',
-    'AU-12 c',
-    'AU-2 c',
-    'AU-3 a',
-    'AU-3 b',
-    'AU-3 c',
-    'AU-12 c',
-    'AC-2 a',
-    'AC-2 a',
-    'AC-2 g',
-    'SI-4 a 1',
-    'SI-4 a 1',
-    'SI-4 c 1',
-    'SI-4 g'
-  ]
+  tag nist: ['AU-2', 'AU-3', 'SI-4']
 
   regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
   compartments = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null').params.fetch('data', []).map { |compartment| compartment['id'] }.compact
@@ -139,14 +103,16 @@ control 'oci-foundations-4.13' do
               (protocol.empty? || protocol.casecmp('all').zero?) &&
               rule['sampling-rate'].to_i == 1
           end
-      end.map { |capture_filter| capture_filter['id'] }.compact
+      end
+      compliant_filter_ids = compliant_filter_ids.map { |capture_filter| capture_filter['id'] }.compact
 
       compliant_resources = logs.select do |log|
         capture_filter_id = log.dig('configuration', 'source', 'parameters', 'capture_filter').to_s
         log['lifecycle-state'] == 'ACTIVE' &&
           log['is-enabled'] == true &&
           compliant_filter_ids.include?(capture_filter_id)
-      end.map { |log| log.dig('configuration', 'source', 'resource').to_s }.reject(&:empty?)
+      end
+      compliant_resources = compliant_resources.map { |log| log.dig('configuration', 'source', 'resource').to_s }.reject(&:empty?)
 
       subnets.each do |subnet|
         subnet_id = subnet['id'].to_s

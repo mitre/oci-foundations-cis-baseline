@@ -65,28 +65,14 @@ control 'oci-foundations-4.17' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.17'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[8.2]
 
-  tag cci: [
-    'CCI-000011',
-    'CCI-002124',
-    'CCI-002123',
-    'CCI-002121',
-    'CCI-000123',
-    'CCI-000169',
-    'CCI-000172',
-    'CCI-000126'
-  ]
+  tag cci: %w[CCI-000123]
 
-  tag nist: [
-    'AC-2 f',
-    'AC-2 h 2',
-    'AC-2 h 1',
-    'AC-2 f',
-    'AU-2 a',
-    'AU-12 a',
-    'AU-12 c',
-    'AU-2 c'
-  ]
+  tag nist: ['AU-2']
 
   regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
   compartments = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null').params.fetch('data', []).map { |compartment| compartment['id'] }.compact

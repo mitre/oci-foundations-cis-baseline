@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# rubocop:disable Metrics
+
 # Script to update OCI CIS control files:
 #   ruby update_controls.rb rename  — Rename files and control IDs, remove STIG tags
 #   ruby update_controls.rb tags    — Fix CCI/NIST tags, add CIS-specific tags
@@ -58,7 +60,6 @@ end
 def rename_content(content, ref)
   lines = content.lines
   result = []
-  skip_multiline_cci = false
 
   lines.each do |line|
     # Replace control ID line (handle both single and double quotes)
@@ -68,14 +69,10 @@ def rename_content(content, ref)
     end
 
     # Remove STIG-specific key:value tags
-    if line =~ /\A\s*tag\s+(#{STIG_TAGS.join('|')}):/
-      next
-    end
+    next if line =~ /\A\s*tag\s+(#{STIG_TAGS.join('|')}):/
 
     # Remove standalone tag 'documentable'
-    if line =~ /\A\s*tag\s+['"]documentable['"]\s*$/
-      next
-    end
+    next if line =~ /\A\s*tag\s+['"]documentable['"]\s*$/
 
     # Remove blank lines left by removed tags (consecutive blanks will be cleaned later)
     result << line
@@ -203,9 +200,7 @@ def update_tags(content, ref, rec, cci_map)
       # Skip all old tag lines (we'll rewrite them)
       if line =~ /\A\s*tag\s+/
         # Check if this starts a multi-line array
-        if line =~ /\A\s*tag\s+(cci|nist):\s*\[/ && !line.include?(']')
-          skip_until_closing_bracket = true
-        end
+        skip_until_closing_bracket = true if line =~ /\A\s*tag\s+(cci|nist):\s*\[/ && !line.include?(']')
         next
       end
 
@@ -239,20 +234,20 @@ def write_new_tags(result, ref, cis_level, assessment_status, v8_controls, ccis,
   result << "  tag assessment_status: '#{assessment_status}'\n"
 
   if v8_controls.any?
-    if v8_controls.length == 1
-      result << "  tag cis_controls: %w[#{v8_controls.first}]\n"
-    else
-      result << "  tag cis_controls: %w[#{v8_controls.join(' ')}]\n"
-    end
+    result << if v8_controls.length == 1
+                "  tag cis_controls: %w[#{v8_controls.first}]\n"
+              else
+                "  tag cis_controls: %w[#{v8_controls.join(' ')}]\n"
+              end
   end
 
   result << "\n"
 
-  if ccis.any?
-    result << "  tag cci: %w[#{ccis.join(' ')}]\n"
-  else
-    result << "  tag cci: []\n"
-  end
+  result << if ccis.any?
+              "  tag cci: %w[#{ccis.join(' ')}]\n"
+            else
+              "  tag cci: []\n"
+            end
 
   result << "\n"
 
@@ -276,8 +271,9 @@ when 'rename'
 when 'tags'
   run_tags
 else
-  puts "Usage: ruby update_controls.rb [rename|tags]"
-  puts "  rename  — Rename files + control IDs, remove STIG tags"
-  puts "  tags    — Fix CCI/NIST, add CIS-specific tags"
+  puts 'Usage: ruby update_controls.rb [rename|tags]'
+  puts '  rename  — Rename files + control IDs, remove STIG tags'
+  puts '  tags    — Fix CCI/NIST, add CIS-specific tags'
   exit 1
 end
+# rubocop:enable Metrics

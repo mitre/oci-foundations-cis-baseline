@@ -52,44 +52,14 @@ control 'oci-foundations-4.14' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.14'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[8.2 8.5 8.11]
 
-  tag cci: [
-    'CCI-000011',
-    'CCI-002124',
-    'CCI-002123',
-    'CCI-002121',
-    'CCI-000123',
-    'CCI-000169',
-    'CCI-000172',
-    'CCI-000126',
-    'CCI-000130',
-    'CCI-000131',
-    'CCI-000132',
-    'CCI-000172',
-    'CCI-000133',
-    'CCI-000134',
-    'CCI-001875',
-    'CCI-000135'
-  ]
+  tag cci: %w[CCI-000123 CCI-000130 CCI-000133]
 
-  tag nist: [
-    'AC-2 f',
-    'AC-2 h 2',
-    'AC-2 h 1',
-    'AC-2 f',
-    'AU-2 a',
-    'AU-12 a',
-    'AU-12 c',
-    'AU-2 c',
-    'AU-3 a',
-    'AU-3 b',
-    'AU-3 c',
-    'AU-12 c',
-    'AU-3 d',
-    'AU-3 e',
-    'AU-7 a',
-    'AU-3 (1)'
-  ]
+  tag nist: ['AU-2', 'AU-3', 'AU-6']
 
   tenancy_ocid = input('tenancy_ocid')
 

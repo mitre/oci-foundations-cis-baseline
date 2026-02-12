@@ -64,42 +64,14 @@ control 'oci-foundations-1.4' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.4'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[4.1 5.2]
 
-  tag cci: [
-    'CCI-000364',
-    'CCI-000365',
-    'CCI-000366',
-    'CCI-000421',
-    'CCI-001097',
-    'CCI-001098',
-    'CCI-002395',
-    'CCI-002110',
-    'CCI-002111',
-    'CCI-002112',
-    'CCI-000012',
-    'CCI-000200',
-    'CCI-000199',
-    'CCI-000205',
-    'CCI-000204'
-  ]
+  tag cci: %w[CCI-000364 CCI-000200]
 
-  tag nist: [
-    'CM-6 a',
-    'CM-6 a',
-    'CM-6 b',
-    'CM-9 a',
-    'SC-7 a',
-    'SC-7 c',
-    'SC-7 b',
-    'AC-2 a',
-    'AC-2 a',
-    'AC-2 b',
-    'AC-2 j',
-    'IA-5 (1) (e)',
-    'IA-5 (1) (d)',
-    'IA-5 (1) (a)',
-    'IA-5 (8)'
-  ]
+  tag nist: ['CM-6', 'IA-5']
 
   tenancy_ocid = input('tenancy_ocid')
 
@@ -118,13 +90,13 @@ control 'oci-foundations-1.4' do
       next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
 
       length_value = policy.fetch('min-length', nil)
-      min_length_values << (length_value.nil? ? nil : length_value.to_i)
+      min_length_values << length_value&.to_i
 
       numeric_value = policy.fetch('min-numerals', nil)
-      min_numeric_values << (numeric_value.nil? ? nil : numeric_value.to_i)
+      min_numeric_values << numeric_value&.to_i
 
       special_value = policy.fetch('min-special-chars', nil)
-      min_special_values << (special_value.nil? ? nil : special_value.to_i)
+      min_special_values << special_value&.to_i
     end
   end
 

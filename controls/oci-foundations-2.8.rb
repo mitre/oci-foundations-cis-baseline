@@ -51,32 +51,14 @@ control 'oci-foundations-2.8' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '2.8'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[4.4 12.3]
 
-  tag cci: [
-    'CCI-001097',
-    'CCI-001098',
-    'CCI-002395',
-    'CCI-002668',
-    'CCI-002669',
-    'CCI-001243',
-    'CCI-001184',
-    'CCI-000364',
-    'CCI-000366',
-    'CCI-000381'
-  ]
+  tag cci: %w[CCI-001097 CCI-001184]
 
-  tag nist: [
-    'SC-7 a',
-    'SC-7 c',
-    'SC-7 b',
-    'SI-4 (11)',
-    'SI-4 (13) (c)',
-    'SI-3 c 2',
-    'SC-23',
-    'CM-6 a',
-    'CM-6 b',
-    'CM-7 a'
-  ]
+  tag nist: ['SC-7', 'SC-23']
 
   allowed_adb_whitelisted_ips = input('allowed_adb_whitelisted_ips')
   allowed_adb_whitelisted_ips = allowed_adb_whitelisted_ips.map { |value| value.to_s.strip.downcase }.reject(&:empty?)

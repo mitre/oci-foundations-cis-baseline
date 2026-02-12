@@ -59,22 +59,14 @@ control 'oci-foundations-1.16' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.16'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[5.3]
 
-  tag cci: [
-    'CCI-000011',
-    'CCI-002121',
-    'CCI-000012',
-    'CCI-002122',
-    'CCI-000664'
-  ]
+  tag cci: %w[CCI-000011]
 
-  tag nist: [
-    'AC-2 f',
-    'AC-2 f',
-    'AC-2 j',
-    'AC-2 g',
-    'SA-8'
-  ]
+  tag nist: ['AC-2']
 
   describe 'Ensure OCI IAM credentials unused for 45 days or more are disabled' do
     skip 'The check for this control needs to be done manually'

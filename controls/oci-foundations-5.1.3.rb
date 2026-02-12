@@ -40,6 +40,13 @@ control 'oci-foundations-5.1.3' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '5.1.3'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Automated'
+
+  tag cci: []
+
+  tag nist: []
 
   cmd = <<~CMD
     (

@@ -26,26 +26,14 @@ control 'oci-foundations-1.6' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.6'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[5.2]
 
-  tag cci: [
-    'CCI-001097',
-    'CCI-001098',
-    'CCI-002395',
-    'CCI-000200',
-    'CCI-000199',
-    'CCI-000205',
-    'CCI-000204'
-  ]
+  tag cci: %w[CCI-000200]
 
-  tag nist: [
-    'SC-7 a',
-    'SC-7 c',
-    'SC-7 b',
-    'IA-5 (1) (e)',
-    'IA-5 (1) (d)',
-    'IA-5 (1) (a)',
-    'IA-5 (8)'
-  ]
+  tag nist: ['IA-5']
 
   tenancy_ocid = input('tenancy_ocid')
 
@@ -62,7 +50,7 @@ control 'oci-foundations-1.6' do
       next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
 
       value = policy['num-passwords-in-history']
-      history_values << (value.nil? ? nil : value.to_i)
+      history_values << value&.to_i
     end
   end
 

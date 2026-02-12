@@ -49,34 +49,14 @@ control 'oci-foundations-1.15' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.15'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[5.4 6.8]
 
-  tag cci: [
-    'CCI-000056',
-    'CCI-000059',
-    'CCI-000058',
-    'CCI-002113',
-    'CCI-002117',
-    'CCI-002118',
-    'CCI-002126',
-    'CCI-002113',
-    'CCI-002117',
-    'CCI-002118',
-    'CCI-000008'
-  ]
+  tag cci: %w[CCI-002113]
 
-  tag nist: [
-    'AC-11 b',
-    'AC-11 a',
-    'AC-11 a',
-    'AC-2 c',
-    'AC-2 d 2',
-    'AC-2 d 3',
-    'AC-2 i 1',
-    'AC-2 c',
-    'AC-2 d 2',
-    'AC-2 d 3',
-    'AC-2 c'
-  ]
+  tag nist: ['AC-2']
 
   cmd = <<~CMD
     (

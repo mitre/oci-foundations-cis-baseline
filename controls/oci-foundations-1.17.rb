@@ -34,20 +34,14 @@ control 'oci-foundations-1.17' do
   impact 0.5
 
   tag severity: 'medium'
-  tag cci: '%w[CCI-000364 CCI-000365 CCI-000366 CCI-000421 CCI-001097 CCI-001098 CCI-002395'
+  tag benchmark_ref: '1.17'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[5]
 
-  tag nist: [
-    'CM-6 a',
-    'CM-6 a',
-    'CM-6 b',
-    'CM-9 a',
-    'SC-7 a',
-    'SC-7 c',
-    'SC-7 b',
-    'AC-2 a',
-    'AC-2 a',
-    'AC-2 b'
-  ]
+  tag cci: %w[CCI-000015]
+
+  tag nist: ['AC-2']
 
   users_with_multiple_api_keys = []
   total_users = 0

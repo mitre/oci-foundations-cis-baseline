@@ -38,28 +38,14 @@ control 'oci-foundations-1.11' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.11'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[4.1 5.2]
 
-  tag cci: [
-    'CCI-000364',
-    'CCI-000365',
-    'CCI-000366',
-    'CCI-000421',
-    'CCI-000200',
-    'CCI-000199',
-    'CCI-000205',
-    'CCI-000204'
-  ]
+  tag cci: %w[CCI-000364 CCI-000200]
 
-  tag nist: [
-    'CM-6 a',
-    'CM-6 a',
-    'CM-6 b',
-    'CM-9 a',
-    'IA-5 (1) (e)',
-    'IA-5 (1) (d)',
-    'IA-5 (1) (a)',
-    'IA-5 (8)'
-  ]
+  tag nist: ['CM-6', 'IA-5']
 
   require 'time'
 

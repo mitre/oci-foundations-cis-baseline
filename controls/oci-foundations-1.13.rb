@@ -30,30 +30,14 @@ control 'oci-foundations-1.13' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '1.13'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[5.1]
 
-  tag cci: [
-    'CCI-002110',
-    'CCI-002111',
-    'CCI-002112',
-    'CCI-000012',
-    'CCI-001054',
-    'CCI-001058',
-    'CCI-001060',
-    'CCI-001059',
-    'CCI-001057'
-  ]
+  tag cci: %w[CCI-002110]
 
-  tag nist: [
-    'AC-2 a',
-    'AC-2 a',
-    'AC-2 b',
-    'AC-2 j',
-    'RA-5 a',
-    'RA-5 c',
-    'RA-5 d',
-    'RA-5 d',
-    'RA-5 b 1'
-  ]
+  tag nist: ['AC-2']
 
   compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
   compartments_data = compartments_response.params.fetch('data', [])

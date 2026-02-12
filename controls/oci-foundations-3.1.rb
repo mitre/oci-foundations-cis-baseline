@@ -55,18 +55,14 @@ control 'oci-foundations-3.1' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '3.1'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[4.8]
 
-  tag cci: [
-    'CCI-000381',
-    'CCI-000382',
-    'CCI-000380'
-  ]
+  tag cci: %w[CCI-000381]
 
-  tag nist: [
-    'CM-7 a',
-    'CM-7 b',
-    'CM-7 b'
-  ]
+  tag nist: ['CM-7']
 
   regions_response = json(command: 'oci iam region-subscription list --all')
   regions_data = regions_response.params.fetch('data', [])

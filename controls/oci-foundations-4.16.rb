@@ -33,6 +33,14 @@ control 'oci-foundations-4.16' do
   impact 0.5
 
   tag severity: 'medium'
+  tag benchmark_ref: '4.16'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[0.0]
+
+  tag cci: []
+
+  tag nist: []
 
   require 'time'
 
