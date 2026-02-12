@@ -42,22 +42,44 @@ control 'oci-foundations-1.3' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd_users = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i ' to use users in tenancy' | jq -nR '[inputs]'"
-  cmd_groups = "oci iam policy list --compartment-id '#{tenancy_ocid}' | grep -i ' to use groups in tenancy' | jq -nR '[inputs]'"
+  policies_response = json(command: %(oci iam policy list --compartment-id "#{tenancy_ocid}" --all 2>/dev/null))
+  policies = policies_response.params.fetch('data', [])
 
-  users_output = json(command: cmd_users)
-  users_params = users_output.params
+  user_group_admin_statement_regex = /\ballow\b.+\bto\b.+\b(?:use|manage)\b\s+(?:users|groups)\s+in\s+tenancy\b/i
+  has_exclusion_regex = /where\b.*\badministrators\b.*(?:!=|<>|\bnot\b|\bneq\b|\bnotin\b)|where\b.*(?:!=|<>|\bnot\b|\bneq\b|\bnotin\b).*\badministrators\b/i
 
-  groups_output = json(command: cmd_groups)
-  groups_params = groups_output.params
+  findings = []
 
-  policy_statements = [users_params, groups_params].flatten.compact.map { |policy| policy.to_s.strip }.reject(&:empty?)
+  policies.each do |policy|
+    policy_name = policy['name']
+    policy_id = policy['id']
 
-  exclusion_regex = /where .*target\.group\.name\s*!=\s*['"]?Administrators['"]?/i
-  non_excluded_policies = policy_statements.reject { |policy| policy.match?(exclusion_regex) }
+    Array(policy['statements']).each do |statement|
+      normalized_statement = statement.to_s.strip
+      next if normalized_statement.empty?
+      next unless normalized_statement.match?(user_group_admin_statement_regex)
+      next if normalized_statement.match?(has_exclusion_regex)
 
-  describe 'Ensure IAM administrators cannot update tenancy Administrators group' do
-    subject { non_excluded_policies }
-    it { should cmp [] }
+      findings << <<~ENTRY.chomp
+        Policy Name: #{policy_name}
+        Policy ID: #{policy_id}
+        Statement: #{normalized_statement}
+        Issue: Statement grants "use/manage users or groups in tenancy" without excluding Administrators.
+      ENTRY
+    end
+  end
+
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'IAM user and group administration policy statements' do
+    it 'should exclude Administrators group access from "use/manage users and groups in tenancy" statements' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

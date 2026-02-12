@@ -60,13 +60,68 @@ control 'oci-foundations-5.1.1' do
 
   tag nist: ['AC-3']
 
-  cmd = %q{oci search resource structured-search --query-text "query bucket resources where (publicAccessType == 'ObjectRead') || (publicAccessType == 'ObjectReadWithoutList')"}
-  json_output = json(command: cmd)
-  output = json_output.params.dig('data', 'items')
+  query_text = %(query bucket resources where (publicAccessType == 'ObjectRead') || (publicAccessType == 'ObjectReadWithoutList'))
 
-  describe 'Ensure no Object Storage buckets are publicly visible' do
-    subject { output }
-    it { should cmp [] }
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id'].to_s
+    next if compartment_id.empty?
+
+    map[compartment_id] = compartment['name']
+  end
+
+  findings = []
+  seen_identifiers = {}
+
+  regions.each do |region|
+    search_response = json(
+      command: %(oci search resource structured-search --region "#{region}" --query-text "#{query_text}" --limit 1000 2>/dev/null)
+    )
+    items = search_response.params.dig('data', 'items') || []
+
+    items.each do |item|
+      identifier = item['identifier'].to_s
+      next if identifier.empty?
+      next if seen_identifiers[identifier]
+
+      seen_identifiers[identifier] = true
+      compartment_id = item['compartment-id'].to_s
+      compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
+      additional_details = item['additional-details']
+      public_access_type = item['public-access-type'].to_s
+      if public_access_type.empty? && additional_details.is_a?(Hash)
+        public_access_type = additional_details['publicAccessType'].to_s
+      end
+
+      findings << <<~ENTRY.chomp
+        Bucket Name: #{item['display-name']}
+        Identifier: #{identifier}
+        Region: #{region}
+        Compartment Name: #{compartment_name}
+        Compartment ID: #{compartment_id}
+        Public Access Type: #{public_access_type.empty? ? 'Unknown' : public_access_type}
+        Issue: Bucket is publicly visible
+      ENTRY
+    end
+  end
+
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Object Storage buckets' do
+    it 'should not be publicly visible' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 
   cloud_guard_check = input('cloud_guard_check')

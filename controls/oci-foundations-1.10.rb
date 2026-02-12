@@ -79,20 +79,23 @@ control 'oci-foundations-1.10' do
       auth_tokens.each do |auth_token|
         created_at = auth_token.dig('meta', 'created')
 
-        token_details = {
-          'user_name' => user_name,
-          'domain_url' => domain_url,
-          'auth_token_id' => auth_token['id'],
-          'user_ocid' => user_ocid,
-          'created' => created_at
-        }
+        created_time = begin
+          Time.parse(created_at.to_s).utc
+        rescue StandardError
+          nil
+        end
 
-        created_time = Time.parse(created_at.to_s).utc
-
-        next unless created_time < cutoff_time
+        next if created_time.nil? || created_time >= cutoff_time
 
         age_days = ((now - created_time) / 86_400).floor
-        stale_auth_tokens << token_details.merge('age_days' => age_days)
+        stale_auth_tokens << <<~ENTRY.chomp
+          Username: #{user_name}
+          User OCID: #{user_ocid}
+          Auth Token ID: #{auth_token['id']}
+          Domain URL: #{domain_url}
+          Created: #{created_at}
+          Age Days: #{age_days}
+        ENTRY
       end
     end
   end
@@ -103,9 +106,18 @@ control 'oci-foundations-1.10' do
       skip 'No auth tokens found in tenancy.'
     end
   else
-    describe 'Ensure user auth tokens rotate within 90 days or less' do
-      subject { stale_auth_tokens }
-      it { should cmp [] }
+    numbered_findings = stale_auth_tokens.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'User auth tokens' do
+      it 'should rotate within 90 days or less' do
+        expect(stale_auth_tokens).to be_empty, <<~MSG
+          Stale auth tokens:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

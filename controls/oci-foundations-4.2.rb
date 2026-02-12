@@ -56,32 +56,74 @@ control 'oci-foundations-4.2' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = "oci iam compartment list --compartment-id '#{tenancy_ocid}' --include-root --compartment-id-in-subtree true --all"
-  compartments = json(command: cmd)
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  compartment_ids = compartments.params.fetch('data', []).select { |field| field['lifecycle-state'] == 'ACTIVE' }.map { |field| field['id'] }
+  compartments_response = json(
+    command: %(oci iam compartment list --compartment-id "#{tenancy_ocid}" --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null)
+  )
+  compartments_data = compartments_response.params.fetch('data', [])
+  active_compartments = compartments_data.select { |compartment| compartment['lifecycle-state'] == 'ACTIVE' }
 
-  active_subs = []
+  active_subscription_entries = []
 
-  compartment_ids.each do |compartment_id|
-    topics_cmd = "oci ons topic list --compartment-id '#{compartment_id}' --all"
-    topics = json(command: topics_cmd)
-    topic_data = topics.params.fetch('data', [])
-    active_topics = topic_data.select { |field| field['lifecycle-state'] == 'ACTIVE' }
+  regions.each do |region|
+    active_compartments.each do |compartment|
+      compartment_id = compartment['id']
+      compartment_name = compartment['name']
+      next if compartment_id.to_s.empty?
 
-    active_topics.each do |topic|
-      topic_id = topic['topic-id']
-      subs_cmd = "oci ons subscription list --compartment-id '#{compartment_id}' --topic-id '#{topic_id}' --all"
-      subs = json(command: subs_cmd)
-      subs_data = subs.params.fetch('data', [])
-      topic_active_subs = subs_data.select { |field| field['lifecycle-state'] == 'ACTIVE' }
+      topics_response = json(command: %(oci ons topic list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null))
+      topics_data = topics_response.params.fetch('data', [])
+      active_topics = topics_data.select { |topic| topic['lifecycle-state'] == 'ACTIVE' }
 
-      active_subs.concat(topic_active_subs) if topic_active_subs.any?
+      active_topics.each do |topic|
+        topic_id = topic['topic-id']
+        next if topic_id.to_s.empty?
+
+        subscriptions_response = json(
+          command: %(oci ons subscription list --compartment-id "#{compartment_id}" --topic-id "#{topic_id}" --region "#{region}" --all 2>/dev/null)
+        )
+        subscriptions_data = subscriptions_response.params.fetch('data', [])
+        active_subscriptions = subscriptions_data.select { |subscription| subscription['lifecycle-state'] == 'ACTIVE' }
+
+        active_subscriptions.each do |subscription|
+          active_subscription_entries << <<~ENTRY.chomp
+            Region: #{region}
+            Compartment Name: #{compartment_name}
+            Compartment ID: #{compartment_id}
+            Topic Name: #{topic['name']}
+            Topic ID: #{topic_id}
+            Subscription Protocol: #{subscription['protocol']}
+            Subscription Endpoint: #{subscription['endpoint']}
+            Subscription ID: #{subscription['id']}
+          ENTRY
+        end
+      end
     end
   end
 
-  describe 'Create at least one notification topic and subscription to receive monitoring alerts' do
-    subject { active_subs }
-    it { should_not cmp [] }
+  findings = []
+  if active_subscription_entries.empty?
+    findings << <<~ENTRY.chomp
+      Issue: No ACTIVE ONS subscription found for monitoring alerts.
+      Active Compartment Count: #{active_compartments.length}
+      Searched Regions: #{regions.empty? ? 'None' : regions.join(', ')}
+    ENTRY
+  end
+
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Notification topics and subscriptions' do
+    it 'should include at least one ACTIVE subscription to receive monitoring alerts' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end
