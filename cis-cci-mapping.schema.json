@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cis-cci-mapping.schema.json",
+  "title": "CIS Controls to CCI/NIST Mapping",
+  "description": "Maps CIS Controls safeguard IDs to DISA CCI identifiers and NIST SP 800-53 controls. Used by MITRE SAF InSpec profiles to tag compliance controls with authoritative CCI/NIST references.",
+  "type": "object",
+  "required": ["cis_controls_version", "generated_at", "source", "entry_count", "mappings"],
+  "properties": {
+    "cis_controls_version": {
+      "type": "string",
+      "description": "CIS Controls version (e.g., '7', '8', '8.1')",
+      "enum": ["7", "8", "8.1"]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date when this mapping file was generated"
+    },
+    "source": {
+      "type": "string",
+      "description": "Authority or method used to produce mappings (e.g., 'CIS Controls v8 + cyber.trackr.live/api')"
+    },
+    "entry_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of mapping entries (must match length of mappings array)"
+    },
+    "mappings": {
+      "type": "array",
+      "description": "Array of CIS safeguard to CCI/NIST mappings",
+      "items": {
+        "$ref": "#/$defs/mapping_entry"
+      }
+    }
+  },
+  "$defs": {
+    "mapping_entry": {
+      "type": "object",
+      "required": ["cis_id", "cis_title", "primary_cci", "nist_control", "mapping_status"],
+      "properties": {
+        "cis_id": {
+          "type": "string",
+          "description": "CIS Controls safeguard ID (e.g., '5.4') or OCI-prefixed override (e.g., 'OCI-4.4')",
+          "pattern": "^(OCI-)?[0-9]+(\\.[0-9]+)*$"
+        },
+        "cis_title": {
+          "type": "string",
+          "description": "Human-readable title of the CIS safeguard or override"
+        },
+        "primary_cci": {
+          "oneOf": [
+            { "$ref": "#/$defs/cci_entry" },
+            { "type": "null" }
+          ],
+          "description": "Primary CCI mapping used in InSpec control tags (null for NOT_MAPPED entries)"
+        },
+        "supporting_ccis": {
+          "type": "array",
+          "description": "Additional CCIs that support the mapping (not used in control tags)",
+          "items": {
+            "$ref": "#/$defs/cci_entry"
+          }
+        },
+        "nist_control": {
+          "type": "string",
+          "description": "NIST SP 800-53 control family or enhancement (e.g., 'AC-2', 'SC-7 (5)')",
+          "pattern": "^([A-Z]{2}-[0-9]+(\\s*\\([0-9]+\\))?(\\.[0-9a-z]+)?|N/A)$"
+        },
+        "coverage_assessment": {
+          "type": "string",
+          "description": "Narrative assessment of how well CCI/NIST covers the CIS safeguard"
+        },
+        "mapping_status": {
+          "type": "string",
+          "description": "How this mapping was derived",
+          "enum": ["OFFICIAL", "MANUAL", "NOT_MAPPED"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "cci_entry": {
+      "type": "object",
+      "required": ["cci", "confidence", "reasoning"],
+      "properties": {
+        "cci": {
+          "type": "string",
+          "description": "DISA CCI identifier (e.g., 'CCI-000015')",
+          "pattern": "^CCI-[0-9]{6}$"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score for this mapping (0.0-1.0)"
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "Explanation of why this CCI maps to the CIS safeguard"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

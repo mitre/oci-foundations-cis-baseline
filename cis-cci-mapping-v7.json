@@ -1,0 +1,2977 @@
+{
+  "cis_controls_version": "7",
+  "generated_at": "2026-02-12",
+  "source": "CIS Controls v7.1 + cyber.trackr.live/api CCI lookup",
+  "entry_count": 172,
+  "mappings": [
+    {
+      "cis_id": "0.0",
+      "cis_title": "Explicitly Not Mapped",
+      "primary_cci": null,
+      "supporting_ccis": [],
+      "nist_control": "N/A",
+      "coverage_assessment": "CIS explicitly does not map this control to any CIS Controls safeguard.",
+      "mapping_status": "NOT_MAPPED"
+    },
+    {
+      "cis_id": "1.1",
+      "cis_title": "Utilize an Active Discovery Tool",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.95,
+        "reasoning": "SI-4.2 \u2014 monitors the system to detect attacks and indicators of potential attacks. Active discovery tools are a form of system monitoring that detects unauthorized assets/connections."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 broadly covers system monitoring including active network discovery. Direct match for active scanning/discovery tools.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.2",
+      "cis_title": "Use a Passive Asset Discovery Tool",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.9,
+        "reasoning": "SI-4.2 \u2014 system monitoring to detect attacks and indicators. Passive discovery is a monitoring technique that observes network traffic rather than actively probing."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000389",
+          "reasoning": "CM-8.1 \u2014 develop/document inventory that accurately reflects the system. Passive discovery feeds asset inventory.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 covers passive monitoring techniques. CM-8 adds inventory context since passive discovery is used to maintain asset awareness.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.3",
+      "cis_title": "Use DHCP Logging to Update Asset Inventory",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.9,
+        "reasoning": "CM-8.1 \u2014 develop/document inventory that accurately reflects the current system. DHCP logging is a mechanism to keep hardware asset inventory accurate and current."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 covers maintaining accurate system component inventory. DHCP logging is a technique to ensure inventory reflects actual network-connected devices.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.4",
+      "cis_title": "Maintain Detailed Asset Inventory",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.95,
+        "reasoning": "CM-8.1 requires developing an inventory of information system components that accurately reflects the current system."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000395",
+          "confidence": 0.9,
+          "reasoning": "CM-8.3 requires inventory at the level of granularity deemed necessary for tracking and reporting."
+        },
+        {
+          "cci": "CCI-001780",
+          "confidence": 0.85,
+          "reasoning": "CM-8.7 requires reviewing and updating the inventory per organization-defined frequency."
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "Strong coverage. CM-8 is the definitive NIST control for system component inventory.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.5",
+      "cis_title": "Maintain Asset Inventory Information",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.95,
+        "reasoning": "CM-8.1 \u2014 develop/document inventory that accurately reflects the current system. Direct match: maintaining asset inventory information is the core requirement of CM-8."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001780",
+          "reasoning": "CM-8.7 \u2014 reviews and updates the component inventory per defined frequency. Covers the ongoing maintenance aspect.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 is the canonical NIST control for asset inventory management. Near-perfect alignment.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.6",
+      "cis_title": "Address Unauthorized Assets",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.85,
+        "reasoning": "CM-8.1 \u2014 inventory that accurately reflects the system. Addressing unauthorized assets requires knowing what is authorized vs. not, which is the inventory's purpose."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002641",
+          "reasoning": "SI-4.2 \u2014 monitoring to detect attacks and unauthorized connections. Detecting unauthorized assets is a monitoring function.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 combined with CM-8(3) (automated unauthorized component detection) covers this best. Primary CCI from CM-8 base control since CM-8(3) CCIs tie to inventory accuracy.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.7",
+      "cis_title": "Deploy Port Level Access Control",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.9,
+        "reasoning": "SC-7.1 \u2014 monitors and controls communications at the external boundary and key internal boundaries. Port-level access control (802.1X, NAC) is boundary protection at the network port level."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 covers boundary protection including port-level access controls. 802.1X and NAC are implementations of boundary protection at the physical/data-link layer.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "1.8",
+      "cis_title": "Utilize Client Certificates to Authenticate Hardware Assets",
+      "primary_cci": {
+        "cci": "CCI-000778",
+        "confidence": 0.95,
+        "reasoning": "IA-3.2 \u2014 uniquely identifies organization-defined devices before establishing connections. Client certificates are a device identification and authentication mechanism."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001958",
+          "reasoning": "IA-3.3 \u2014 authenticates organization-defined devices before establishing connections. The authentication complement to identification.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IA-3",
+      "coverage_assessment": "IA-3 is the exact NIST control for device identification and authentication. Client certificates are a primary mechanism for implementing IA-3.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.1",
+      "cis_title": "Maintain Inventory of Authorized Software",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.9,
+        "reasoning": "CM-8.1 \u2014 develop/document inventory that accurately reflects the current system. CM-8 covers both hardware and software component inventory."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 covers system component inventory including software. The control statements explicitly reference software components in the discussion.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.2",
+      "cis_title": "Ensure Software is Supported by Vendor",
+      "primary_cci": {
+        "cci": "CCI-003376",
+        "confidence": 0.95,
+        "reasoning": "SA-22.1 \u2014 component replacement verification. SA-22 directly addresses replacing system components when vendor support is no longer available."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SA-22",
+      "coverage_assessment": "SA-22 (Unsupported System Components) is the exact NIST control for ensuring software/firmware has active vendor support. Direct alignment.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.3",
+      "cis_title": "Utilize Software Inventory Tools",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.9,
+        "reasoning": "CM-8.1 \u2014 develop/document inventory that accurately reflects the system. Software inventory tools are the mechanism to implement the CM-8 inventory requirement."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 covers system component inventory. The use of automated tools is addressed in CM-8(2) (automated maintenance) but the base control CCI captures the requirement.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.4",
+      "cis_title": "Track Software Inventory Information",
+      "primary_cci": {
+        "cci": "CCI-000399",
+        "confidence": 0.9,
+        "reasoning": "CM-8.5 \u2014 inventory that includes organization-defined information for effective component accountability. Tracking specific software inventory attributes (name, version, vendor, etc.) maps to accountability information."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 assessment procedure 5 specifically covers including organization-defined accountability information in the inventory, which is what tracking software attributes achieves.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.5",
+      "cis_title": "Integrate Software and Hardware Asset Inventories",
+      "primary_cci": {
+        "cci": "CCI-000392",
+        "confidence": 0.85,
+        "reasoning": "CM-8.2 \u2014 inventory includes all components within the authorization boundary. An integrated inventory that covers both hardware and software ensures completeness within the boundary."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000389",
+          "reasoning": "CM-8.1 \u2014 inventory that accurately reflects the current system. Integration of HW/SW inventories improves accuracy.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 covers comprehensive system component inventory. Integrating hardware and software inventories ensures completeness per CM-8a.2.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.6",
+      "cis_title": "Address Unapproved Software",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.9,
+        "reasoning": "CM-7.1 \u2014 system configured for essential capabilities only. Addressing unapproved software is about restricting system functionality to only authorized/approved software."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 (Least Functionality) covers restricting software to only approved/needed components. Directly addresses removing or preventing unapproved software.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.7",
+      "cis_title": "Utilize Application Whitelisting",
+      "primary_cci": {
+        "cci": "CCI-001774",
+        "confidence": 0.95,
+        "reasoning": "CM-7(5).3 \u2014 employs deny-all, permit-by-exception policy for software execution. This is the literal definition of application whitelisting."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001773",
+          "reasoning": "CM-7(5).2 \u2014 identifies authorized software programs. The identification step that precedes whitelisting enforcement.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7 (5)",
+      "coverage_assessment": "CM-7(5) is titled 'Authorized Software / Whitelisting' \u2014 exact match. The deny-all, permit-by-exception policy is application whitelisting by definition.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.8",
+      "cis_title": "Implement Application Whitelisting of Libraries",
+      "primary_cci": {
+        "cci": "CCI-001774",
+        "confidence": 0.9,
+        "reasoning": "CM-7(5).3 \u2014 deny-all, permit-by-exception for authorized software. Libraries are a subset of software programs; the whitelisting principle extends to libraries and DLLs."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-7 (5)",
+      "coverage_assessment": "CM-7(5) covers whitelisting of software programs, which includes libraries. The control scope encompasses all executable code including shared libraries.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.9",
+      "cis_title": "Implement Application Whitelisting of Scripts",
+      "primary_cci": {
+        "cci": "CCI-001774",
+        "confidence": 0.9,
+        "reasoning": "CM-7(5).3 \u2014 deny-all, permit-by-exception for authorized software. Scripts are a form of software program covered by the whitelisting policy."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-7 (5)",
+      "coverage_assessment": "CM-7(5) covers whitelisting of software programs, which includes scripts. The deny-all policy applies to all executable content including interpreted scripts.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "2.10",
+      "cis_title": "Physically or Logically Segregate High Risk Applications",
+      "primary_cci": {
+        "cci": "CCI-002395",
+        "confidence": 0.9,
+        "reasoning": "SC-7.2 \u2014 implements subnetworks for publicly accessible components that are physically/logically separated from internal networks. Segregation of high-risk applications is boundary protection through isolation."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 covers boundary protection including physical and logical separation of system components. Segregating high-risk applications aligns with subnetwork isolation requirements.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.1",
+      "cis_title": "Run Automated Vulnerability Scanning Tools",
+      "primary_cci": {
+        "cci": "CCI-001054",
+        "confidence": 0.95,
+        "reasoning": "RA-5.1 \u2014 defines scan frequency for vulnerability monitoring. Running automated vulnerability scanning is the core requirement of RA-5."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001057",
+          "reasoning": "RA-5.6 \u2014 employs interoperable vulnerability scanning tools. Addresses the 'automated tools' aspect specifically.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "RA-5",
+      "coverage_assessment": "RA-5 (Vulnerability Monitoring and Scanning) is the exact NIST control for automated vulnerability scanning. Direct alignment.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.2",
+      "cis_title": "Perform Authenticated Vulnerability Scanning",
+      "primary_cci": {
+        "cci": "CCI-001054",
+        "confidence": 0.9,
+        "reasoning": "RA-5.1 \u2014 defines vulnerability scan frequency and approach. Authenticated scanning is a more thorough form of vulnerability scanning covered by RA-5."
+      },
+      "supporting_ccis": [],
+      "nist_control": "RA-5",
+      "coverage_assessment": "RA-5 covers all forms of vulnerability scanning. Authenticated scanning provides deeper system analysis and is an implementation detail of the scanning requirement.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.3",
+      "cis_title": "Protect Dedicated Assessment Accounts",
+      "primary_cci": {
+        "cci": "CCI-000225",
+        "confidence": 0.85,
+        "reasoning": "AC-6.1 requires employing least privilege, allowing only authorized accesses necessary for assigned tasks."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002227",
+          "confidence": 0.8,
+          "reasoning": "AC-6(5).2 restricts privileged accounts to organization-defined personnel or roles."
+        }
+      ],
+      "nist_control": "AC-6",
+      "coverage_assessment": "Good coverage. AC-6 (least privilege) fits protecting dedicated assessment accounts.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.4",
+      "cis_title": "Deploy Automated Operating System Patch Management Tools",
+      "primary_cci": {
+        "cci": "CCI-001225",
+        "confidence": 0.95,
+        "reasoning": "SI-2.1 \u2014 identify, report, and correct system flaws. Automated OS patch management is the primary mechanism for flaw remediation."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002605",
+          "reasoning": "SI-2.9 \u2014 installs software updates within organization-defined timeframes. The automated deployment aspect of patch management.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-2",
+      "coverage_assessment": "SI-2 (Flaw Remediation) is the exact NIST control for patch management. Automated tools are the mechanism to implement timely flaw correction.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.5",
+      "cis_title": "Deploy Automated Software Patch Management Tools",
+      "primary_cci": {
+        "cci": "CCI-001225",
+        "confidence": 0.95,
+        "reasoning": "SI-2.1 \u2014 identify, report, and correct system flaws. Software patch management (beyond OS) is also flaw remediation."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-2",
+      "coverage_assessment": "SI-2 covers all flaw remediation including application-level software patching. Same control family as OS patching.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.6",
+      "cis_title": "Compare Back-to-Back Vulnerability Scans",
+      "primary_cci": {
+        "cci": "CCI-001058",
+        "confidence": 0.9,
+        "reasoning": "RA-5.7 \u2014 analyzes vulnerability scan reports/results. Comparing back-to-back scans is an analysis technique to identify remediation progress and new vulnerabilities."
+      },
+      "supporting_ccis": [],
+      "nist_control": "RA-5",
+      "coverage_assessment": "RA-5 covers vulnerability scan analysis. Comparing successive scans is part of the analysis and remediation verification process.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "3.7",
+      "cis_title": "Utilize a Risk-Rating Process",
+      "primary_cci": {
+        "cci": "CCI-001048",
+        "confidence": 0.95,
+        "reasoning": "RA-3.1 \u2014 assesses risk including likelihood and magnitude of harm from unauthorized access. A risk-rating process is the implementation of risk assessment."
+      },
+      "supporting_ccis": [],
+      "nist_control": "RA-3",
+      "coverage_assessment": "RA-3 (Risk Assessment) is the exact NIST control for risk rating/assessment processes. Direct alignment.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.1",
+      "cis_title": "Maintain Inventory of Administrative Accounts",
+      "primary_cci": {
+        "cci": "CCI-002110",
+        "confidence": 0.95,
+        "reasoning": "AC-2.1 requires defining information system account types that support organizational missions."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002118",
+          "confidence": 0.9,
+          "reasoning": "AC-2.9 requires specifying access authorizations (privileges) for each account."
+        },
+        {
+          "cci": "CCI-000012",
+          "confidence": 0.85,
+          "reasoning": "AC-2.22 requires reviewing accounts for compliance with account management requirements."
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "Strong coverage. AC-2 (Account Management) is the definitive control for managing and inventorying system accounts.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.2",
+      "cis_title": "Change Default Passwords",
+      "primary_cci": {
+        "cci": "CCI-001989",
+        "confidence": 0.97,
+        "reasoning": "IA-5.12 explicitly requires changing default content of authenticators prior to information system installation."
+      },
+      "supporting_ccis": [],
+      "nist_control": "IA-5",
+      "coverage_assessment": "Excellent coverage. CCI-001989 (IA-5.12) is a direct, precise match for changing default passwords.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.3",
+      "cis_title": "Ensure the Use of Dedicated Administrative Accounts",
+      "primary_cci": {
+        "cci": "CCI-002227",
+        "confidence": 0.92,
+        "reasoning": "AC-6(5).2 requires restricting privileged accounts to organization-defined personnel or roles."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000225",
+          "confidence": 0.85,
+          "reasoning": "AC-6.1 enforces least privilege for administrative tasks."
+        }
+      ],
+      "nist_control": "AC-6 (5)",
+      "coverage_assessment": "Strong coverage. AC-6(5) specifically addresses privileged accounts and restricting them to defined personnel/roles.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.4",
+      "cis_title": "Use Unique Passwords",
+      "primary_cci": {
+        "cci": "CCI-000192",
+        "confidence": 0.88,
+        "reasoning": "IA-5(1).1 enforces password complexity requirements for password-based authentication."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000200",
+          "confidence": 0.9,
+          "reasoning": "IA-5(1).18 prohibits password reuse for a defined number of generations."
+        },
+        {
+          "cci": "CCI-001544",
+          "confidence": 0.8,
+          "reasoning": "IA-5.3 ensures authenticators have sufficient strength of mechanism."
+        }
+      ],
+      "nist_control": "IA-5 (1)",
+      "coverage_assessment": "Good coverage. IA-5(1) addresses password-based authentication including complexity and reuse prevention.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.5",
+      "cis_title": "Use Multifactor Authentication For All Administrative Access",
+      "primary_cci": {
+        "cci": "CCI-000765",
+        "confidence": 0.97,
+        "reasoning": "IA-2(1).1 requires MFA for network access to privileged accounts."
+      },
+      "supporting_ccis": [],
+      "nist_control": "IA-2 (1)",
+      "coverage_assessment": "Excellent coverage. CCI-000765 (IA-2(1).1) is a direct match for MFA on administrative access.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.6",
+      "cis_title": "Use Dedicated Workstations For All Administrative Tasks",
+      "primary_cci": {
+        "cci": "CCI-002227",
+        "confidence": 0.9,
+        "reasoning": "AC-6(5).2 \u2014 restricts privileged accounts to organization-defined personnel or roles. Dedicated admin workstations enforce privileged account restrictions by separating admin functions to specific systems."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002226",
+          "reasoning": "AC-6(5).1 \u2014 defines personnel/roles to whom privileged accounts are restricted. Identifying who uses dedicated admin workstations.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AC-6 (5)",
+      "coverage_assessment": "AC-6(5) (Privileged Accounts) covers restricting privileged access to defined roles/systems. Dedicated admin workstations enforce this by physically/logically separating privileged operations.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.7",
+      "cis_title": "Limit Access to Script Tools",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.9,
+        "reasoning": "CM-7.1 \u2014 system configured to provide only essential capabilities. Limiting access to script tools restricts system functionality to reduce attack surface."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000382",
+          "reasoning": "CM-7.3 \u2014 enforces restrictions on defined functions, ports, protocols, software. Script tools are software that can be restricted per policy.",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 (Least Functionality) covers restricting unnecessary system capabilities. Limiting script tool access reduces attack surface by removing unneeded functionality.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.8",
+      "cis_title": "Log and Alert on Changes to Administrative Group Membership",
+      "primary_cci": {
+        "cci": "CCI-000172",
+        "confidence": 0.9,
+        "reasoning": "AU-12c requires generating audit records for defined events. Admin group membership changes are auditable events."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002122",
+          "confidence": 0.85,
+          "reasoning": "AC-2g requires monitoring account/group usage, supporting alerting on admin group changes."
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12c covers audit record generation. AC-2g provides supporting coverage for monitoring account/group usage.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "4.9",
+      "cis_title": "Log and Alert on Unsuccessful Administrative Account Login",
+      "primary_cci": {
+        "cci": "CCI-000044",
+        "confidence": 0.95,
+        "reasoning": "AC-7.2 directly addresses enforcing limits on consecutive invalid logon attempts, which is the mechanism underlying logging and alerting on unsuccessful admin logins"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000123",
+          "reasoning": "AU-2.1 requires the system to be capable of auditing defined events, including failed logon attempts",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AC-7",
+      "coverage_assessment": "AC-7 covers the enforcement side (detecting/responding to failed logons); AU-2 covers the audit requirement. AC-7 is primary because the safeguard focuses on admin account login failures.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "5.1",
+      "cis_title": "Establish Secure Configurations",
+      "primary_cci": {
+        "cci": "CCI-000366",
+        "confidence": 0.95,
+        "reasoning": "CM-6b requires implementing security configuration settings."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000364",
+          "confidence": 0.9,
+          "reasoning": "CM-6a requires establishing configuration settings."
+        },
+        {
+          "cci": "CCI-000365",
+          "confidence": 0.88,
+          "reasoning": "CM-6a requires documenting configuration settings."
+        }
+      ],
+      "nist_control": "CM-6",
+      "coverage_assessment": "CM-6b is a direct match for establishing secure configurations.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "5.2",
+      "cis_title": "Maintain Secure Images",
+      "primary_cci": {
+        "cci": "CCI-000293",
+        "confidence": 0.95,
+        "reasoning": "CM-2.1 requires developing and documenting a current baseline configuration, which directly maps to maintaining secure (golden) images"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000295",
+          "reasoning": "CM-2.2 requires maintaining the baseline under configuration control, ensuring images remain current and secure",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-2",
+      "coverage_assessment": "CM-2 baseline configuration directly covers maintaining secure/golden images as the authoritative system configuration reference.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "5.3",
+      "cis_title": "Securely Store Master Images",
+      "primary_cci": {
+        "cci": "CCI-000295",
+        "confidence": 0.9,
+        "reasoning": "CM-2.2 requires maintaining the baseline configuration under configuration control, which encompasses secure storage of master images"
+      },
+      "supporting_ccis": [],
+      "nist_control": "CM-2",
+      "coverage_assessment": "CM-2 covers maintaining baselines under configuration control. Secure storage of master images is an inherent part of maintaining configuration control over baselines.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "5.4",
+      "cis_title": "Deploy System Configuration Management Tools",
+      "primary_cci": {
+        "cci": "CCI-000364",
+        "confidence": 0.95,
+        "reasoning": "CM-6.2 requires establishing configuration settings using defined security checklists, which directly maps to deploying configuration management tooling"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000366",
+          "reasoning": "CM-6.5 requires implementing the security configuration settings, covering the deployment/enforcement aspect",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-6",
+      "coverage_assessment": "CM-6 configuration settings covers deploying tools that establish and enforce system configuration. Preferred over CM-3 (change control) because this safeguard is about configuration management tooling, not change approval processes.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "5.5",
+      "cis_title": "Implement Automated Configuration Monitoring Systems",
+      "primary_cci": {
+        "cci": "CCI-002704",
+        "confidence": 0.9,
+        "reasoning": "SI-7.2 requires employing integrity verification tools to detect unauthorized changes to software/firmware/information, directly mapping to automated configuration monitoring"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001502",
+          "reasoning": "CM-6.11 requires monitoring configuration setting changes per policies, covering the configuration-specific monitoring aspect",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-7",
+      "coverage_assessment": "SI-7 integrity verification tools detect unauthorized changes, which is the core function of automated configuration monitoring. CM-6 monitoring provides supporting coverage for configuration settings specifically.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.1",
+      "cis_title": "Utilize Three Synchronized Time Sources",
+      "primary_cci": {
+        "cci": "CCI-000159",
+        "confidence": 0.95,
+        "reasoning": "AU-8.1 requires the system to use internal clocks for generating audit record timestamps, which depends on synchronized time sources"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001890",
+          "reasoning": "AU-8.4 requires timestamps mappable to UTC/GMT, which necessitates synchronized authoritative time sources",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-8",
+      "coverage_assessment": "AU-8 time stamps directly covers time synchronization requirements. The need for multiple synchronized sources ensures reliable, accurate timestamps for audit records.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.2",
+      "cis_title": "Activate audit logging",
+      "primary_cci": {
+        "cci": "CCI-000169",
+        "confidence": 0.95,
+        "reasoning": "AU-12a requires providing audit record generation capability for auditable events."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000126",
+          "confidence": 0.85,
+          "reasoning": "AU-2d defines which events are to be audited."
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12a is the most precise match for activating audit logging capability.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.3",
+      "cis_title": "Enable Detailed Logging",
+      "primary_cci": {
+        "cci": "CCI-000130",
+        "confidence": 0.95,
+        "reasoning": "AU-3.1 requires audit records to contain information establishing what type of event occurred, which is the foundational requirement for detailed logging"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000134",
+          "reasoning": "AU-3.5 requires audit records to establish the outcome of the event, a key component of detailed logging",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-3",
+      "coverage_assessment": "AU-3 content of audit records directly addresses what detail must be captured in logs (event type, time, location, source, outcome, identity).",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.4",
+      "cis_title": "Ensure Adequate Storage for Logs",
+      "primary_cci": {
+        "cci": "CCI-001849",
+        "confidence": 0.95,
+        "reasoning": "AU-4.2 requires allocating audit record storage capacity per defined requirements, directly mapping to ensuring adequate log storage"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AU-4",
+      "coverage_assessment": "AU-4 audit log storage capacity is a direct match. AU-4.2 specifically addresses allocating sufficient storage for audit records.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.5",
+      "cis_title": "Central Log Management",
+      "primary_cci": {
+        "cci": "CCI-000148",
+        "confidence": 0.9,
+        "reasoning": "AU-6.1 requires reviewing and analyzing audit records for indications of inappropriate or unusual activity, which necessitates centralized log management for effective analysis"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002641",
+          "reasoning": "SI-4.2 requires monitoring the system to detect attacks, supporting centralized monitoring capabilities",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-6",
+      "coverage_assessment": "AU-6 audit record review/analysis/reporting is the primary driver for centralized log management. Central collection enables the review and correlation activities AU-6 requires.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.6",
+      "cis_title": "Deploy SIEM or Log Analytic Tools",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.95,
+        "reasoning": "SI-4.2 requires monitoring the system to detect attacks and indicators of potential attacks, which is the core function of SIEM and log analytics tools"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001255",
+          "reasoning": "SI-4.8 requires deploying monitoring devices strategically to collect essential information, covering SIEM sensor/collector deployment",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring directly covers SIEM deployment. SIEM tools are the primary technical implementation of the monitoring capabilities SI-4 requires.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.7",
+      "cis_title": "Regularly Review Logs",
+      "primary_cci": {
+        "cci": "CCI-000148",
+        "confidence": 0.95,
+        "reasoning": "AU-6a requires reviewing and analyzing audit records on a defined frequency."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000149",
+          "confidence": 0.85,
+          "reasoning": "AU-6b requires reporting findings from log review."
+        }
+      ],
+      "nist_control": "AU-6",
+      "coverage_assessment": "AU-6a is a direct match for regular log review and analysis.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "6.8",
+      "cis_title": "Regularly Tune SIEM",
+      "primary_cci": {
+        "cci": "CCI-001253",
+        "confidence": 0.9,
+        "reasoning": "SI-4.1 requires defining monitoring objectives for attacks and potential indicators, and tuning SIEM is the operational activity of refining those monitoring objectives and detection rules"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001257",
+          "reasoning": "SI-4.13 requires increasing monitoring when risk indicators suggest elevated threats, which is an aspect of SIEM tuning",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 monitoring objectives and device tuning. Regularly tuning SIEM aligns with defining/refining monitoring objectives (SI-4.1) and adjusting monitoring based on risk (SI-4.13).",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.1",
+      "cis_title": "Ensure Use of Only Fully Supported Browsers and Email Clients",
+      "primary_cci": {
+        "cci": "CCI-003376",
+        "confidence": 0.95,
+        "reasoning": "SA-22.1 requires replacing system components when support is no longer available from the developer/vendor, directly addressing the use of only supported software"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SA-22",
+      "coverage_assessment": "SA-22 unsupported system components is a direct match. It requires replacing components that have lost vendor support, which is exactly what this safeguard mandates for browsers and email clients.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.2",
+      "cis_title": "Disable Unnecessary or Unauthorized Browser or Email Client Plugins",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.95,
+        "reasoning": "CM-7.1 requires configuring the system to provide only essential capabilities, directly mapping to disabling unnecessary browser/email plugins"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000382",
+          "reasoning": "CM-7.3 requires prohibiting or restricting use of defined functions/ports/protocols/services, covering the enforcement of plugin restrictions",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 least functionality is a direct match. Disabling unnecessary plugins is a specific instance of configuring systems to provide only essential capabilities.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.3",
+      "cis_title": "Limit Use of Scripting Languages in Web Browsers and Email Clients",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.9,
+        "reasoning": "CM-7.1 requires configuring the system to provide only essential capabilities; limiting scripting languages is restricting functionality to essential needs"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000382",
+          "reasoning": "CM-7.3 requires prohibiting or restricting defined functions, covering the specific restriction of scripting language execution",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 least functionality covers restricting scripting languages as part of limiting system capabilities to only what is essential for operations.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.4",
+      "cis_title": "Maintain and Enforce Network-Based URL Filters",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.9,
+        "reasoning": "SC-7.1 requires monitoring and controlling communications at external boundaries; URL filtering is a boundary protection mechanism that controls outbound web traffic"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001368",
+          "reasoning": "AC-4.1 enforces approved authorizations for information flow within the system, supporting URL-based flow control",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection covers URL filtering as a mechanism for monitoring and controlling communications at system boundaries. AC-4 information flow enforcement provides supporting coverage.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.5",
+      "cis_title": "Subscribe to URL-Categorization Service",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.85,
+        "reasoning": "SC-7.1 monitoring and controlling communications at boundaries requires URL categorization services to effectively classify and filter web traffic"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection. URL categorization services enable effective boundary controls by classifying web destinations for filtering decisions.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.6",
+      "cis_title": "Log All URL Requests",
+      "primary_cci": {
+        "cci": "CCI-000169",
+        "confidence": 0.9,
+        "reasoning": "AU-12.1 requires providing audit record generation capability for defined auditable events; logging URL requests is generating audit records for web access events"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000172",
+          "reasoning": "AU-12.5 requires generating audit records for defined events with defined content, covering the actual generation of URL request logs",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12 audit record generation covers logging URL requests as a specific type of auditable event. AU-12 is preferred over SI-4 because this safeguard is about generating log records, not monitoring/alerting.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.7",
+      "cis_title": "Use of DNS Filtering Services",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.85,
+        "reasoning": "SC-7.1 monitoring and controlling communications at boundaries; DNS filtering is a boundary protection mechanism that controls network communications at the DNS resolution layer"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001178",
+          "reasoning": "SC-20.1 provides data origin authentication for name resolution, supporting DNS integrity aspects of filtering",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection is primary for DNS filtering as a boundary control mechanism. SC-20 provides supporting coverage for DNS integrity/authentication aspects.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.8",
+      "cis_title": "Implement DMARC and Enable Receiver-Side Verification",
+      "primary_cci": {
+        "cci": "CCI-002741",
+        "confidence": 0.9,
+        "reasoning": "SI-8.1 requires employing spam protection mechanisms at entry points to detect and act on unsolicited messages; DMARC is a key email authentication mechanism that prevents spoofed/spam email"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-8",
+      "coverage_assessment": "SI-8 spam protection covers DMARC as an email authentication and spam prevention mechanism at system entry points. DMARC validates sender authenticity, which is a core spam protection function.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.9",
+      "cis_title": "Block Unnecessary File Types",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.85,
+        "reasoning": "CM-7.1 configuring the system to provide only essential capabilities; blocking unnecessary file types restricts system functionality to only needed file formats"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002619",
+          "reasoning": "SI-3.1 employing malicious code protection at entry points covers blocking dangerous file types as a malware prevention measure",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 least functionality is primary for blocking file types as a restriction of unnecessary capabilities. SI-3 provides supporting coverage when the blocked file types are associated with malware vectors.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "7.10",
+      "cis_title": "Sandbox All Email Attachments",
+      "primary_cci": {
+        "cci": "CCI-002619",
+        "confidence": 0.9,
+        "reasoning": "SI-3.1 requires employing malicious code protection mechanisms at entry points to detect malicious code; sandboxing email attachments is a malicious code detection technique at the email entry point"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-3",
+      "coverage_assessment": "SI-3 malicious code protection at entry points directly covers sandboxing email attachments as a detection/prevention mechanism for malware delivered via email.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.1",
+      "cis_title": "Utilize Centrally Managed Anti-Malware Software",
+      "primary_cci": {
+        "cci": "CCI-002619",
+        "confidence": 0.95,
+        "reasoning": "SI-3.1 requires employing malicious code protection mechanisms at entry points; centrally managed anti-malware is the primary implementation of this requirement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001243",
+          "reasoning": "SI-3.10 requires configuring malicious code protection to perform defined actions in response to detection, covering the central management/response aspect",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-3",
+      "coverage_assessment": "SI-3 malicious code protection is a direct match for centrally managed anti-malware software deployment and operation.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.2",
+      "cis_title": "Ensure Anti-Malware Software and Signatures Are Updated",
+      "primary_cci": {
+        "cci": "CCI-001240",
+        "confidence": 0.95,
+        "reasoning": "SI-3.5 explicitly requires updating malicious code protection mechanisms whenever new releases are available per configuration management policy"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-3",
+      "coverage_assessment": "SI-3.5 (CCI-001240) is an exact match -- it specifically addresses updating anti-malware mechanisms and signatures when new releases are available.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.3",
+      "cis_title": "Enable Operating System Anti-Exploitation Features",
+      "primary_cci": {
+        "cci": "CCI-002824",
+        "confidence": 0.95,
+        "reasoning": "SI-16.2 requires implementing defined security safeguards to protect system memory from unauthorized code execution, directly covering OS anti-exploitation features like DEP and ASLR"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-16",
+      "coverage_assessment": "SI-16 memory protection is a direct match. OS anti-exploitation features (DEP, ASLR, SEHOP) are the specific technical implementations of SI-16 memory protection safeguards.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.4",
+      "cis_title": "Configure Anti-Malware Scanning of Removable Devices",
+      "primary_cci": {
+        "cci": "CCI-002619",
+        "confidence": 0.85,
+        "reasoning": "SI-3.1 requires malicious code protection at entry points; removable media is an entry point for malicious code"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002584",
+          "reasoning": "MP-7.4 requires restricting or prohibiting use of defined media types using defined safeguards, covering the removable device control aspect",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-3",
+      "coverage_assessment": "SI-3 malicious code protection at entry points covers scanning removable devices as a malware entry vector. MP-7 media use provides supporting coverage for the removable device control policies.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.5",
+      "cis_title": "Configure Devices to Not Auto-Run Content",
+      "primary_cci": {
+        "cci": "CCI-000381",
+        "confidence": 0.9,
+        "reasoning": "CM-7.1 - configuring systems to provide only essential capabilities; disabling auto-run removes unnecessary functionality"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000382",
+          "reasoning": "CM-7.3 - prohibiting or restricting use of organization-defined functions (auto-run)",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 least functionality directly covers restricting auto-run as unnecessary/risky default behavior",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.6",
+      "cis_title": "Centralize Anti-Malware Logging",
+      "primary_cci": {
+        "cci": "CCI-000154",
+        "confidence": 0.9,
+        "reasoning": "AU-6(4).1 - centrally review and analyze audit records from multiple components, directly maps to centralizing anti-malware logs"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000153",
+          "reasoning": "AU-6(3).1 - correlate audit records across different repositories for situational awareness",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-6 (4)",
+      "coverage_assessment": "AU-6(4) central review and analysis is the best match for centralizing anti-malware logging across an enterprise",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.7",
+      "cis_title": "Enable DNS Query Logging",
+      "primary_cci": {
+        "cci": "CCI-000169",
+        "confidence": 0.92,
+        "reasoning": "AU-12.1 - audit record generation capability for auditable events; DNS queries are auditable events requiring log generation"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000172",
+          "reasoning": "AU-12.5 - generates audit records for defined events with defined content",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12 audit generation covers enabling logging for DNS queries as an auditable event type",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "8.8",
+      "cis_title": "Enable Command-Line Audit Logging",
+      "primary_cci": {
+        "cci": "CCI-000169",
+        "confidence": 0.9,
+        "reasoning": "AU-12.1 - audit record generation capability; command-line execution is an auditable event requiring logging"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000130",
+          "reasoning": "AU-3.1 - audit records containing what type of event occurred, relevant to capturing command-line content",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12 audit generation is primary; AU-3 content requirements ensure command-line details are captured in records",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "9.1",
+      "cis_title": "Associate Active Ports, Services, and Protocols to Asset Inventory",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.93,
+        "reasoning": "CM-8.1 - develop and document inventory of system components that accurately reflects the current system, including active ports/services/protocols"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000399",
+          "reasoning": "CM-8.5 - inventory includes organization-defined information for effective component accountability",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 system component inventory directly covers maintaining inventory of ports, services, and protocols associated with assets",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "9.2",
+      "cis_title": "Ensure Only Approved Ports, Protocols and Services Are Running",
+      "primary_cci": {
+        "cci": "CCI-000382",
+        "confidence": 0.95,
+        "reasoning": "CM-7b requires prohibiting or restricting use of defined functions, ports, protocols, and services."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000381",
+          "confidence": 0.88,
+          "reasoning": "CM-7a requires providing only essential capabilities (least functionality)."
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7b is a direct and precise match for restricting ports/protocols/services.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "9.3",
+      "cis_title": "Perform Regular Automated Port Scans",
+      "primary_cci": {
+        "cci": "CCI-001054",
+        "confidence": 0.9,
+        "reasoning": "RA-5.1 - scans for vulnerabilities at organization-defined frequency; port scanning is a vulnerability scanning activity"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001057",
+          "reasoning": "RA-5.6 - employs scanning tools and techniques that facilitate interoperability and automation",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "RA-5",
+      "coverage_assessment": "RA-5 vulnerability scanning covers automated port scans as part of regular vulnerability assessment processes",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "9.4",
+      "cis_title": "Apply Host-Based Firewalls or Port-Filtering",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.92,
+        "reasoning": "SC-7.1 - monitors and controls communications at external boundary and key internal boundaries; host-based firewalls implement boundary protection"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection covers host-based firewalls and port filtering as system boundary controls",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "9.5",
+      "cis_title": "Implement Application Firewalls",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.88,
+        "reasoning": "SC-7.1 - monitors and controls communications at external boundary and key internal boundaries; application firewalls operate at application layer boundaries"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002395",
+          "reasoning": "SC-7.2 - implements subnetworks for publicly accessible components with logical separation",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection covers application firewalls as application-layer boundary enforcement",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "10.1",
+      "cis_title": "Ensure Regular Automated Backups",
+      "primary_cci": {
+        "cci": "CCI-000535",
+        "confidence": 0.95,
+        "reasoning": "CP-9.2 - conducts backups of user-level information at organization-defined frequency consistent with recovery objectives"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000537",
+          "reasoning": "CP-9.4 - conducts backups of system-level information at organization-defined frequency",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CP-9",
+      "coverage_assessment": "CP-9 system backup directly addresses regular automated backups for both user-level and system-level information",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "10.2",
+      "cis_title": "Perform Complete System Backups",
+      "primary_cci": {
+        "cci": "CCI-000537",
+        "confidence": 0.95,
+        "reasoning": "CP-9.4 - conducts backups of system-level information; complete system backups are system-level backup operations"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000535",
+          "reasoning": "CP-9.2 - conducts backups of user-level information, complementing system-level for complete backups",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CP-9",
+      "coverage_assessment": "CP-9 directly covers complete system backups through both system-level and user-level backup requirements",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "10.3",
+      "cis_title": "Test Data on Backup Media",
+      "primary_cci": {
+        "cci": "CCI-000494",
+        "confidence": 0.88,
+        "reasoning": "CP-4.3 - tests contingency plan to determine effectiveness and readiness; backup media testing validates recoverability"
+      },
+      "supporting_ccis": [],
+      "nist_control": "CP-4",
+      "coverage_assessment": "CP-4 contingency plan testing covers validation of backup media through recovery testing exercises",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "10.4",
+      "cis_title": "Protect Backups",
+      "primary_cci": {
+        "cci": "CCI-000540",
+        "confidence": 0.95,
+        "reasoning": "CP-9.7 - protects confidentiality, integrity, and availability of backup information at storage locations; directly maps to protecting backups"
+      },
+      "supporting_ccis": [],
+      "nist_control": "CP-9",
+      "coverage_assessment": "CP-9 assessment procedure 7 explicitly covers protecting backup information confidentiality, integrity, and availability",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "10.5",
+      "cis_title": "Ensure All Backups Have at Least One Offline Backup Destination",
+      "primary_cci": {
+        "cci": "CCI-000505",
+        "confidence": 0.88,
+        "reasoning": "CP-6.1 - establishes alternate storage site for backup information; offline backup destination is an alternate storage site"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000540",
+          "reasoning": "CP-9.7 - protects confidentiality, integrity, and availability of backup information at storage locations",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CP-6",
+      "coverage_assessment": "CP-6 alternate storage site covers offline backup destinations; CP-9 backup protection supplements storage security",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.1",
+      "cis_title": "Maintain Standard Security Configurations for Network Devices",
+      "primary_cci": {
+        "cci": "CCI-000366",
+        "confidence": 0.93,
+        "reasoning": "CM-6.5 - implements security configuration settings; maintaining standard configs for network devices is implementing configuration settings"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000364",
+          "reasoning": "CM-6.2 - establishes configuration settings using security configuration checklists",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-6",
+      "coverage_assessment": "CM-6 configuration settings directly covers establishing and maintaining standard security configurations for network devices",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.2",
+      "cis_title": "Document Traffic Configuration Rules",
+      "primary_cci": {
+        "cci": "CCI-000365",
+        "confidence": 0.88,
+        "reasoning": "CM-6.3 - documents configuration settings using security configuration checklists; traffic rules are configuration settings requiring documentation"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001368",
+          "reasoning": "AC-4.1 - enforces approved authorizations for controlling information flow; traffic rules implement flow control",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-6",
+      "coverage_assessment": "CM-6 documentation of configuration settings is primary; AC-4 information flow enforcement provides supplemental coverage for traffic rules",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.3",
+      "cis_title": "Use Automated Tools to Verify Standard Device Configurations and Detect Changes",
+      "primary_cci": {
+        "cci": "CCI-000318",
+        "confidence": 0.85,
+        "reasoning": "CM-3f requires auditing and reviewing activities associated with configuration-controlled changes."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002704",
+          "confidence": 0.88,
+          "reasoning": "SI-7 covers automated integrity verification tooling."
+        }
+      ],
+      "nist_control": "CM-3",
+      "coverage_assessment": "CM-3f covers change detection and review. SI-7 supports automated integrity verification.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.4",
+      "cis_title": "Install the Latest Stable Version of Any Security-Related Updates on All Network Devices",
+      "primary_cci": {
+        "cci": "CCI-002605",
+        "confidence": 0.93,
+        "reasoning": "SI-2.9 - installs security-relevant software updates within organization-defined time period; directly maps to installing latest security updates"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002607",
+          "reasoning": "SI-2.11 - installs security-relevant firmware updates within defined time period; covers network device firmware",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-2",
+      "coverage_assessment": "SI-2 flaw remediation covers installing security updates (software and firmware) on network devices",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.5",
+      "cis_title": "Manage Network Devices Using Multi-Factor Authentication and Encrypted Sessions",
+      "primary_cci": {
+        "cci": "CCI-000765",
+        "confidence": 0.93,
+        "reasoning": "IA-2(1).1 - implements multifactor authentication for network access to privileged accounts; managing network devices requires privileged access with MFA"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002310",
+          "reasoning": "AC-17.2 - establishes usage restrictions for remote access including encryption requirements",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IA-2 (1)",
+      "coverage_assessment": "IA-2(1) MFA for privileged network access is primary; AC-17 remote access covers encrypted session requirements",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.6",
+      "cis_title": "Use Dedicated Machines For All Network Administrative Tasks",
+      "primary_cci": {
+        "cci": "CCI-002226",
+        "confidence": 0.9,
+        "reasoning": "AC-6(5).1 - restricts privileged accounts to organization-defined personnel or roles; dedicated admin machines enforce privileged account restrictions"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-6 (5)",
+      "coverage_assessment": "AC-6(5) privileged accounts restriction covers using dedicated machines for administrative tasks to enforce least privilege",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "11.7",
+      "cis_title": "Manage Network Infrastructure Through a Dedicated Network",
+      "primary_cci": {
+        "cci": "CCI-002395",
+        "confidence": 0.9,
+        "reasoning": "SC-7.2 - implements subnetworks that are physically/logically separated from internal networks; dedicated management network is a separated subnetwork"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001097",
+          "reasoning": "SC-7.1 - monitors and controls communications at key internal boundaries",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection with subnetwork separation covers dedicated management networks for infrastructure",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.1",
+      "cis_title": "Maintain an Inventory of Network Boundaries",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.88,
+        "reasoning": "SC-7.1 - monitors and controls communications at external boundary and key internal boundaries; requires knowing where boundaries are"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000389",
+          "reasoning": "CM-8.1 - develops and documents inventory of system components; boundary inventory is a component inventory function",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection requires boundary awareness; CM-8 inventory provides supplemental tracking of boundary components",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.2",
+      "cis_title": "Scan for Unauthorized Connections Across Trusted Network Boundaries",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.92,
+        "reasoning": "SI-4.2 - monitors system for attacks and indicators per defined objectives; scanning for unauthorized connections is a monitoring activity"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002643",
+          "reasoning": "SI-4.4 - monitors for unauthorized network connections",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring directly covers scanning for unauthorized connections with specific assessment procedures for network monitoring",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.3",
+      "cis_title": "Deny Communications With Known Malicious IP Addresses",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.9,
+        "reasoning": "SC-7.1 - monitors and controls communications at external boundary; denying malicious IPs is boundary control enforcement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001098",
+          "reasoning": "SC-7.3 - connects to external networks only through managed interfaces with boundary protection devices",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection covers denying communications with malicious IPs as external boundary control",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.4",
+      "cis_title": "Deny Communication Over Unauthorized Ports",
+      "primary_cci": {
+        "cci": "CCI-000382",
+        "confidence": 0.93,
+        "reasoning": "CM-7.3 - prohibits or restricts use of organization-defined functions, ports, protocols, and/or services; directly addresses port restrictions"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001097",
+          "reasoning": "SC-7.1 - monitors and controls communications at boundaries; port filtering is boundary control",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-7",
+      "coverage_assessment": "CM-7 least functionality explicitly addresses prohibiting or restricting unauthorized ports, protocols, and services",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.5",
+      "cis_title": "Configure Monitoring Systems to Record Network Packets",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.9,
+        "reasoning": "SI-4a requires monitoring the information system to detect attacks. Network packet recording is a key monitoring technique."
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4a covers system monitoring including network-level packet monitoring.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.6",
+      "cis_title": "Deploy Network-Based IDS Sensors",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.92,
+        "reasoning": "SI-4.2 - monitors system for attacks and indicators; network-based IDS sensors are monitoring devices for attack detection"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001255",
+          "reasoning": "SI-4.8 - deploys monitoring devices strategically for essential data collection",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring covers deploying network IDS sensors with specific procedures for strategic device placement",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.7",
+      "cis_title": "Deploy Network-Based Intrusion Prevention Systems",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.92,
+        "reasoning": "SI-4.2 - monitors system for attacks and indicators; IPS extends IDS with active prevention, still a monitoring activity"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001255",
+          "reasoning": "SI-4.8 - deploys monitoring devices strategically; IPS devices are strategically placed monitoring devices",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring covers network IPS deployment as an active monitoring and prevention mechanism",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.8",
+      "cis_title": "Deploy NetFlow Collection on Networking Boundary Devices",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.95,
+        "reasoning": "SI-4.2 - monitors the system to detect attacks and indicators of potential attacks; NetFlow collection is a network monitoring technique at boundary devices"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001255",
+          "reasoning": "SI-4.8 - deploys monitoring devices strategically within the system to collect essential information",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 directly addresses system monitoring including network traffic analysis at boundary points",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.9",
+      "cis_title": "Deploy Application Layer Filtering Proxy Server",
+      "primary_cci": {
+        "cci": "CCI-001112",
+        "confidence": 0.95,
+        "reasoning": "SC-7(8).1 - routes internal communications traffic to external networks through authenticated proxy servers at managed interfaces"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7 (8)",
+      "coverage_assessment": "SC-7(8) specifically addresses routing traffic through authenticated proxy servers, directly matching application layer filtering proxy deployment",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.10",
+      "cis_title": "Decrypt Network Traffic at Proxy",
+      "primary_cci": {
+        "cci": "CCI-002665",
+        "confidence": 0.9,
+        "reasoning": "SI-4(10).1 - defines encrypted communications traffic that is to be visible to monitoring tools; decrypting at proxy enables visibility of encrypted traffic"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002667",
+          "reasoning": "SI-4(10).3 - makes provisions so encrypted communications traffic is visible to monitoring tools",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4 (10)",
+      "coverage_assessment": "SI-4(10) Visibility of Encrypted Communications directly covers decrypting traffic for inspection at proxy servers",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.11",
+      "cis_title": "Require All Remote Login to Use Multi-Factor Authentication",
+      "primary_cci": {
+        "cci": "CCI-000765",
+        "confidence": 0.95,
+        "reasoning": "IA-2(1).1 - implements multifactor authentication for network access to privileged accounts; remote login MFA requirement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000766",
+          "reasoning": "IA-2(2).1 - implements multifactor authentication for network access to non-privileged accounts",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IA-2 (1)",
+      "coverage_assessment": "IA-2(1) and IA-2(2) together cover MFA for all remote network access (privileged and non-privileged)",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "12.12",
+      "cis_title": "Manage All Devices Remotely Logging Into Internal Network",
+      "primary_cci": {
+        "cci": "CCI-000065",
+        "confidence": 0.9,
+        "reasoning": "AC-17.5 - authorizes remote access to the information system prior to allowing such connections; managing remote devices requires authorization controls"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002310",
+          "reasoning": "AC-17.2 - establishes usage restrictions for each type of remote access allowed",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AC-17",
+      "coverage_assessment": "AC-17 covers remote access authorization, usage restrictions, and configuration requirements for all devices accessing the internal network remotely",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.1",
+      "cis_title": "Maintain an Inventory of Sensitive Information",
+      "primary_cci": {
+        "cci": "CCI-001045",
+        "confidence": 0.9,
+        "reasoning": "RA-2.1 - categorizes information and the information system in accordance with applicable standards; inventorying sensitive information requires security categorization"
+      },
+      "supporting_ccis": [],
+      "nist_control": "RA-2",
+      "coverage_assessment": "RA-2 security categorization requires identifying and categorizing information types, which inherently requires maintaining an inventory of sensitive information",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.2",
+      "cis_title": "Remove Sensitive Data or Systems Not Regularly Accessed by Organization",
+      "primary_cci": {
+        "cci": "CCI-001028",
+        "confidence": 0.85,
+        "reasoning": "MP-6.1 - sanitizes information system media prior to disposal or release; removing sensitive data that is no longer needed aligns with media sanitization"
+      },
+      "supporting_ccis": [],
+      "nist_control": "MP-6",
+      "coverage_assessment": "MP-6 media sanitization covers the removal and secure disposal of sensitive data from systems no longer in regular use",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.3",
+      "cis_title": "Monitor and Block Unauthorized Network Traffic",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.95,
+        "reasoning": "SC-7.1 - monitors and controls communications at the external boundary and key internal boundaries; directly addresses monitoring and blocking unauthorized traffic"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001109",
+          "reasoning": "SC-7(5).1 - denies network traffic by default and allows by exception",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection with SC-7(5) deny-by-default policy directly covers monitoring and blocking unauthorized network traffic",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.4",
+      "cis_title": "Only Allow Access to Authorized Cloud Storage or Email Providers",
+      "primary_cci": {
+        "cci": "CCI-001368",
+        "confidence": 0.9,
+        "reasoning": "AC-4.1 - enforces approved authorizations for controlling the flow of information within the system; restricting cloud storage/email providers is information flow enforcement"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-4",
+      "coverage_assessment": "AC-4 information flow enforcement covers restricting access to only authorized cloud storage and email providers through approved flow control policies",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.5",
+      "cis_title": "Monitor and Detect Any Unauthorized Use of Encryption",
+      "primary_cci": {
+        "cci": "CCI-002450",
+        "confidence": 0.85,
+        "reasoning": "SC-13.2 - implements organization-defined cryptographic uses and types required; monitoring for unauthorized encryption requires defined cryptographic policy"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002641",
+          "reasoning": "SI-4.2 - monitors for attacks and indicators; unauthorized encryption use is a monitoring concern",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-13",
+      "coverage_assessment": "SC-13 defines authorized cryptographic uses; detecting unauthorized encryption requires both SC-13 policy definition and SI-4 monitoring capabilities",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.6",
+      "cis_title": "Encrypt Mobile Device Data",
+      "primary_cci": {
+        "cci": "CCI-001199",
+        "confidence": 0.95,
+        "reasoning": "SC-28.1 - protects the confidentiality and/or integrity of information at rest; encrypting mobile device data is protection of data at rest"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-28",
+      "coverage_assessment": "SC-28 protection of information at rest directly covers the requirement to encrypt data stored on mobile devices",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.7",
+      "cis_title": "Manage USB Devices",
+      "primary_cci": {
+        "cci": "CCI-002584",
+        "confidence": 0.95,
+        "reasoning": "MP-7.4 - restricts or prohibits the use of organization-defined types of information system media on defined systems using defined security safeguards; USB device management is media use restriction"
+      },
+      "supporting_ccis": [],
+      "nist_control": "MP-7",
+      "coverage_assessment": "MP-7 media use directly addresses restricting and managing USB devices on organizational systems",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.8",
+      "cis_title": "Manage System's External Removable Media's Read/Write Configurations",
+      "primary_cci": {
+        "cci": "CCI-002584",
+        "confidence": 0.95,
+        "reasoning": "MP-7.4 - restricts or prohibits the use of defined media types using defined security safeguards; controlling read/write configurations is a media use restriction"
+      },
+      "supporting_ccis": [],
+      "nist_control": "MP-7",
+      "coverage_assessment": "MP-7 media use covers managing removable media configurations including read/write access controls",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "13.9",
+      "cis_title": "Encrypt Data on USB Storage Devices",
+      "primary_cci": {
+        "cci": "CCI-001199",
+        "confidence": 0.9,
+        "reasoning": "SC-28.1 - protects confidentiality/integrity of information at rest; encrypting USB storage is protecting data at rest on removable media"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001020",
+          "reasoning": "MP-5.1 - protects and controls media during transport; encrypted USB protects data during transport",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-28",
+      "coverage_assessment": "SC-28 data at rest protection covers USB encryption; MP-5 adds transport protection dimension for removable media",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.1",
+      "cis_title": "Segment the Network Based on Sensitivity",
+      "primary_cci": {
+        "cci": "CCI-002395",
+        "confidence": 0.95,
+        "reasoning": "SC-7b requires implementing subnetworks that are physically/logically separated from internal networks. Directly addresses network segmentation."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001097",
+          "confidence": 0.85,
+          "reasoning": "SC-7 covers boundary monitoring."
+        },
+        {
+          "cci": "CCI-001098",
+          "confidence": 0.82,
+          "reasoning": "SC-7 covers managed interfaces."
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 (Boundary Protection) directly covers network segmentation based on sensitivity.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.2",
+      "cis_title": "Enable Firewall Filtering Between VLANs",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.95,
+        "reasoning": "SC-7.1 - monitors and controls communications at key internal managed interfaces within the system; VLAN firewall filtering is internal boundary protection"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection explicitly covers key internal managed interfaces, which includes VLAN boundaries requiring firewall filtering",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.3",
+      "cis_title": "Disable Workstation to Workstation Communication",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.9,
+        "reasoning": "SC-7.1 - monitors and controls communications at key internal boundaries; disabling workstation-to-workstation communication is internal boundary control"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001109",
+          "reasoning": "SC-7(5).1 - deny by default, allow by exception; workstation isolation follows deny-by-default principle",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 with SC-7(5) deny-by-default covers restricting lateral workstation-to-workstation communication within internal network segments",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.4",
+      "cis_title": "Encrypt All Sensitive Information in Transit",
+      "primary_cci": {
+        "cci": "CCI-002418",
+        "confidence": 0.95,
+        "reasoning": "SC-8.1 - protects the confidentiality and/or integrity of transmitted information; directly covers encrypting sensitive data in transit"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SC-8",
+      "coverage_assessment": "SC-8 transmission confidentiality and integrity is the exact NIST control for encrypting sensitive information in transit",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.5",
+      "cis_title": "Utilize an Active Discovery Tool to Identify Sensitive Data",
+      "primary_cci": {
+        "cci": "CCI-001045",
+        "confidence": 0.85,
+        "reasoning": "RA-2.1 - categorizes information in accordance with applicable standards; active discovery tools identify and categorize sensitive data across systems"
+      },
+      "supporting_ccis": [],
+      "nist_control": "RA-2",
+      "coverage_assessment": "RA-2 security categorization covers the identification and classification of sensitive data; active discovery tools automate this categorization process",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.6",
+      "cis_title": "Protect Information through Access Control Lists",
+      "primary_cci": {
+        "cci": "CCI-000213",
+        "confidence": 0.9,
+        "reasoning": "AC-3 requires enforcing approved authorizations for logical access to information and system resources."
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-3",
+      "coverage_assessment": "AC-3 (Access Enforcement) is the authoritative control for ACL-based protection.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.7",
+      "cis_title": "Enforce Access Control to Data Through Automated Tools",
+      "primary_cci": {
+        "cci": "CCI-000213",
+        "confidence": 0.95,
+        "reasoning": "AC-3.1 - enforces approved authorizations for logical access to information and system resources; automated access enforcement is exactly AC-3"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-3",
+      "coverage_assessment": "AC-3 access enforcement is the precise NIST control for enforcing access control to data through automated mechanisms",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.8",
+      "cis_title": "Encrypt Sensitive Information at Rest",
+      "primary_cci": {
+        "cci": "CCI-001199",
+        "confidence": 0.95,
+        "reasoning": "SC-28 requires protecting confidentiality/integrity of information at rest. Direct 1:1 match."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002472",
+          "confidence": 0.85,
+          "reasoning": "SC-28 covers defining which information requires protection at rest."
+        }
+      ],
+      "nist_control": "SC-28",
+      "coverage_assessment": "SC-28 (Protection of Information at Rest) is the exact NIST control for encryption at rest.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "14.9",
+      "cis_title": "Enforce Detail Logging for Access or Changes to Sensitive Data",
+      "primary_cci": {
+        "cci": "CCI-000172",
+        "confidence": 0.95,
+        "reasoning": "AU-12.5 - generates audit records for defined events with defined content; logging access/changes to sensitive data is audit record generation"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000169",
+          "reasoning": "AU-12.1 - provides audit record generation capability for auditable events",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AU-12",
+      "coverage_assessment": "AU-12 audit record generation directly covers enforcing detailed logging for access to and changes in sensitive data",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.1",
+      "cis_title": "Maintain an Inventory of Authorized Wireless Access Points",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.9,
+        "reasoning": "CM-8.1 - develops and documents an inventory of information system components that accurately reflects the current system; wireless APs are system components requiring inventory"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001438",
+          "reasoning": "AC-18.1 - establishes usage restrictions for wireless access; inventory supports wireless access management",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 system component inventory covers maintaining inventory of wireless access points as system components; AC-18 adds wireless-specific governance",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.2",
+      "cis_title": "Detect Wireless Access Points Connected to the Wired Network",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.9,
+        "reasoning": "SI-4.2 - monitors the system to detect attacks and indicators of potential attacks; detecting rogue wireless APs is system monitoring"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001441",
+          "reasoning": "AC-18.4 - authorizes wireless access prior to allowing connections; detection supports authorization enforcement",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring covers detecting unauthorized wireless access points connected to the wired network; AC-18 provides wireless access authorization context",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.3",
+      "cis_title": "Use a Wireless Intrusion Detection System",
+      "primary_cci": {
+        "cci": "CCI-001281",
+        "confidence": 0.95,
+        "reasoning": "SI-4(14) - employs a wireless intrusion detection system; this is the exact NIST enhancement for WIDS"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SI-4 (14)",
+      "coverage_assessment": "SI-4(14) Wireless Intrusion Detection is the precise NIST enhancement for deploying a wireless IDS",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.4",
+      "cis_title": "Disable Wireless Access on Devices if Not Required",
+      "primary_cci": {
+        "cci": "CCI-001438",
+        "confidence": 0.9,
+        "reasoning": "AC-18.1 - establishes usage restrictions for wireless access; disabling unnecessary wireless access is a usage restriction"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-18",
+      "coverage_assessment": "AC-18 wireless access usage restrictions and configuration requirements cover disabling wireless access when not operationally required",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.5",
+      "cis_title": "Limit Wireless Access on Client Devices",
+      "primary_cci": {
+        "cci": "CCI-001438",
+        "confidence": 0.9,
+        "reasoning": "AC-18.1 - establishes usage restrictions for wireless access; limiting wireless access on clients is a usage restriction"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002323",
+          "reasoning": "AC-18.3 - establishes configuration/connection requirements for wireless access; limiting access involves configuration controls",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AC-18",
+      "coverage_assessment": "AC-18 wireless access restrictions and configuration requirements directly cover limiting wireless access on client devices",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.6",
+      "cis_title": "Disable Peer-to-Peer Wireless Network Capabilities on Wireless Clients",
+      "primary_cci": {
+        "cci": "CCI-001438",
+        "confidence": 0.9,
+        "reasoning": "AC-18.1 establishes usage restrictions for wireless access; disabling peer-to-peer wireless is a usage restriction on wireless capabilities"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002323",
+          "confidence": 0.85,
+          "reasoning": "AC-18.3 establishes configuration/connection requirements for wireless access; disabling P2P is a configuration requirement"
+        }
+      ],
+      "nist_control": "AC-18",
+      "coverage_assessment": "AC-18 directly covers wireless access restrictions including disabling unauthorized wireless modes like peer-to-peer",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.7",
+      "cis_title": "Leverage the Advanced Encryption Standard (AES) to Encrypt Wireless Data",
+      "primary_cci": {
+        "cci": "CCI-002449",
+        "confidence": 0.9,
+        "reasoning": "SC-13.1 defines cryptographic uses and type of cryptography required; AES for wireless encryption is a specific cryptographic use definition"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001444",
+          "confidence": 0.9,
+          "reasoning": "AC-18(1).2 requires protecting wireless access using encryption; directly addresses wireless encryption requirement"
+        }
+      ],
+      "nist_control": "SC-13",
+      "coverage_assessment": "SC-13 covers cryptographic protection requirements; AC-18(1) provides wireless-specific encryption support",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.8",
+      "cis_title": "Use Wireless Authentication Protocols That Require Mutual, Multi-Factor Authentication",
+      "primary_cci": {
+        "cci": "CCI-001443",
+        "confidence": 0.95,
+        "reasoning": "AC-18(1).1 requires protecting wireless access using authentication of users and/or devices; directly addresses wireless mutual authentication"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000765",
+          "confidence": 0.8,
+          "reasoning": "IA-2(1).1 requires multifactor authentication for network access to privileged accounts; supports the MFA component of the requirement"
+        }
+      ],
+      "nist_control": "AC-18 (1)",
+      "coverage_assessment": "AC-18(1) directly addresses wireless authentication and encryption; IA-2(1) reinforces the multifactor authentication aspect",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.9",
+      "cis_title": "Disable Wireless Peripheral Access of Devices",
+      "primary_cci": {
+        "cci": "CCI-000082",
+        "confidence": 0.9,
+        "reasoning": "AC-19.1 establishes usage restrictions for organization-controlled mobile devices; disabling wireless peripherals is a usage restriction on device wireless capabilities"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002325",
+          "confidence": 0.85,
+          "reasoning": "AC-19.3 establishes configuration requirements for organization-controlled mobile devices; disabling wireless peripherals is a configuration requirement"
+        }
+      ],
+      "nist_control": "AC-19",
+      "coverage_assessment": "AC-19 covers access control for mobile devices including disabling unnecessary wireless hardware features like Bluetooth peripherals",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "15.10",
+      "cis_title": "Create Separate Wireless Network for Personal and Untrusted Devices",
+      "primary_cci": {
+        "cci": "CCI-002395",
+        "confidence": 0.9,
+        "reasoning": "SC-7.2 requires implementing subnetworks that are physically/logically separated from internal networks; separate wireless network for untrusted devices is network segmentation"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001438",
+          "confidence": 0.8,
+          "reasoning": "AC-18.1 establishes usage restrictions for wireless access; network separation for personal devices is a wireless usage restriction"
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "SC-7 boundary protection with subnetwork separation directly addresses creating isolated wireless networks for untrusted devices",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.1",
+      "cis_title": "Maintain an Inventory of Authentication Systems",
+      "primary_cci": {
+        "cci": "CCI-000389",
+        "confidence": 0.9,
+        "reasoning": "CM-8.1 requires developing and documenting an inventory of system components that accurately reflects the current system; authentication systems are critical system components"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001780",
+          "confidence": 0.8,
+          "reasoning": "CM-8.7 requires reviewing and updating the inventory per organization-defined frequency; ongoing maintenance of the authentication system inventory"
+        }
+      ],
+      "nist_control": "CM-8",
+      "coverage_assessment": "CM-8 component inventory directly covers maintaining an inventory of authentication systems as a subset of system component inventory",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.2",
+      "cis_title": "Configure Centralized Point of Authentication",
+      "primary_cci": {
+        "cci": "CCI-000764",
+        "confidence": 0.9,
+        "reasoning": "IA-2.1 requires the system to uniquely identify and authenticate organizational users; centralized authentication is the mechanism for consistent identification and authentication"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002110",
+          "confidence": 0.75,
+          "reasoning": "AC-2.1 defines account types that support organizational missions; centralized authentication enables consistent account management"
+        }
+      ],
+      "nist_control": "IA-2",
+      "coverage_assessment": "IA-2 identification and authentication covers the requirement for centralized, consistent user authentication across the organization",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.3",
+      "cis_title": "Require Multi-factor Authentication",
+      "primary_cci": {
+        "cci": "CCI-000765",
+        "confidence": 0.95,
+        "reasoning": "IA-2(1) requires MFA for network access to privileged accounts."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000766",
+          "confidence": 0.88,
+          "reasoning": "IA-2(2) covers non-privileged network access MFA."
+        }
+      ],
+      "nist_control": "IA-2 (1)",
+      "coverage_assessment": "IA-2(1) is the primary match for MFA on privileged access.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.4",
+      "cis_title": "Encrypt or Hash All Authentication Credentials",
+      "primary_cci": {
+        "cci": "CCI-000196",
+        "confidence": 0.95,
+        "reasoning": "IA-5(1).12 requires the system to store only cryptographically-protected passwords for password-based authentication; directly addresses encrypting/hashing credentials"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000183",
+          "confidence": 0.85,
+          "reasoning": "IA-5.19 protects authenticator content from unauthorized disclosure; encryption/hashing prevents credential exposure"
+        }
+      ],
+      "nist_control": "IA-5 (1)",
+      "coverage_assessment": "IA-5(1) password-based authentication enhancement directly requires cryptographic protection of stored credentials",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.5",
+      "cis_title": "Encrypt Transmittal of Username and Authentication Credentials",
+      "primary_cci": {
+        "cci": "CCI-002418",
+        "confidence": 0.95,
+        "reasoning": "SC-8.1 requires the system to protect confidentiality and/or integrity of transmitted information; authentication credentials in transit are transmitted information"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000183",
+          "confidence": 0.8,
+          "reasoning": "IA-5.19 protects authenticator content from unauthorized disclosure; encrypting credentials in transit prevents disclosure"
+        }
+      ],
+      "nist_control": "SC-8",
+      "coverage_assessment": "SC-8 transmission confidentiality directly covers encrypting authentication credentials during transmittal",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.6",
+      "cis_title": "Maintain an Inventory of Accounts",
+      "primary_cci": {
+        "cci": "CCI-002115",
+        "confidence": 0.9,
+        "reasoning": "AC-2d.1 requires specifying authorized users of the information system."
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002110",
+          "confidence": 0.88,
+          "reasoning": "AC-2.1 covers defining account types."
+        },
+        {
+          "cci": "CCI-002111",
+          "confidence": 0.85,
+          "reasoning": "AC-2.2 covers identifying/selecting accounts."
+        },
+        {
+          "cci": "CCI-000012",
+          "confidence": 0.82,
+          "reasoning": "AC-2.22 covers periodic account review."
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "AC-2 (Account Management) covers account inventory through multiple assessment procedures.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.7",
+      "cis_title": "Establish Process for Revoking Access",
+      "primary_cci": {
+        "cci": "CCI-000011",
+        "confidence": 0.95,
+        "reasoning": "AC-2.13 requires creating, enabling, modifying, disabling, and removing accounts in accordance with organization-defined procedures; access revocation is disabling/removing accounts"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002121",
+          "confidence": 0.85,
+          "reasoning": "AC-2.14 defines procedures or conditions for creating, enabling, modifying, disabling, and removing accounts; the established process itself"
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "AC-2 account management directly addresses establishing and following procedures for revoking access through account disabling and removal",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.8",
+      "cis_title": "Disable Any Unassociated Accounts",
+      "primary_cci": {
+        "cci": "CCI-000011",
+        "confidence": 0.9,
+        "reasoning": "AC-2.13 requires disabling accounts in accordance with organization-defined procedures; unassociated accounts should be disabled per procedure"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002122",
+          "confidence": 0.85,
+          "reasoning": "AC-2.15 requires monitoring the use of information system accounts; monitoring enables identification of unassociated accounts for disabling"
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "AC-2 account management covers disabling unassociated accounts as part of the account lifecycle management procedures",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.9",
+      "cis_title": "Disable Dormant Accounts",
+      "primary_cci": {
+        "cci": "CCI-000017",
+        "confidence": 0.95,
+        "reasoning": "AC-2(3) requires automatically disabling inactive accounts after a defined time period. Direct 1:1 match."
+      },
+      "supporting_ccis": [],
+      "nist_control": "AC-2 (3)",
+      "coverage_assessment": "AC-2(3) (Disable Inactive Accounts) is the exact NIST control enhancement for disabling dormant accounts.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.10",
+      "cis_title": "Ensure All Accounts Have An Expiration Date",
+      "primary_cci": {
+        "cci": "CCI-000012",
+        "confidence": 0.9,
+        "reasoning": "AC-2.22 requires reviewing accounts for compliance with account management requirements on a defined frequency; account expiration is a key management requirement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000011",
+          "confidence": 0.85,
+          "reasoning": "AC-2.13 requires creating, modifying, disabling accounts per procedures; expiration dates are a condition for automatic account disabling"
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "AC-2 account management encompasses account expiration as part of the account lifecycle and compliance review process",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.11",
+      "cis_title": "Lock Workstation Sessions After Inactivity",
+      "primary_cci": {
+        "cci": "CCI-000059",
+        "confidence": 0.95,
+        "reasoning": "AC-11.3 defines the time period of inactivity after which the system initiates a session lock; directly addresses locking sessions after inactivity"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000056",
+          "confidence": 0.9,
+          "reasoning": "AC-11.4 requires retaining the session lock until the user reestablishes access using identification and authentication procedures"
+        }
+      ],
+      "nist_control": "AC-11",
+      "coverage_assessment": "AC-11 session lock directly and completely covers locking workstation sessions after defined inactivity periods",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.12",
+      "cis_title": "Monitor Attempts to Access Deactivated Accounts",
+      "primary_cci": {
+        "cci": "CCI-000126",
+        "confidence": 0.85,
+        "reasoning": "AU-2.5 determines that the organization-defined subset of auditable events are to be audited; access attempts to deactivated accounts are auditable events that must be monitored"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000044",
+          "confidence": 0.8,
+          "reasoning": "AC-7.2 enforces the limit of consecutive invalid logon attempts; failed login attempts against deactivated accounts trigger this control"
+        }
+      ],
+      "nist_control": "AU-2",
+      "coverage_assessment": "AU-2 audit events covers monitoring access attempts to deactivated accounts as part of security-relevant auditable events",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "16.13",
+      "cis_title": "Alert on Account Login Behavior Deviation",
+      "primary_cci": {
+        "cci": "CCI-002641",
+        "confidence": 0.9,
+        "reasoning": "SI-4.2 requires monitoring the system to detect attacks per defined monitoring objectives; login behavior deviation detection is attack/anomaly monitoring"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002654",
+          "confidence": 0.8,
+          "reasoning": "SI-4.18 requires providing monitoring information as needed or per defined frequency; alerting on deviations is providing monitoring information"
+        }
+      ],
+      "nist_control": "SI-4",
+      "coverage_assessment": "SI-4 system monitoring covers detecting and alerting on anomalous login behavior as part of attack and indicator monitoring",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.1",
+      "cis_title": "Perform a Skills Gap Analysis",
+      "primary_cci": {
+        "cci": "CCI-001480",
+        "confidence": 0.85,
+        "reasoning": "AT-2.1 establishes refresh training frequency for security awareness; a skills gap analysis is the prerequisite assessment that determines what training is needed and how often"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 literacy training and awareness covers the assessment of workforce security skills as the foundation for training program design; no direct 'gap analysis' CCI exists",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.2",
+      "cis_title": "Deliver Training to Fill the Skills Gap",
+      "primary_cci": {
+        "cci": "CCI-000108",
+        "confidence": 0.95,
+        "reasoning": "AT-3.1 requires providing role-based security training to personnel with assigned security roles and responsibilities; role-based training directly fills identified skills gaps"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000110",
+          "confidence": 0.85,
+          "reasoning": "AT-3.3 provides refresher role-based security training at organization-defined frequency; ongoing training to address evolving skills gaps"
+        }
+      ],
+      "nist_control": "AT-3",
+      "coverage_assessment": "AT-3 role-based training directly covers delivering targeted training to fill skills gaps for personnel with security roles",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.3",
+      "cis_title": "Implement a Security Awareness Program",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.95,
+        "reasoning": "AT-2.2 requires delivering foundational security awareness training to system users during initial onboarding; this is the core of a security awareness program"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001479",
+          "confidence": 0.9,
+          "reasoning": "AT-2.4 conducts recurring security awareness training per established frequency; the ongoing component of the awareness program"
+        }
+      ],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 literacy training and awareness directly covers implementing a security awareness program with initial and recurring training",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.4",
+      "cis_title": "Update Awareness Content Frequently",
+      "primary_cci": {
+        "cci": "CCI-000112",
+        "confidence": 0.9,
+        "reasoning": "AT-2.3 requires delivering security awareness training when system modifications or changes occur; updating content when things change ensures awareness stays current"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001479",
+          "confidence": 0.85,
+          "reasoning": "AT-2.4 conducts recurring security awareness training per established organizational frequency; frequency-based updates keep content fresh"
+        }
+      ],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 covers updating awareness content through change-triggered and frequency-based training delivery requirements",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.5",
+      "cis_title": "Train Workforce on Secure Authentication",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.9,
+        "reasoning": "AT-2.2 delivers foundational security awareness training to system users; secure authentication practices are core awareness content for all users"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 security awareness training covers authentication best practices as a fundamental topic within the awareness program",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.6",
+      "cis_title": "Train Workforce on Identifying Social Engineering Attacks",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.9,
+        "reasoning": "AT-2.2 delivers foundational security awareness training to system users; social engineering recognition is a standard awareness training topic"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 security awareness training covers social engineering attack identification as a core awareness topic",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.7",
+      "cis_title": "Train Workforce on Sensitive Data Handling",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.9,
+        "reasoning": "AT-2.2 delivers foundational security awareness training to system users; sensitive data handling is a standard awareness training topic"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 security awareness training covers sensitive data handling procedures as a core awareness topic",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.8",
+      "cis_title": "Train Workforce on Causes of Unintentional Data Exposure",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.9,
+        "reasoning": "AT-2.2 delivers foundational security awareness training to system users; understanding data exposure causes is a standard awareness training topic"
+      },
+      "supporting_ccis": [],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 security awareness training covers unintentional data exposure causes as a core awareness topic",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "17.9",
+      "cis_title": "Train Workforce Members on Identifying and Reporting Incidents",
+      "primary_cci": {
+        "cci": "CCI-000106",
+        "confidence": 0.85,
+        "reasoning": "AT-2.2 delivers foundational security awareness training including incident identification; awareness training is the broader program that includes incident reporting"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000813",
+          "confidence": 0.85,
+          "reasoning": "IR-2.1 provides incident response training consistent with assigned roles; directly addresses training on identifying and reporting incidents"
+        }
+      ],
+      "nist_control": "AT-2",
+      "coverage_assessment": "AT-2 awareness training and IR-2 incident response training together cover workforce training on incident identification and reporting",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.1",
+      "cis_title": "Establish Secure Coding Practices",
+      "primary_cci": {
+        "cci": "CCI-003233",
+        "confidence": 0.95,
+        "reasoning": "SA-15.1 requires the developer to follow a documented development process; establishing secure coding practices is defining that documented development process"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-003234",
+          "confidence": 0.9,
+          "reasoning": "SA-15.2 requires the documented development process to explicitly address security requirements; secure coding practices must address security"
+        }
+      ],
+      "nist_control": "SA-15",
+      "coverage_assessment": "SA-15 development process, standards, and tools directly covers establishing and following secure coding practices with security requirements",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.2",
+      "cis_title": "Ensure That Explicit Error Checking is Performed for All In-House Developed Software",
+      "primary_cci": {
+        "cci": "CCI-003173",
+        "confidence": 0.9,
+        "reasoning": "SA-11.3 requires developer testing (unit, integration, system, regression) at defined depth and coverage, which encompasses explicit error checking during development testing"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-003171",
+          "reasoning": "SA-11.1 requires developer to create a security assessment plan that would include error checking procedures",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SA-11",
+      "coverage_assessment": "SA-11 covers developer security testing broadly; explicit error checking is a specific testing activity within this control's scope",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.3",
+      "cis_title": "Verify That Acquired Software is Still Supported",
+      "primary_cci": {
+        "cci": "CCI-003376",
+        "confidence": 0.95,
+        "reasoning": "SA-22.1 directly requires replacing system components when support is no longer available from developer/vendor/manufacturer"
+      },
+      "supporting_ccis": [],
+      "nist_control": "SA-22",
+      "coverage_assessment": "Direct match -- SA-22 specifically addresses unsupported system components and requires replacement or documented justification",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.4",
+      "cis_title": "Only Use Up-to-Date and Trusted Third-Party Components",
+      "primary_cci": {
+        "cci": "CCI-000722",
+        "confidence": 0.85,
+        "reasoning": "SA-12.1 (now SR-3 in Rev 5) defines security safeguards to protect against supply chain threats; ensuring third-party components are up-to-date and trusted is a supply chain protection measure"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000723",
+          "reasoning": "SA-12.2 implements those supply chain safeguards as part of defense-in-breadth strategy",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SA-12",
+      "coverage_assessment": "SA-12 (withdrawn to SR-3 in Rev 5) covers supply chain protection; CCI-000722 is the Rev 4 CCI still in use since SR-3 CCIs were not returned by the API",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.5",
+      "cis_title": "Use Only Standardized and Extensively Reviewed Encryption Algorithms",
+      "primary_cci": {
+        "cci": "CCI-002449",
+        "confidence": 0.95,
+        "reasoning": "SC-13.1 defines cryptographic uses and type of cryptography required, which directly covers the requirement to use standardized encryption algorithms"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002450",
+          "reasoning": "SC-13.2 requires implementing the defined cryptography in accordance with federal laws and standards (e.g., FIPS-validated algorithms)",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-13",
+      "coverage_assessment": "Direct match -- SC-13 mandates use of cryptography per federal standards, which inherently requires standardized, reviewed algorithms",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.6",
+      "cis_title": "Ensure Software Development Personnel are Trained in Secure Coding",
+      "primary_cci": {
+        "cci": "CCI-000108",
+        "confidence": 0.95,
+        "reasoning": "AT-3.1 requires role-based security training before access authorization or duty assignment; secure coding training for developers is role-based security training"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000110",
+          "reasoning": "AT-3.3 requires refresher training at defined frequency, ensuring ongoing secure coding competency",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AT-3",
+      "coverage_assessment": "Direct match -- AT-3 covers role-based security training which includes secure coding training for development personnel",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.7",
+      "cis_title": "Apply Static and Dynamic Code Analysis Tools",
+      "primary_cci": {
+        "cci": "CCI-003171",
+        "confidence": 0.9,
+        "reasoning": "SA-11.1 requires developer to create a security assessment plan; static and dynamic analysis tools are key elements of such plans. SA-11 enhancement (1) specifically addresses static analysis but the base control CCI covers the overarching requirement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-003173",
+          "reasoning": "SA-11.3 requires performing testing at defined depth and coverage, which would include static/dynamic analysis methods",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SA-11",
+      "coverage_assessment": "SA-11 base control covers developer security testing; SA-11(1) enhancement specifically addresses static code analysis but shares parent CCIs",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.8",
+      "cis_title": "Establish a Process to Accept and Address Reports of Software Vulnerabilities",
+      "primary_cci": {
+        "cci": "CCI-003177",
+        "confidence": 0.9,
+        "reasoning": "SA-11.7 requires developer to implement a verifiable flaw remediation process, which encompasses accepting and addressing vulnerability reports"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001225",
+          "reasoning": "SI-2.1 requires identifying information system flaws, supporting the intake side of vulnerability reporting",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SA-11",
+      "coverage_assessment": "SA-11 flaw remediation process (CCI-003177) covers establishing vulnerability handling; SI-2 provides complementary flaw identification coverage",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.9",
+      "cis_title": "Separate Production and Non-Production Systems",
+      "primary_cci": {
+        "cci": "CCI-000293",
+        "confidence": 0.85,
+        "reasoning": "CM-2.1 requires developing a current baseline configuration; separating production from non-production is a fundamental baseline configuration decision"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001097",
+          "reasoning": "SC-7.1 monitors and controls communications at boundaries, which supports enforcement of production/non-production separation",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-2",
+      "coverage_assessment": "CM-2 baseline configuration defines system boundaries including production separation; SC-7 boundary protection enforces the separation at the network level",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.10",
+      "cis_title": "Deploy Web Application Firewalls",
+      "primary_cci": {
+        "cci": "CCI-001097",
+        "confidence": 0.9,
+        "reasoning": "SC-7.1 requires monitoring and controlling communications at external boundaries; WAFs are boundary protection devices that monitor/control web traffic"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002395",
+          "reasoning": "SC-7.2 requires subnetworks for publicly accessible components with logical separation, which WAFs help enforce",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "SC-7",
+      "coverage_assessment": "Direct match -- SC-7 boundary protection encompasses WAF deployment as a managed interface for web application traffic control",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "18.11",
+      "cis_title": "Use Standard Hardening Configuration Templates for Databases",
+      "primary_cci": {
+        "cci": "CCI-000366",
+        "confidence": 0.95,
+        "reasoning": "CM-6.5 requires implementing security configuration settings; using standard hardening templates for databases is directly implementing configuration settings"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000364",
+          "reasoning": "CM-6.2 requires establishing settings using defined security configuration checklists, which aligns with standardized hardening templates",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CM-6",
+      "coverage_assessment": "Direct match -- CM-6 configuration settings directly covers using standardized configuration templates/checklists for system components including databases",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.1",
+      "cis_title": "Document Incident Response Procedures",
+      "primary_cci": {
+        "cci": "CCI-000809",
+        "confidence": 0.95,
+        "reasoning": "IR-1.6 requires developing documented procedures facilitating incident response policy implementation and associated controls"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000805",
+          "reasoning": "IR-1.3 requires developing documented incident response policy addressing purpose, scope, roles, responsibilities",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-1",
+      "coverage_assessment": "Direct match -- IR-1 specifically requires documented incident response policy and procedures",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.2",
+      "cis_title": "Assign Job Titles and Duties for Incident Response",
+      "primary_cci": {
+        "cci": "CCI-000813",
+        "confidence": 0.9,
+        "reasoning": "IR-2.1 provides training to personnel with assigned roles and responsibilities, which presupposes those roles are defined and assigned"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000805",
+          "reasoning": "IR-1.3 addresses roles and responsibilities as part of the documented IR policy",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-2",
+      "coverage_assessment": "IR-2 training for assigned IR roles implies role assignment; IR-1 policy documentation defines the roles themselves. Combined coverage is strong.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.3",
+      "cis_title": "Designate Management Personnel to Support Incident Handling",
+      "primary_cci": {
+        "cci": "CCI-000805",
+        "confidence": 0.9,
+        "reasoning": "IR-1.3 requires documented IR policy addressing management commitment and coordination, which includes designating management personnel for IR support"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000839",
+          "reasoning": "IR-7.1 requires an incident response support resource integral to the IR capability, implying management support designation",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-1",
+      "coverage_assessment": "IR-1 policy documentation addresses management commitment to IR; IR-7 provides the support resource requirement. Management designation is embedded in IR-1 scope.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.4",
+      "cis_title": "Devise Organization-wide Standards for Reporting Incidents",
+      "primary_cci": {
+        "cci": "CCI-000834",
+        "confidence": 0.95,
+        "reasoning": "IR-6.1 defines the time period for personnel to report suspected security incidents, establishing an organization-wide reporting standard"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000835",
+          "reasoning": "IR-6.2 requires personnel to actually report incidents within that defined time period",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-6",
+      "coverage_assessment": "Direct match -- IR-6 establishes incident reporting requirements including timelines and procedures, which constitutes organization-wide reporting standards",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.5",
+      "cis_title": "Maintain Contact Information For Reporting Security Incidents",
+      "primary_cci": {
+        "cci": "CCI-000836",
+        "confidence": 0.9,
+        "reasoning": "IR-6.3 requires reporting security incident information to designated authorities, which necessitates maintaining their contact information"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000839",
+          "reasoning": "IR-7.1 requires an IR support resource offering advice/assistance to users, which implies maintaining accessible contact information",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-6",
+      "coverage_assessment": "IR-6 reporting to designated authorities implies maintained contact lists; IR-7 support resource availability reinforces the contact maintenance requirement",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.6",
+      "cis_title": "Publish Information Regarding Reporting Computer Anomalies and Incidents",
+      "primary_cci": {
+        "cci": "CCI-000835",
+        "confidence": 0.9,
+        "reasoning": "IR-6.2 requires personnel to report suspected incidents within defined time periods; publishing reporting information enables personnel to fulfill this requirement"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000834",
+          "reasoning": "IR-6.1 defines the reporting time period, which must be published/communicated to personnel",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-6",
+      "coverage_assessment": "IR-6 incident reporting requirements inherently require publishing reporting procedures and channels to organizational personnel",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.7",
+      "cis_title": "Conduct Periodic Incident Scenario Sessions for Personnel",
+      "primary_cci": {
+        "cci": "CCI-000818",
+        "confidence": 0.95,
+        "reasoning": "IR-3.1 requires testing incident response capability at defined frequency using defined tests, which directly covers periodic scenario sessions"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-000814",
+          "reasoning": "IR-2.3 requires refresher incident response training at defined intervals, complementing scenario-based testing",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "IR-3",
+      "coverage_assessment": "Direct match -- IR-3 incident response testing covers periodic scenario sessions including tabletop exercises and simulations",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "19.8",
+      "cis_title": "Create Incident Scoring and Prioritization Schema",
+      "primary_cci": {
+        "cci": "CCI-000822",
+        "confidence": 0.9,
+        "reasoning": "IR-4.1 requires implementing incident handling capability including preparation, detection/analysis, containment, eradication, and recovery; incident scoring/prioritization is integral to the detection and analysis phase"
+      },
+      "supporting_ccis": [],
+      "nist_control": "IR-4",
+      "coverage_assessment": "IR-4 incident handling encompasses the full lifecycle; scoring and prioritization is a core component of the detection and analysis phase within IR-4",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.1",
+      "cis_title": "Establish a Penetration Testing Program",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.95,
+        "reasoning": "CA-8.1 requires conducting penetration testing at defined frequency on defined systems, which is the establishment of a penetration testing program"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002095",
+          "reasoning": "CA-8.3 defines the systems/components to be tested, establishing the program's scope",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CA-8",
+      "coverage_assessment": "Direct match -- CA-8 penetration testing directly covers establishing and conducting a penetration testing program",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.2",
+      "cis_title": "Conduct Regular External and Internal Penetration Tests",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.95,
+        "reasoning": "CA-8.1 requires conducting penetration testing at organization-defined frequency on defined systems, covering both regular external and internal testing"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002094",
+          "reasoning": "CA-8.2 defines the frequency for penetration testing, ensuring regularity",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CA-8",
+      "coverage_assessment": "Direct match -- CA-8 with its frequency definition (CA-8.2) covers regular internal and external penetration testing",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.3",
+      "cis_title": "Perform Periodic Red Team Exercises",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.85,
+        "reasoning": "CA-8.1 is the base penetration testing CCI; CA-8(2) enhancement specifically addresses red team exercises but the enhancement-level CCIs are not separately cataloged in the API. The base CA-8 CCI is the primary anchor."
+      },
+      "supporting_ccis": [],
+      "nist_control": "CA-8",
+      "coverage_assessment": "CA-8(2) Red Team Exercises enhancement is the precise control; using CA-8.1 base CCI as the API does not expose enhancement-specific CCIs separately",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.4",
+      "cis_title": "Include Tests for Presence of Unprotected System Information and Artifacts",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.85,
+        "reasoning": "CA-8.1 penetration testing scope includes testing for unprotected system information as part of the defined test scenarios"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001054",
+          "reasoning": "RA-5.1 vulnerability scanning complements by scanning for unprotected information artifacts",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CA-8",
+      "coverage_assessment": "CA-8 penetration testing covers testing for unprotected artifacts; RA-5 vulnerability scanning provides additional coverage for automated detection",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.5",
+      "cis_title": "Create a Test Bed for Elements Not Typically Tested in Production",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.8,
+        "reasoning": "CA-8.1 defines penetration testing on defined systems; a dedicated test bed supports this testing capability for elements that cannot be safely tested in production"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002095",
+          "reasoning": "CA-8.3 defines which systems/components are subject to testing, which would include test bed environments",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CA-8",
+      "coverage_assessment": "CA-8 covers the overarching pen test requirement; test bed creation is an infrastructure decision supporting CA-8 execution. Slightly indirect mapping.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.6",
+      "cis_title": "Use Vulnerability Scanning and Penetration Testing Tools in Concert",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.85,
+        "reasoning": "CA-8.1 penetration testing combined with vulnerability scanning represents the coordinated use of both tool types"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-001054",
+          "reasoning": "RA-5.1 vulnerability scanning provides the scanning side of the coordinated testing approach",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "CA-8",
+      "coverage_assessment": "Using CA-8 (pen testing) and RA-5 (vuln scanning) together covers the coordinated tool usage requirement",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.7",
+      "cis_title": "Ensure Results From Penetration Test Are Documented Using Open, Machine-Readable Standards",
+      "primary_cci": {
+        "cci": "CCI-002093",
+        "confidence": 0.8,
+        "reasoning": "CA-8.1 penetration testing implicitly requires documenting results; the machine-readable format requirement is a specificity within CA-8 scope"
+      },
+      "supporting_ccis": [],
+      "nist_control": "CA-8",
+      "coverage_assessment": "CA-8 covers pen testing including results documentation. The specific requirement for open, machine-readable standards is more granular than NIST specifies, but falls within CA-8 scope.",
+      "mapping_status": "OFFICIAL"
+    },
+    {
+      "cis_id": "20.8",
+      "cis_title": "Control and Monitor Accounts Associated With Penetration Testing",
+      "primary_cci": {
+        "cci": "CCI-000010",
+        "confidence": 0.85,
+        "reasoning": "AC-2.11 requires approval for account creation requests, which applies to pen testing accounts requiring controlled creation and management"
+      },
+      "supporting_ccis": [
+        {
+          "cci": "CCI-002122",
+          "reasoning": "AC-2.15 requires monitoring system account usage, covering the monitoring aspect of pen test accounts",
+          "confidence": 0.85
+        }
+      ],
+      "nist_control": "AC-2",
+      "coverage_assessment": "AC-2 account management covers creating, monitoring, and controlling accounts including those used for penetration testing activities",
+      "mapping_status": "OFFICIAL"
+    }
+  ]
+}
