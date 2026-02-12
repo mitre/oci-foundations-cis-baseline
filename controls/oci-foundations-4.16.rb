@@ -38,9 +38,9 @@ control 'oci-foundations-4.16' do
   tag assessment_status: 'Automated'
   tag cis_controls: %w[0.0]
 
-  tag cci: []
+  tag cci: %w[CCI-002438]
 
-  tag nist: []
+  tag nist: ['SC-12']
 
   require 'time'
 

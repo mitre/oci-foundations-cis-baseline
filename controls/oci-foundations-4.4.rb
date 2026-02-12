@@ -69,9 +69,9 @@ control 'oci-foundations-4.4' do
   tag cis_level: 'Level 1'
   tag assessment_status: 'Automated'
 
-  tag cci: []
+  tag cci: %w[CCI-002641]
 
-  tag nist: []
+  tag nist: ['SI-4']
 
   required_rule_conditions = [
     'com.oraclecloud.identitycontrolplane.addidpgroupmapping',

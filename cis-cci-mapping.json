@@ -4413,5 +4413,44 @@
       ]
     },
     "mapping_status": "INFERRED"
+  },
+  {
+    "cis_id": "OCI-4.4",
+    "cis_title": "Ensure Cloud Guard is enabled in the root compartment of the tenancy (Manual - no CIS v8 mapping)",
+    "primary_cci": {
+      "cci": "CCI-002641",
+      "confidence": 0.92,
+      "reasoning": "SI-4.2 requires monitoring the information system to detect attacks and indicators of potential attacks. Cloud Guard is OCI CSPM that continuously monitors for security issues and threats."
+    },
+    "supporting_ccis": [],
+    "nist_control": "SI-4",
+    "coverage_assessment": "Direct mapping. Cloud Guard provides continuous security monitoring matching SI-4 system monitoring requirements.",
+    "mapping_status": "MANUAL"
+  },
+  {
+    "cis_id": "OCI-4.16",
+    "cis_title": "Ensure customer created CMK is rotated at least annually (Manual - CIS v8 mapped as 0.0/Not Mapped)",
+    "primary_cci": {
+      "cci": "CCI-002438",
+      "confidence": 0.93,
+      "reasoning": "SC-12.11 requires managing cryptographic keys including key generation requirements. Annual key rotation is a key management lifecycle requirement."
+    },
+    "supporting_ccis": [],
+    "nist_control": "SC-12",
+    "coverage_assessment": "Direct mapping. CMK rotation is a cryptographic key management activity under SC-12.",
+    "mapping_status": "MANUAL"
+  },
+  {
+    "cis_id": "OCI-5.1.3",
+    "cis_title": "Ensure Versioning is Enabled for Object Storage Buckets (Manual - no CIS v8 mapping)",
+    "primary_cci": {
+      "cci": "CCI-000537",
+      "confidence": 0.9,
+      "reasoning": "CP-9.4 requires conducting backups of system-level information. Object versioning provides continuous data protection equivalent to backup with near-zero RPO."
+    },
+    "supporting_ccis": [],
+    "nist_control": "CP-9",
+    "coverage_assessment": "Good coverage. Object versioning serves as continuous backup mechanism, directly supporting CP-9 backup requirements.",
+    "mapping_status": "MANUAL"
   }
 ]

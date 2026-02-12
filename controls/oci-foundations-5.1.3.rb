@@ -44,9 +44,9 @@ control 'oci-foundations-5.1.3' do
   tag cis_level: 'Level 2'
   tag assessment_status: 'Automated'
 
-  tag cci: []
+  tag cci: %w[CCI-000537]
 
-  tag nist: []
+  tag nist: ['CP-9']
 
   cmd = <<~CMD
     (
