@@ -58,24 +58,72 @@ control 'oci-foundations-5.3.1' do
 
   tag nist: ['SC-28']
 
-  cmd = <<~CMD
-    (
-      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
-      do
-        for fssid in `oci search resource structured-search --region $region --query-text "query filesystem resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
-        do
-          output=`oci fs file-system get --file-system-id $fssid --region $region 2>/dev/null | jq -r '.data | select(."kms-key-id" == "").id'`
-          if [ ! -z "$output" ]; then echo $output; fi
-        done
-      done
-    ) | jq -nR '[inputs]'
-  CMD
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  json_output = json(command: cmd)
-  output = json_output.params
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id'].to_s
+    next if compartment_id.empty?
 
-  describe 'Ensure File Storage Systems are encrypted with Customer Managed Keys (CMK)' do
-    subject { output }
-    it { should cmp [] }
+    map[compartment_id] = compartment['name']
+  end
+
+  findings = []
+  total_file_systems = 0
+
+  regions.each do |region|
+    search_response = json(command: %(oci search resource structured-search --region "#{region}" --query-text "query filesystem resources" --limit 1000 2>/dev/null))
+    items = search_response.params.dig('data', 'items') || []
+    file_system_ids = items.map { |item| item['identifier'] }.compact
+
+    file_system_ids.each do |file_system_id|
+      file_system_response = json(command: %(oci fs file-system get --file-system-id "#{file_system_id}" --region "#{region}" 2>/dev/null))
+      file_system = file_system_response.params.fetch('data', {})
+      next if file_system.empty?
+
+      lifecycle_state = file_system['lifecycle-state']
+      next if lifecycle_state == 'DELETED'
+
+      total_file_systems += 1
+      kms_key_id = file_system['kms-key-id'].to_s.strip
+      next unless kms_key_id.empty?
+
+      compartment_id = file_system['compartment-id'].to_s
+      compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
+
+      findings << <<~ENTRY.chomp
+        Name: #{file_system['display-name']}
+        ID: #{file_system['id']}
+        Region: #{region}
+        Compartment Name: #{compartment_name}
+        Compartment ID: #{compartment_id}
+        Lifecycle State: #{lifecycle_state}
+        Issue: kms-key-id is unset (Oracle-managed key)
+      ENTRY
+    end
+  end
+
+  if total_file_systems.zero?
+    impact 0.0
+    describe 'Ensure File Storage Systems are encrypted with Customer Managed Keys (CMK)' do
+      skip 'No File Storage Systems found in tenancy.'
+    end
+  else
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'File Storage file systems' do
+      it 'should be encrypted with customer-managed keys (CMK)' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
+    end
   end
 end
