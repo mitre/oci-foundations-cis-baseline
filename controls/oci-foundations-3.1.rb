@@ -87,14 +87,14 @@ control 'oci-foundations-3.1' do
 
         next unless legacy_imds_disabled == false
 
-        non_compliant_instances << {
-          'display_name' => instance['display-name'],
-          'id' => instance['id'],
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'instance_options_present' => !instance_options.nil?,
-          'are_legacy_imds_endpoints_disabled' => legacy_imds_disabled
-        }
+        non_compliant_instances << <<~ENTRY.chomp
+          Display Name: #{instance['display-name']}
+          ID: #{instance['id']}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Instance Options Present: #{!instance_options.nil?}
+          Legacy IMDS Endpoints Disabled: #{legacy_imds_disabled}
+        ENTRY
       end
     end
   end
@@ -105,9 +105,18 @@ control 'oci-foundations-3.1' do
       skip 'No compute instances found in tenancy.'
     end
   else
-    describe 'Ensure Compute Instance Legacy Metadata service endpoint is disabled' do
-      subject { non_compliant_instances }
-      it { should cmp [] }
+    numbered_findings = non_compliant_instances.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Compute instances' do
+      it 'should have legacy metadata service endpoints disabled' do
+        expect(non_compliant_instances).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

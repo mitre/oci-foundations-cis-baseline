@@ -99,25 +99,34 @@ control 'oci-foundations-1.7' do
 
       next if mfa_status == 'ENROLLED'
 
-      non_compliant_users << {
-        'user_name' => user['user-name'],
-        'user_ocid' => user['ocid'],
-        'domain_display_name' => domain_display_name,
-        'domain_url' => domain_url,
-        'mfa_status' => mfa_status
-      }
+      non_compliant_users << <<~ENTRY.chomp
+        Username: #{user['user-name']}
+        User OCID: #{user['ocid']}
+        Domain Display Name: #{domain_display_name}
+        Domain URL: #{domain_url}
+        MFA Status: #{mfa_status}
+      ENTRY
     end
   end
 
   if total_users.zero?
     impact 0.0
-    describe 'Ensure MFA is enabled for all users with a console password' do
+    describe 'OCI IAM users with console passwords' do
       skip 'No users found in tenancy.'
     end
   else
-    describe 'Ensure MFA is enabled for all users with a console password' do
-      subject { non_compliant_users }
-      it { should cmp [] }
+    numbered_findings = non_compliant_users.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'OCI IAM users with console passwords' do
+      it 'should have MFA status set to ENROLLED' do
+        expect(non_compliant_users).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

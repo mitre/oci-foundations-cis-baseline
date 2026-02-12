@@ -91,14 +91,14 @@ control 'oci-foundations-3.2' do
 
         next if platform_config && secure_boot_enabled == true
 
-        non_compliant_instances << {
-          'display_name' => instance['display-name'],
-          'id' => instance['id'],
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'platform_config_present' => !platform_config.nil?,
-          'is_secure_boot_enabled' => secure_boot_enabled
-        }
+        non_compliant_instances << <<~ENTRY.chomp
+          Display Name: #{instance['display-name']}
+          ID: #{instance['id']}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Platform Config Present: #{!platform_config.nil?}
+          Secure Boot Enabled: #{secure_boot_enabled}
+        ENTRY
       end
     end
   end
@@ -109,9 +109,18 @@ control 'oci-foundations-3.2' do
       skip 'No compute instances found in tenancy.'
     end
   else
-    describe 'Ensure Secure Boot is enabled on Compute Instance' do
-      subject { non_compliant_instances }
-      it { should cmp [] }
+    numbered_findings = non_compliant_instances.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Compute instances' do
+      it 'should have Secure Boot enabled' do
+        expect(non_compliant_instances).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

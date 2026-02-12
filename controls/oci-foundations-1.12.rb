@@ -107,7 +107,7 @@ control 'oci-foundations-1.12' do
     describe 'Tenancy administrator users' do
       it 'should not have API keys associated with their accounts' do
         expect(admins_with_api_keys).to be_empty, <<~MSG
-          Admins with keys:
+          Non-compliant findings:
 
           #{numbered_findings.join("\n\n")}
         MSG

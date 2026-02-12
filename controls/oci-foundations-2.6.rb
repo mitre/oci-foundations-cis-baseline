@@ -124,16 +124,16 @@ control 'oci-foundations-2.6' do
 
         next if unexpected_ips.empty? && missing_ips.empty? && unexpected_vcn_pairs.empty? && missing_vcn_pairs.empty?
 
-        oic_access_findings << {
-          'name' => instance['display-name'],
-          'id' => instance['id'],
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'missing_ips' => missing_ips,
-          'unexpected_ips' => unexpected_ips,
-          'missing_vcn_pairs' => missing_vcn_pairs,
-          'unexpected_vcn_pairs' => unexpected_vcn_pairs
-        }
+        oic_access_findings << <<~ENTRY.chomp
+          Name: #{instance['display-name']}
+          ID: #{instance['id']}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Missing IPs: #{missing_ips.empty? ? 'None' : missing_ips.join(', ')}
+          Unexpected IPs: #{unexpected_ips.empty? ? 'None' : unexpected_ips.join(', ')}
+          Missing VCN/IP Pairs: #{missing_vcn_pairs.empty? ? 'None' : missing_vcn_pairs.map { |pair| "#{pair['vcn_id']}:#{pair['ip']}" }.join(', ')}
+          Unexpected VCN/IP Pairs: #{unexpected_vcn_pairs.empty? ? 'None' : unexpected_vcn_pairs.map { |pair| "#{pair['vcn_id']}:#{pair['ip']}" }.join(', ')}
+        ENTRY
       end
     end
   end
@@ -144,9 +144,18 @@ control 'oci-foundations-2.6' do
       skip 'No Oracle Integration Cloud instances found in tenancy.'
     end
   else
-    describe 'Ensure Oracle Integration Cloud (OIC) access is restricted to allowed sources' do
-      subject { oic_access_findings }
-      it { should cmp [] }
+    numbered_findings = oic_access_findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Oracle Integration Cloud instances' do
+      it 'should allow access only from approved IPs and VCN/IP pairs' do
+        expect(oic_access_findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

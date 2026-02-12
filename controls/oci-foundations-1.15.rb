@@ -84,12 +84,26 @@ control 'oci-foundations-1.15' do
       has_condition = stmt.include?('where')
       has_delete_exclusion = stmt.match?(/request\.permission\s*!=\s*['"][^'"]*_delete['"]/)
 
-      violations << { policy: policy['name'] || policy['id'], statement: statement } unless has_condition && has_delete_exclusion
+      next if has_condition && has_delete_exclusion
+
+      violations << <<~ENTRY.chomp
+        Policy: #{policy['name'] || policy['id']}
+        Statement: #{statement}
+      ENTRY
     end
   end
 
-  describe 'Ensure storage service-level admins cannot delete resources they manage' do
-    subject { violations }
-    it { should cmp [] }
+  numbered_findings = violations.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Storage service-level administrator policy statements' do
+    it 'should include a delete-permission exclusion condition' do
+      expect(violations).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

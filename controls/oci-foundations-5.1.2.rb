@@ -80,17 +80,26 @@ control 'oci-foundations-5.1.2' do
 
         next unless kms_key_id.to_s.strip.empty?
 
-        buckets_missing_cmk << {
-          'name' => bucket_name,
-          'region' => region
-        }
+        buckets_missing_cmk << <<~ENTRY.chomp
+          Bucket Name: #{bucket_name}
+          Region: #{region}
+        ENTRY
       end
     end
   end
 
-  describe 'Ensure Object Storage Buckets are encrypted with a Customer Managed Key (CMK)' do
-    subject { buckets_missing_cmk }
-    it { should cmp [] }
+  numbered_findings = buckets_missing_cmk.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Object Storage buckets' do
+    it 'should be encrypted with a customer-managed key (CMK)' do
+      expect(buckets_missing_cmk).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 
   cloud_guard_check = input('cloud_guard_check')

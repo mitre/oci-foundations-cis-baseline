@@ -83,10 +83,10 @@ control 'oci-foundations-1.2' do
   end
 
   if administrators_manage_all_grants.empty?
-    findings << {
-      'issue' => 'No Administrators statement found for manage all-resources in tenancy',
-      'expected_statement_pattern' => 'Allow group Administrators to manage all-resources in tenancy'
-    }
+    findings << <<~ENTRY.chomp
+      Issue: No Administrators statement found for 'manage all-resources in tenancy'
+      Expected Statement Pattern: Allow group Administrators to manage all-resources in tenancy
+    ENTRY
   end
 
   non_administrator_manage_all_grants = manage_all_resources_grants.reject do |grant|
@@ -94,11 +94,25 @@ control 'oci-foundations-1.2' do
   end
 
   non_administrator_manage_all_grants.each do |grant|
-    findings << grant.merge('issue' => 'Statement grants manage all-resources in tenancy to non-Administrators principal')
+    findings << <<~ENTRY.chomp
+      Issue: Statement grants 'manage all-resources in tenancy' to non-Administrators principal
+      Policy Name: #{grant['policy_name']}
+      Policy ID: #{grant['policy_id']}
+      Statement: #{grant['statement']}
+    ENTRY
   end
 
-  describe 'Ensure permissions on all resources are given only to the tenancy administrator group' do
-    subject { findings }
-    it { should cmp [] }
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Tenancy policy statements' do
+    it 'should grant "manage all-resources in tenancy" only to the Administrators group' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant policy statements:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

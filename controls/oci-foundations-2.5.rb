@@ -79,16 +79,25 @@ control 'oci-foundations-2.5' do
 
         next if bad_ingress.empty? && bad_egress.empty?
 
-        security_list_findings << {
-          'vcn_name' => vcn['display-name'],
-          'region' => region
-        }
+        security_list_findings << <<~ENTRY.chomp
+          VCN Name: #{vcn['display-name']}
+          Region: #{region}
+        ENTRY
       end
     end
   end
 
-  describe 'Ensure the default security list of every VCN restricts all traffic except ICMP within VCN' do
-    subject { security_list_findings }
-    it { should cmp [] }
+  numbered_findings = security_list_findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Default VCN security lists' do
+    it 'should restrict all traffic except ICMP within the VCN' do
+      expect(security_list_findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

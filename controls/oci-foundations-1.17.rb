@@ -84,13 +84,13 @@ control 'oci-foundations-1.17' do
 
       next if api_keys.length <= 1
 
-      users_with_multiple_api_keys << {
-        'user_name' => user_name,
-        'api_key_count' => api_keys.length,
-        'user_ocid' => user_ocid,
-        'domain_name' => domain_name,
-        'domain_url' => domain_url
-      }
+      users_with_multiple_api_keys << <<~ENTRY.chomp
+        Username: #{user_name}
+        API Key Count: #{api_keys.length}
+        User OCID: #{user_ocid}
+        Domain Name: #{domain_name}
+        Domain URL: #{domain_url}
+      ENTRY
     end
   end
 
@@ -100,9 +100,18 @@ control 'oci-foundations-1.17' do
       skip 'No users found in tenancy.'
     end
   else
-    describe 'Ensure there is only one active API Key for any single OCI IAM user' do
-      subject { users_with_multiple_api_keys }
-      it { should cmp [] }
+    numbered_findings = users_with_multiple_api_keys.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'OCI IAM users with API keys' do
+      it 'should have at most one active API key' do
+        expect(users_with_multiple_api_keys).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

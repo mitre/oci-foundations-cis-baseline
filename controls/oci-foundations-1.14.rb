@@ -102,18 +102,34 @@ control 'oci-foundations-1.14' do
   end
 
   malformed_statements.each do |entry|
-    findings << entry.merge('issue' => 'Statement includes request.principal but is missing request.principal.type and/or request.principal.id/request.principal.compartment.id')
+    findings << <<~ENTRY.chomp
+      Issue: Statement includes request.principal but is missing request.principal.type and/or request.principal.id/request.principal.compartment.id
+      Compartment Name: #{entry['compartment_name']}
+      Compartment ID: #{entry['compartment_id']}
+      Policy Name: #{entry['policy_name']}
+      Policy ID: #{entry['policy_id']}
+      Statement: #{entry['statement']}
+    ENTRY
   end
 
   if request_principal_statements.empty?
     impact 0.0
-    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
+    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources' do
       skip 'No IAM policy statements with request.principal were found.'
     end
   else
-    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
-      subject { findings }
-      it { should cmp [] }
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'IAM policy statements using request.principal' do
+      it 'should include request.principal.type and request.principal.id or request.principal.compartment.id' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

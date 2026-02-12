@@ -74,25 +74,34 @@ control 'oci-foundations-1.13' do
 
       next if has_verified_primary && has_verified_recovery
 
-      users_without_valid_emails << {
-        'user_name' => user_name,
-        'user_ocid' => user_ocid,
-        'domain_url' => domain_url,
-        'has_verified_primary' => has_verified_primary,
-        'has_verified_recovery' => has_verified_recovery
-      }
+      users_without_valid_emails << <<~ENTRY.chomp
+        Username: #{user_name}
+        User OCID: #{user_ocid}
+        Domain URL: #{domain_url}
+        Has Verified Primary: #{has_verified_primary}
+        Has Verified Recovery: #{has_verified_recovery}
+      ENTRY
     end
   end
 
   if total_users.zero?
     impact 0.0
-    describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
+    describe 'OCI IAM user accounts' do
       skip 'No users found in tenancy.'
     end
   else
-    describe 'Ensure all OCI IAM user accounts have a valid and current email address' do
-      subject { users_without_valid_emails }
-      it { should cmp [] }
+    numbered_findings = users_without_valid_emails.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'OCI IAM user accounts' do
+      it 'should have verified primary and recovery email addresses' do
+        expect(users_without_valid_emails).to be_empty, <<~MSG
+          Users without valid email and recovery email:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end
