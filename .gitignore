@@ -149,4 +149,4 @@ results/
 contrib/*
 
 # Vim
-.*~
+.*~.beads/recovery-context.md

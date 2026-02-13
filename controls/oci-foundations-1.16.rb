@@ -31,13 +31,13 @@ control 'oci-foundations-1.16' do
     ."urn-ietf-params-scim-schemas-oracle-idcs-extension-user-state-user"."last-successful-login-date"'
     Review the output the that the date is under 45 days, or no date means they have not
     logged in For API Keys: Create the search query text: export query="search
-    \"<tenancy-ocid>/_Audit_Include_Subcompartment\" |
+    "<tenancy-ocid>/_Audit_Include_Subcompartment" |
     data.identity.credentials='*<key-finger-print>' | summarize count() by
     data.identity.principalId" Select a day range. Date format is 2024-12-01 Note each query
     can only be 14 days multiple queries will be required to go 45 days Execute the below: oci
     logging-search search-logs --search-query $query --time-start <start-date> --time-end
     <end-date> --query 'data.results[0].data.count' export query="search
-    \"<tenancy-ocid>/_Audit_Include_Subcompartment\" |
+    "<tenancy-ocid>/_Audit_Include_Subcompartment" |
     data.identity.credentials='*<key-finger-print>' | summarize count() by
     data.identity.principalId" If results the count is not zero, the user has used their API
     key during that period Repeat steps 2 – 4 for the 45-day period

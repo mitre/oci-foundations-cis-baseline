@@ -14,7 +14,7 @@ control 'oci-foundations-1.17' do
     API Key From CLI: Each user and in each Identity Domain oci raw-request --http-method GET
     --target-uri
     "https://<domain-endpoint>/admin/v1/ApiKeys?filter=user.ocid+eq+%<user-ocid>%22" | jq
-    '.data.Resources[] | "\(.fingerprint) \(.id)"' Ensure only one key is returned}
+    '.data.Resources[] | "(.fingerprint) (.id)"' Ensure only one key is returned}
   CHECK
 
   desc 'fix', <<~FIX

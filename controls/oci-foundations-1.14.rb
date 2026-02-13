@@ -92,8 +92,6 @@ control 'oci-foundations-1.14' do
     end
   end
 
-  findings = []
-
   malformed_statements = request_principal_statements.reject do |entry|
     statement = entry['statement']
     has_type = statement.match?(/request\.principal\.type/i)
@@ -101,8 +99,8 @@ control 'oci-foundations-1.14' do
     has_type && has_identifier
   end
 
-  malformed_statements.each do |entry|
-    findings << <<~ENTRY.chomp
+  findings = malformed_statements.map do |entry|
+    <<~ENTRY.chomp
       Issue: Statement includes request.principal but is missing request.principal.type and/or request.principal.id/request.principal.compartment.id
       Compartment Name: #{entry['compartment_name']}
       Compartment ID: #{entry['compartment_id']}
