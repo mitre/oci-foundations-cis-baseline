@@ -80,20 +80,23 @@ control 'oci-foundations-1.9' do
       secret_keys.each do |secret_key|
         created_at = secret_key.dig('meta', 'created')
 
-        key_details = {
-          'user_name' => user_name,
-          'domain_url' => domain_url,
-          'customer_secret_key_id' => secret_key['id'],
-          'user_ocid' => user_ocid,
-          'created' => created_at
-        }
+        created_time = begin
+          Time.parse(created_at.to_s).utc
+        rescue StandardError
+          nil
+        end
 
-        created_time = Time.parse(created_at.to_s).utc
-
-        next unless created_time < cutoff_time
+        next if created_time.nil? || created_time >= cutoff_time
 
         age_days = ((now - created_time) / 86_400).floor
-        stale_customer_secret_keys << key_details.merge('age_days' => age_days)
+        stale_customer_secret_keys << <<~ENTRY.chomp
+          Username: #{user_name}
+          User OCID: #{user_ocid}
+          Customer Secret Key ID: #{secret_key['id']}
+          Domain URL: #{domain_url}
+          Created: #{created_at}
+          Age Days: #{age_days}
+        ENTRY
       end
     end
   end
@@ -104,9 +107,18 @@ control 'oci-foundations-1.9' do
       skip 'No customer secret keys found in tenancy.'
     end
   else
-    describe 'Ensure user customer secret keys rotate every 90 days' do
-      subject { stale_customer_secret_keys }
-      it { should cmp [] }
+    numbered_findings = stale_customer_secret_keys.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'User customer secret keys' do
+      it 'should rotate every 90 days' do
+        expect(stale_customer_secret_keys).to be_empty, <<~MSG
+          Stale customer secret keys:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

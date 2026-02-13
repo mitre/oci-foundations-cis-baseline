@@ -54,12 +54,54 @@ control 'oci-foundations-6.2' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = "oci search resource structured-search --query-text \"query VCN, instance, volume, bootvolume, filesystem, bucket, autonomousdatabase, database, dbsystem resources where compartmentId = '#{tenancy_ocid}'\""
-  json_output = json(command: cmd)
-  output = json_output.params.dig('data', 'items')
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  describe 'Ensure no resources are created in the root compartment' do
-    subject { output }
-    it { should cmp [] }
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id'].to_s
+    next if compartment_id.empty?
+
+    map[compartment_id] = compartment['name']
+  end
+
+  query_text = %(query VCN, instance, volume, bootvolume, filesystem, bucket, autonomousdatabase, database, dbsystem resources where compartmentId = '#{tenancy_ocid}')
+
+  findings = []
+  regions.each do |region|
+    search_response = json(command: %(oci search resource structured-search --region "#{region}" --query-text "#{query_text}" --limit 1000 2>/dev/null))
+    items = search_response.params.dig('data', 'items') || []
+
+    items.each do |item|
+      compartment_id = item['compartment-id'].to_s
+      compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
+
+      findings << <<~ENTRY.chomp
+        Region: #{region}
+        Resource Type: #{item['resource-type']}
+        Name: #{item['display-name']}
+        Identifier: #{item['identifier']}
+        Compartment Name: #{compartment_name}
+        Compartment ID: #{compartment_id}
+        Lifecycle State: #{item['lifecycle-state']}
+        Issue: Resource exists in the root compartment
+      ENTRY
+    end
+  end
+
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Resources in the root compartment' do
+    it 'should not include VCN, instance, volume, boot volume, file system, bucket, autonomous database, database, or DB system resources' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

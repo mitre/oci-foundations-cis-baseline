@@ -57,13 +57,34 @@ control 'oci-foundations-6.1' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = "oci search resource structured-search --query-text \"query compartment resources where (compartmentId='#{tenancy_ocid}' && lifecycleState='ACTIVE')\""
+  compartments_response = json(command: %(oci iam compartment list --compartment-id "#{tenancy_ocid}" --access-level ACCESSIBLE --all 2>/dev/null))
+  compartments = compartments_response.params.fetch('data', [])
+  active_top_level_compartments = compartments.select { |compartment| compartment['lifecycle-state'] == 'ACTIVE' }
 
-  json_output = json(command: cmd)
-  output = json_output.params.dig('data', 'items') || []
+  findings = []
+  if active_top_level_compartments.empty?
+    discovered_compartments = active_top_level_compartments.map do |compartment|
+      "#{compartment['name']} (#{compartment['id']})"
+    end
 
-  describe 'Create at least one compartment in your tenancy to store cloud resources' do
-    subject { output }
-    it { should_not cmp [] }
+    findings << <<~ENTRY.chomp
+      Issue: No ACTIVE customer-created top-level compartments found.
+      Tenancy OCID: #{tenancy_ocid}
+      Active Top-level Compartments: #{discovered_compartments.empty? ? 'None' : discovered_compartments.join(', ')}
+    ENTRY
+  end
+
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Top-level tenancy compartments' do
+    it 'should include at least one ACTIVE customer-created compartment' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

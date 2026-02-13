@@ -117,11 +117,23 @@ control 'oci-foundations-4.7' do
       end
     end
 
-    findings << { region: region, issue: 'Missing enabled user change notification rule(s)' } unless rule_present
+    findings << <<~ENTRY.chomp unless rule_present
+      Region: #{region}
+      Issue: Missing enabled user change notification rule(s)
+    ENTRY
   end
 
-  describe 'Ensure a notification is configured for user changes' do
-    subject { findings }
-    it { should cmp [] }
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'IAM user change notifications' do
+    it 'should have enabled event rules with an active ONS topic' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

@@ -107,11 +107,23 @@ control 'oci-foundations-4.18' do
       end
     end
 
-    findings << { region: region, issue: 'Missing enabled local OCI user authentication notification rule(s)' } unless rule_present
+    findings << <<~ENTRY.chomp unless rule_present
+      Region: #{region}
+      Issue: Missing enabled local OCI user authentication notification rule(s)
+    ENTRY
   end
 
-  describe 'Ensure a notification is configured for Local OCI User Authentication' do
-    subject { findings }
-    it { should cmp [] }
+  numbered_findings = findings.each_with_index.map do |entry, index|
+    "[#{index + 1}]\n#{entry}"
+  end
+
+  describe 'Local OCI user authentication notifications' do
+    it 'should have enabled event rules with an active ONS topic' do
+      expect(findings).to be_empty, <<~MSG
+        Non-compliant findings:
+
+        #{numbered_findings.join("\n\n")}
+      MSG
+    end
   end
 end

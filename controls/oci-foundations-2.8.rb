@@ -97,28 +97,28 @@ control 'oci-foundations-2.8' do
         whitelisted_ips = details['whitelisted-ips'].map { |ip| ip.to_s.strip.downcase }.reject(&:empty?)
 
         if whitelisted_ips.empty?
-          whitelist_findings << {
-            'name' => instance['display-name'],
-            'id' => instance_id,
-            'region' => region,
-            'compartment_id' => compartment_id,
-            'whitelisted_ips' => whitelisted_ips,
-            'issue' => 'whitelisted-ips is empty or unset'
-          }
+          whitelist_findings << <<~ENTRY.chomp
+            Name: #{instance['display-name']}
+            ID: #{instance_id}
+            Region: #{region}
+            Compartment ID: #{compartment_id}
+            Whitelisted IPs: None
+            Issue: whitelisted-ips is empty or unset
+          ENTRY
           next
         end
 
         unauthorized_ips = whitelisted_ips.reject { |ip| allowed_adb_whitelisted_ips.include?(ip) }
         next if unauthorized_ips.empty?
 
-        whitelist_findings << {
-          'name' => instance['display-name'],
-          'id' => instance_id,
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'whitelisted_ips' => whitelisted_ips,
-          'unauthorized_ips' => unauthorized_ips
-        }
+        whitelist_findings << <<~ENTRY.chomp
+          Name: #{instance['display-name']}
+          ID: #{instance_id}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Whitelisted IPs: #{whitelisted_ips.join(', ')}
+          Unauthorized IPs: #{unauthorized_ips.join(', ')}
+        ENTRY
       end
     end
   end
@@ -129,9 +129,18 @@ control 'oci-foundations-2.8' do
       skip 'No Oracle Autonomous Databases found in tenancy.'
     end
   else
-    describe 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
-      subject { whitelist_findings }
-      it { should cmp [] }
+    numbered_findings = whitelist_findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Oracle Autonomous Shared Databases' do
+      it 'should restrict whitelisted IPs to approved sources when not in a VCN' do
+        expect(whitelist_findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

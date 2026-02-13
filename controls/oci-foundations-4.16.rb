@@ -98,17 +98,17 @@ control 'oci-foundations-4.16' do
 
           age_days = created_time ? ((now - created_time) / 86_400).floor : nil
 
-          non_compliant_keys << {
-            'display_name' => key['display-name'],
-            'key_id' => key['id'],
-            'vault_name' => vault['display-name'],
-            'vault_id' => vault['id'],
-            'region' => region,
-            'compartment_id' => compartment_id,
-            'lifecycle_state' => lifecycle_state,
-            'time_created' => created_at,
-            'age_days' => age_days
-          }.compact
+          non_compliant_keys << <<~ENTRY.chomp
+            Display Name: #{key['display-name']}
+            Key ID: #{key['id']}
+            Vault Name: #{vault['display-name']}
+            Vault ID: #{vault['id']}
+            Region: #{region}
+            Compartment ID: #{compartment_id}
+            Lifecycle State: #{lifecycle_state}
+            Time Created: #{created_at}
+            Age Days: #{age_days.nil? ? 'Unknown' : age_days}
+          ENTRY
         end
       end
     end
@@ -125,9 +125,18 @@ control 'oci-foundations-4.16' do
       skip 'No master encryption keys found in tenancy.'
     end
   else
-    describe 'Ensure customer created Customer Managed Key (CMK) is rotated at least annually' do
-      subject { non_compliant_keys }
-      it { should cmp [] }
+    numbered_findings = non_compliant_keys.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Customer-managed encryption keys' do
+      it 'should be enabled and rotated within the last 365 days' do
+        expect(non_compliant_keys).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

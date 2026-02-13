@@ -150,17 +150,26 @@ control 'oci-foundations-4.17' do
                 'No enabled write log found for bucket'
               end
 
-      findings << {
-        'bucket_name' => bucket_name,
-        'region' => bucket_region,
-        'compartment_id' => bucket['compartment-id'],
-        'issue' => issue
-      }
+      findings << <<~ENTRY.chomp
+        Bucket Name: #{bucket_name}
+        Region: #{bucket_region}
+        Compartment ID: #{bucket['compartment-id']}
+        Issue: #{issue}
+      ENTRY
     end
 
-    describe 'Ensure write level Object Storage logging is enabled for all buckets' do
-      subject { findings }
-      it { should cmp [] }
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Object Storage buckets' do
+      it 'should have an enabled ACTIVE write log' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

@@ -84,14 +84,14 @@ control 'oci-foundations-5.2.1' do
       kms_key_id = volume['kms-key-id'].to_s.strip
       next unless kms_key_id.empty?
 
-      findings << {
-        'name' => volume['display-name'],
-        'id' => volume['id'],
-        'region' => region,
-        'compartment_id' => volume['compartment-id'],
-        'lifecycle_state' => lifecycle_state,
-        'issue' => 'kms-key-id is unset (Oracle-managed key)'
-      }
+      findings << <<~ENTRY.chomp
+        Name: #{volume['display-name']}
+        ID: #{volume['id']}
+        Region: #{region}
+        Compartment ID: #{volume['compartment-id']}
+        Lifecycle State: #{lifecycle_state}
+        Issue: kms-key-id is unset (Oracle-managed key)
+      ENTRY
     end
   end
 
@@ -101,9 +101,18 @@ control 'oci-foundations-5.2.1' do
       skip 'No block volumes found in tenancy.'
     end
   else
-    describe 'Ensure Block Volumes are encrypted with Customer Managed Keys (CMK).' do
-      subject { findings }
-      it { should cmp [] }
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Block volumes' do
+      it 'should be encrypted with customer-managed keys (CMK)' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

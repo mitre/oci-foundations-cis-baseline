@@ -55,24 +55,72 @@ control 'oci-foundations-5.2.2' do
 
   tag nist: ['SC-28']
 
-  cmd = <<~CMD
-    (
-      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
-      do
-        for bvid in `oci search resource structured-search --region $region --query-text "query bootvolume resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
-        do
-          output=`oci bv boot-volume get --boot-volume-id $bvid 2>/dev/null| jq -r '.data | select(."kms-key-id" == null).id'`
-          if [ ! -z "$output" ]; then echo $output; fi
-        done
-      done
-    ) | jq -nR '[inputs]'
-  CMD
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
 
-  json_output = json(command: cmd)
-  output = json_output.params
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id'].to_s
+    next if compartment_id.empty?
 
-  describe 'Ensure boot volumes are encrypted with Customer Managed Key (CMK)' do
-    subject { output }
-    it { should cmp [] }
+    map[compartment_id] = compartment['name']
+  end
+
+  findings = []
+  total_boot_volumes = 0
+
+  regions.each do |region|
+    search_response = json(command: %(oci search resource structured-search --region "#{region}" --query-text "query bootvolume resources" --limit 1000 2>/dev/null))
+    items = search_response.params.dig('data', 'items') || []
+    boot_volume_ids = items.map { |item| item['identifier'] }.compact
+
+    boot_volume_ids.each do |boot_volume_id|
+      boot_volume_response = json(command: %(oci bv boot-volume get --boot-volume-id "#{boot_volume_id}" --region "#{region}" 2>/dev/null))
+      boot_volume = boot_volume_response.params.fetch('data', {})
+      next if boot_volume.empty?
+
+      lifecycle_state = boot_volume['lifecycle-state']
+      next if lifecycle_state == 'TERMINATED'
+
+      total_boot_volumes += 1
+      kms_key_id = boot_volume['kms-key-id'].to_s.strip
+      next unless kms_key_id.empty?
+
+      compartment_id = boot_volume['compartment-id'].to_s
+      compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
+
+      findings << <<~ENTRY.chomp
+        Name: #{boot_volume['display-name']}
+        ID: #{boot_volume['id']}
+        Region: #{region}
+        Compartment Name: #{compartment_name}
+        Compartment ID: #{compartment_id}
+        Lifecycle State: #{lifecycle_state}
+        Issue: kms-key-id is unset (Oracle-managed key)
+      ENTRY
+    end
+  end
+
+  if total_boot_volumes.zero?
+    impact 0.0
+    describe 'Ensure boot volumes are encrypted with Customer Managed Key (CMK)' do
+      skip 'No boot volumes found in tenancy.'
+    end
+  else
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Boot volumes' do
+      it 'should be encrypted with customer-managed keys (CMK)' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
+    end
   end
 end

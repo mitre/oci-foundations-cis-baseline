@@ -84,20 +84,23 @@ control 'oci-foundations-1.8' do
       api_keys.each do |api_key|
         created_at = api_key.dig('meta', 'created')
 
-        key_details = {
-          'user_name' => user_name,
-          'domain_url' => domain_url,
-          'api_key_id' => api_key['id'],
-          'user_ocid' => user_ocid,
-          'created' => created_at
-        }
+        created_time = begin
+          Time.parse(created_at.to_s).utc
+        rescue StandardError
+          nil
+        end
 
-        created_time = Time.parse(created_at.to_s).utc
-
-        next unless created_time < cutoff_time
+        next if created_time.nil? || created_time >= cutoff_time
 
         age_days = ((now - created_time) / 86_400).floor
-        stale_api_keys << key_details.merge('age_days' => age_days)
+        stale_api_keys << <<~ENTRY.chomp
+          Username: #{user_name}
+          User OCID: #{user_ocid}
+          API Key ID: #{api_key['id']}
+          Domain URL: #{domain_url}
+          Created: #{created_at}
+          Age Days: #{age_days}
+        ENTRY
       end
     end
   end
@@ -108,9 +111,18 @@ control 'oci-foundations-1.8' do
       skip 'No API keys found in tenancy.'
     end
   else
-    describe 'Ensure user API keys rotate within 90 days' do
-      subject { stale_api_keys }
-      it { should cmp [] }
+    numbered_findings = stale_api_keys.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'User API keys' do
+      it 'should rotate within 90 days' do
+        expect(stale_api_keys).to be_empty, <<~MSG
+          Stale API keys:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

@@ -91,26 +91,35 @@ control 'oci-foundations-2.7' do
 
         next if allowed_network_endpoint_types.include?(endpoint_type_normalized)
 
-        endpoint_type_findings << {
-          'name' => instance['name'],
-          'id' => instance['id'],
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'network_endpoint_type' => endpoint_type
-        }
+        endpoint_type_findings << <<~ENTRY.chomp
+          Name: #{instance['name']}
+          ID: #{instance['id']}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Network Endpoint Type: #{endpoint_type}
+        ENTRY
       end
     end
   end
 
   if total_oac_instances.zero?
     impact 0.0
-    describe 'Ensure Oracle Analytics Cloud (OAC) access is restricted to allowed sources or deployed within a Virtual Cloud Network.' do
+    describe 'Ensure Oracle Analytics Cloud (OAC) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
       skip 'No Oracle Analytics Cloud instances found in tenancy.'
     end
   else
-    describe 'Ensure Oracle Analytics Cloud (OAC) access is restricted to allowed sources or deployed within a Virtual Cloud Network.' do
-      subject { endpoint_type_findings }
-      it { should cmp [] }
+    numbered_findings = endpoint_type_findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Oracle Analytics Cloud instances' do
+      it 'should use only approved network endpoint types' do
+        expect(endpoint_type_findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

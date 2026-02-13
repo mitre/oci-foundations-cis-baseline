@@ -120,14 +120,14 @@ control 'oci-foundations-4.13' do
         covered = compliant_resources.include?(subnet_id) || compliant_resources.include?(vcn_id)
         next if covered
 
-        findings << {
-          'subnet_name' => subnet['display-name'],
-          'subnet_id' => subnet_id,
-          'vcn_id' => vcn_id,
-          'region' => region,
-          'compartment_id' => compartment_id,
-          'issue' => 'No enabled flow log with compliant capture filter found for subnet or parent VCN'
-        }
+        findings << <<~ENTRY.chomp
+          Subnet Name: #{subnet['display-name']}
+          Subnet ID: #{subnet_id}
+          VCN ID: #{vcn_id}
+          Region: #{region}
+          Compartment ID: #{compartment_id}
+          Issue: No enabled flow log with compliant capture filter found for subnet or parent VCN
+        ENTRY
       end
     end
   end
@@ -138,9 +138,18 @@ control 'oci-foundations-4.13' do
       skip 'No subnets found in tenancy.'
     end
   else
-    describe 'Ensure VCN flow logging is enabled for all subnets' do
-      subject { findings }
-      it { should cmp [] }
+    numbered_findings = findings.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'Subnet and VCN flow logs' do
+      it 'should have enabled compliant flow logging for every subnet' do
+        expect(findings).to be_empty, <<~MSG
+          Non-compliant findings:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end

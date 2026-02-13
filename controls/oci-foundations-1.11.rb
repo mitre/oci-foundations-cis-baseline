@@ -86,20 +86,23 @@ control 'oci-foundations-1.11' do
       database_passwords.each do |database_password|
         created_at = database_password.dig('meta', 'created')
 
-        password_details = {
-          'user_name' => user_name,
-          'domain_url' => domain_url,
-          'database_password_id' => database_password['id'],
-          'user_ocid' => user_ocid,
-          'created' => created_at
-        }
+        created_time = begin
+          Time.parse(created_at.to_s).utc
+        rescue StandardError
+          nil
+        end
 
-        created_time = Time.parse(created_at.to_s).utc
-
-        next unless created_time < cutoff_time
+        next if created_time.nil? || created_time >= cutoff_time
 
         age_days = ((now - created_time) / 86_400).floor
-        stale_database_passwords << password_details.merge('age_days' => age_days)
+        stale_database_passwords << <<~ENTRY.chomp
+          Username: #{user_name}
+          User OCID: #{user_ocid}
+          Database Password ID: #{database_password['id']}
+          Domain URL: #{domain_url}
+          Created: #{created_at}
+          Age Days: #{age_days}
+        ENTRY
       end
     end
   end
@@ -110,9 +113,18 @@ control 'oci-foundations-1.11' do
       skip 'No database passwords found in tenancy.'
     end
   else
-    describe 'Ensure user IAM Database Passwords rotate within 90 days' do
-      subject { stale_database_passwords }
-      it { should cmp [] }
+    numbered_findings = stale_database_passwords.each_with_index.map do |entry, index|
+      "[#{index + 1}]\n#{entry}"
+    end
+
+    describe 'User IAM database passwords' do
+      it 'should rotate within 90 days' do
+        expect(stale_database_passwords).to be_empty, <<~MSG
+          Stale IAM database passwords:
+
+          #{numbered_findings.join("\n\n")}
+        MSG
+      end
     end
   end
 end
