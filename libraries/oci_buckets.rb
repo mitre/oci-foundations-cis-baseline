@@ -79,13 +79,7 @@ class OciBuckets < OciCollectionResourceBase
 
   # Returns findings for buckets without versioning enabled.
   def missing_versioning_findings
-    table.reject { |row|
-      begin
-        row[:versioning].casecmp('Enabled').zero?
-      rescue StandardError
-        false
-      end
-    }.map do |row|
+    table.reject { |row| row[:versioning].to_s.casecmp('enabled').zero? }.map do |row|
       <<~ENTRY.chomp
         Bucket Name: #{row[:name]}
         Region: #{row[:region]}

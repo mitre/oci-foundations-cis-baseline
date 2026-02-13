@@ -75,9 +75,8 @@ class OciIdentityDomainPasswordPolicies < OciCollectionResourceBase
   private
 
   def fetch_domain_urls
-    cmd = %(oci iam domain list --compartment-id '#{@tenancy_ocid}' --all | jq '[.data[] | .url]')
-    result = inspec.json(command: "#{cmd} 2>/dev/null").params
-    result.is_a?(Array) ? result : []
+    domains = oci_cli(%(oci iam domain list --compartment-id "#{@tenancy_ocid}" --all))
+    domains.map { |d| d['url'] }.compact
   rescue StandardError
     []
   end

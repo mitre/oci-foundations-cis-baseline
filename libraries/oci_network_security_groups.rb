@@ -79,7 +79,7 @@ class OciNetworkSecurityGroups < OciCollectionResourceBase
     table.select do |row|
       row[:direction] == 'INGRESS' &&
         row[:source] == '0.0.0.0/0' &&
-        row[:protocol] == protocol &&
+        [protocol, 'all'].include?(row[:protocol]) &&
         port_exposed?(row, port)
     end.map do |row|
       port_display = row[:port_min].nil? ? 'All TCP ports (none specified)' : "#{row[:port_min]}-#{row[:port_max]}"

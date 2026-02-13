@@ -20,13 +20,15 @@ class CloudGuardHelper < OciResourceBase
   def detector_rule_value(rule_id:, config_key:)
     return nil if @detector_recipe_ocid.to_s.empty?
 
-    cmd = %(oci cloud-guard detector-recipe-detector-rule get \
-      --detector-recipe-id "#{@detector_recipe_ocid}" \
-      --detector-rule-id "#{rule_id}" | \
-      jq -r --arg ck "#{config_key}" \
-      '.data.details.configurations[]? | select(.["config-key"] == $ck) | .value')
+    data = oci_cli_raw(
+      %(oci cloud-guard detector-recipe-detector-rule get \
+        --detector-recipe-id "#{@detector_recipe_ocid}" \
+        --detector-rule-id "#{rule_id}")
+    )
 
-    oci_command(cmd).stdout.strip
+    configs = data.dig('data', 'details', 'configurations') || []
+    match = configs.find { |c| c['config-key'] == config_key }
+    match&.fetch('value', nil)
   end
 
   def detector_rule_enabled?(rule_id:)
