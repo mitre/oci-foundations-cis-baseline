@@ -3,6 +3,28 @@ require_relative 'oci_backend'
 class OciBuckets < OciCollectionResourceBase
   name 'oci_buckets'
   desc 'Lists OCI Object Storage buckets across all regions and compartments.'
+  example <<~EXAMPLE
+    # Check all buckets have customer-managed encryption keys
+    findings = oci_buckets.missing_cmk_findings
+
+    describe 'Object Storage buckets' do
+      it 'should be encrypted with a customer-managed key' do
+        expect(findings).to be_empty
+      end
+    end
+
+    # Check all buckets have versioning enabled
+    describe 'Object Storage buckets' do
+      it 'should have versioning enabled' do
+        expect(oci_buckets.missing_versioning_findings).to be_empty
+      end
+    end
+
+    # FilterTable queries
+    describe oci_buckets.where(versioning: 'Disabled') do
+      its('count') { should eq 0 }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:names,               field: :name)

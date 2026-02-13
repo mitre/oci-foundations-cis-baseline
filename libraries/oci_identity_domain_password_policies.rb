@@ -3,6 +3,26 @@ require_relative 'oci_backend'
 class OciIdentityDomainPasswordPolicies < OciCollectionResourceBase
   name 'oci_identity_domain_password_policies'
   desc 'Fetches password policies from OCI Identity Domains.'
+  example <<~EXAMPLE
+    policies = oci_identity_domain_password_policies(
+      tenancy_ocid: input('tenancy_ocid')
+    )
+
+    describe 'Password minimum length' do
+      subject { policies.min_lengths }
+      it { should all(be >= 14) }
+    end
+
+    describe 'Password expiration' do
+      subject { policies.password_expires_afters }
+      it { should all(be <= 365) }
+    end
+
+    describe 'Password history' do
+      subject { policies.num_passwords_in_histories }
+      it { should all(be >= 24) }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:domain_urls,              field: :domain_url)

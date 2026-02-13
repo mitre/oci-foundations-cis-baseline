@@ -3,6 +3,22 @@ require_relative 'oci_backend'
 class OciNetworkSecurityGroups < OciCollectionResourceBase
   name 'oci_network_security_groups'
   desc 'Lists OCI network security group rules across all regions and compartments.'
+  example <<~EXAMPLE
+    # Check for unrestricted RDP access
+    findings = oci_network_security_groups.internet_ingress_findings(port: 3389)
+
+    describe 'Network security groups' do
+      it 'should not allow ingress from 0.0.0.0/0 to port 3389' do
+        expect(findings).to be_empty
+      end
+    end
+
+    # FilterTable queries
+    describe oci_network_security_groups
+      .where(direction: 'INGRESS', source: '0.0.0.0/0') do
+      its('count') { should eq 0 }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:regions,           field: :region)

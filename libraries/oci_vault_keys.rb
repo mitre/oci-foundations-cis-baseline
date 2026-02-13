@@ -4,6 +4,24 @@ require_relative 'oci_backend'
 class OciVaultKeys < OciCollectionResourceBase
   name 'oci_vault_keys'
   desc 'Lists OCI Vault master encryption keys across all regions, compartments, and vaults.'
+  example <<~EXAMPLE
+    vault_keys = oci_vault_keys
+
+    unless vault_keys.total_vaults.zero?
+      findings = vault_keys.non_compliant_findings(max_age_days: 365)
+
+      describe 'Customer-managed encryption keys' do
+        it 'should be enabled and rotated within the last 365 days' do
+          expect(findings).to be_empty
+        end
+      end
+    end
+
+    # FilterTable queries
+    describe oci_vault_keys.where(lifecycle_state: 'ENABLED') do
+      its('count') { should be >= 1 }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:key_ids,          field: :key_id)

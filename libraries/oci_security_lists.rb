@@ -3,6 +3,21 @@ require_relative 'oci_backend'
 class OciSecurityLists < OciCollectionResourceBase
   name 'oci_security_lists'
   desc 'Lists OCI security list ingress rules across all regions and compartments.'
+  example <<~EXAMPLE
+    # Check for unrestricted SSH access
+    findings = oci_security_lists.internet_ingress_findings(port: 22)
+
+    describe 'Security lists' do
+      it 'should not allow ingress from 0.0.0.0/0 to port 22' do
+        expect(findings).to be_empty
+      end
+    end
+
+    # FilterTable queries
+    describe oci_security_lists.where(source: '0.0.0.0/0', protocol: '6') do
+      its('count') { should eq 0 }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:regions,              field: :region)

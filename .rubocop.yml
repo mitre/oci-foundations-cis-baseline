@@ -27,6 +27,9 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Max: 12
 
+Metrics/ClassLength:
+  Max: 150
+
 Lint/ConstantDefinitionInBlock:
   Enabled: false
 

@@ -3,6 +3,33 @@ require_relative 'oci_backend'
 class OciEventRules < OciCollectionResourceBase
   name 'oci_event_rules'
   desc 'Lists OCI event rules across all regions for a given compartment.'
+  example <<~EXAMPLE
+    # Check that event rules cover all regions for specific event types
+    rules = oci_event_rules(compartment_id: input('tenancy_ocid'))
+
+    required = [
+      'com.oraclecloud.identitycontrolplane.createpolicy',
+      'com.oraclecloud.identitycontrolplane.deletepolicy',
+      'com.oraclecloud.identitycontrolplane.updatepolicy'
+    ]
+
+    missing = rules.missing_regions(
+      required_event_types: required,
+      topic_name: input('iam_policy_notification_topic')
+    )
+
+    describe 'IAM policy change notifications' do
+      it 'should cover all regions' do
+        expect(missing).to be_empty
+      end
+    end
+
+    # FilterTable queries
+    describe oci_event_rules(compartment_id: input('tenancy_ocid'))
+      .where(enabled: true) do
+      its('count') { should be >= 1 }
+    end
+  EXAMPLE
 
   filter_table_config = FilterTable.create
   filter_table_config.register_column(:regions,       field: :region)
