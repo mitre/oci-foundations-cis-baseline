@@ -28,7 +28,7 @@ control 'oci-foundations-4.12' do
     Compartment Verify that in the Actions section the Action Type contains: Notifications and
     that a valid Topic is referenced. From CLI: Find the OCID of the specific Event Rule based
     on Display Name and Compartment OCID oci events rule list --compartment-id
-    <compartment-ocid> --query "data [?\"display-name\"=='<display-name>']".{"id:id"} --output
+    <compartment-ocid> --query "data [?"display-name"=='<display-name>']".{"id:id"} --output
     table List the details of a specific Event Rule based on the OCID of the rule. oci events
     rule get --rule-id <rule-id> In the JSON output locate the Conditions key value pair and
     verify that the following Conditions are present: com.oraclecloud.virtualnetwork.createdrg
@@ -76,13 +76,13 @@ control 'oci-foundations-4.12' do
     Find the topic-id of the topic the Event Rule should use for sending Notifications by
     using the topic name and Compartment OCID oci ons topic list --compartment-id
     <compartment-ocid> --all --query "data
-    [?name=='<topic_name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a JSON
+    [?name=='<topic_name>']".{"name:name,topic_id:"topic-id""} --output table Create a JSON
     file to be used when creating the Event Rule. Replace topic id, display name, description
     and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS", "isEnabled":
 
     true, "topicId": "<topic-id>" } ] }, "condition":
 
-    "{\"eventType\":[\"com.oraclecloud.virtualnetwork.createdrg\",\"com.oraclecloud.virtualnetwork.deletedrg\",\"com.oraclecloud.virtualnetwork.updatedrg\",\"com.oraclecloud.virtualnetwork.createdrgattachment\",\"com.oraclecloud.virtualnetwork.deletedrgattachment\",\"com.oraclecloud.virtualnetwork.updatedrgattachment\",\"com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment\",\"com.oraclecloud.virtualnetwork.createinternetgateway\",\"com.oraclecloud.virtualnetwork.deleteinternetgateway\",\"com.oraclecloud.virtualnetwork.updateinternetgateway\",\"com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment\",\"com.oraclecloud.virtualnetwork.createlocalpeeringgateway\",\"com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end\",\"com.oraclecloud.virtualnetwork.updatelocalpeeringgateway\",\"com.oraclecloud.natgateway.changenatgatewaycompartment\",\"com.oraclecloud.natgateway.createnatgateway\",\"com.oraclecloud.natgateway.deletenatgateway\",\"com.oraclecloud.natgateway.updatenatgateway\",\"com.oraclecloud.servicegateway.attachserviceid\",\"com.oraclecloud.servicegateway.changeservicegatewaycompartment\",\"com.oraclecloud.servicegateway.createservicegateway\",\"com.oraclecloud.servicegateway.deleteservicegateway.end\",\"com.oraclecloud.servicegateway.detachserviceid\",\"com.oraclecloud.servicegateway.updateservicegateway\"],\"data\":{}}",
+    "{"eventType":["com.oraclecloud.virtualnetwork.createdrg","com.oraclecloud.virtualnetwork.deletedrg","com.oraclecloud.virtualnetwork.updatedrg","com.oraclecloud.virtualnetwork.createdrgattachment","com.oraclecloud.virtualnetwork.deletedrgattachment","com.oraclecloud.virtualnetwork.updatedrgattachment","com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment","com.oraclecloud.virtualnetwork.createinternetgateway","com.oraclecloud.virtualnetwork.deleteinternetgateway","com.oraclecloud.virtualnetwork.updateinternetgateway","com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment","com.oraclecloud.virtualnetwork.createlocalpeeringgateway","com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end","com.oraclecloud.virtualnetwork.updatelocalpeeringgateway","com.oraclecloud.natgateway.changenatgatewaycompartment","com.oraclecloud.natgateway.createnatgateway","com.oraclecloud.natgateway.deletenatgateway","com.oraclecloud.natgateway.updatenatgateway","com.oraclecloud.servicegateway.attachserviceid","com.oraclecloud.servicegateway.changeservicegatewaycompartment","com.oraclecloud.servicegateway.createservicegateway","com.oraclecloud.servicegateway.deleteservicegateway.end","com.oraclecloud.servicegateway.detachserviceid","com.oraclecloud.servicegateway.updateservicegateway"],"data":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule
     create --from-json file://event_rule.json Note in the JSON returned that it lists the
@@ -106,7 +106,7 @@ control 'oci-foundations-4.12' do
 
   tag nist: ['AC-18']
 
-  required_rule_conditions = [
+  required_event_types = [
     'com.oraclecloud.virtualnetwork.createdrg',
     'com.oraclecloud.virtualnetwork.deletedrg',
     'com.oraclecloud.virtualnetwork.updatedrg',
@@ -134,57 +134,15 @@ control 'oci-foundations-4.12' do
   ]
 
   tenancy_ocid = input('tenancy_ocid')
-  network_gateway_notification_topic = input('network_gateway_notification_topic')
+  topic_name = input('network_gateway_notification_topic')
 
-  regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
-
-  findings = []
-  regions.each do |region|
-    rules = json(command: %(oci events rule list --compartment-id "#{tenancy_ocid}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
-
-    rule_present = rules.any? do |rule|
-      rule_details = json(command: %(oci events rule get --rule-id "#{rule['id']}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
-
-      next false unless rule_details['is-enabled']
-
-      condition_data = begin
-        json(content: rule_details['condition'].to_s).params
-      rescue StandardError
-        {}
-      end
-
-      event_types = condition_data['eventType']
-      next false unless (required_rule_conditions - event_types).empty?
-
-      actions = rule_details.dig('actions', 'actions') || []
-      actions.any? do |action|
-        next false unless action['action-type'] == 'ONS' && action['is-enabled']
-
-        topic_id = action['topic-id']
-        next false if topic_id.to_s.strip.empty?
-
-        topic = json(command: %(oci ons topic get --topic-id "#{topic_id}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
-        topic['name'] == network_gateway_notification_topic && topic['lifecycle-state'] == 'ACTIVE'
-      end
-    end
-
-    findings << <<~ENTRY.chomp unless rule_present
-      Region: #{region}
-      Issue: Missing enabled network gateway change notification rule(s)
-    ENTRY
-  end
-
-  numbered_findings = findings.each_with_index.map do |entry, index|
-    "[#{index + 1}]\n#{entry}"
-  end
+  rules = oci_event_rules(compartment_id: tenancy_ocid)
+  missing = rules.missing_regions(required_event_types: required_event_types, topic_name: topic_name)
 
   describe 'Network gateway change notifications' do
-    it 'should have enabled event rules with an active ONS topic' do
-      expect(findings).to be_empty, <<~MSG
-        Non-compliant findings:
-
-        #{numbered_findings.join("\n\n")}
-      MSG
+    it 'should have enabled event rules with an active ONS topic in all regions' do
+      expect(missing).to be_empty,
+                         "Regions missing compliant event rules: #{missing.join(', ')}"
     end
   end
 end
