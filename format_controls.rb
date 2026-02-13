@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# rubocop:disable Metrics
+
 # Script to reformat InSpec control files for better readability
 # Usage: ruby format_controls.rb [file_or_directory]
 #   ruby format_controls.rb controls/1_1.rb           # Format single file
@@ -9,6 +11,7 @@
 
 require 'fileutils'
 
+# Reformats InSpec control files to use heredocs and consistent style
 class ControlFormatter
   WRAP_WIDTH = 90
 
@@ -299,3 +302,4 @@ if __FILE__ == $PROGRAM_NAME
 
   format_files(path)
 end
+# rubocop:enable Metrics

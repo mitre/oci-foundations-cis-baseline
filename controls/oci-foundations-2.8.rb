@@ -1,0 +1,137 @@
+control 'oci-foundations-2.8' do
+  title 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network'
+
+  desc <<~DESC
+    Oracle Autonomous Database Shared (ADB-S) automates database tuning, security, backups,
+    updates, and other routine management tasks traditionally performed by DBAs. ADB-S provide
+    ingress filtering of network traffic or can be deployed within an existing Virtual Cloud
+    Network (VCN). It is recommended that all new ADB-S databases be deployed within a VCN and
+    that the Access Control Rules are restricted to your corporate IP Addresses or VCNs for
+    existing ADB-S databases. Restricting connectivity to ADB-S Databases reduces an ADB-S
+    database’s exposure to risk.
+  DESC
+
+  desc 'check', <<~CHECK
+    From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
+
+    Advanced Resource Query and hit enter. Click the Advanced Resource Query button in the
+    upper right of the screen. Enter the following query in the query box: query
+    autonomousdatabase resources For each ABD-S database returned click on the link under
+    Display name Click Edit next to Access Control List Ensure `Access Control Rules’ IP
+    Address/CIDR Block as well as VCNs are correct Repeat for other subscribed regions From
+    CLI: Execute the following command: for region in `oci iam region list | jq -r '.data[] |
+    .name'`; do for compid in `oci iam compartment list --compartment-id-in-subtree TRUE
+    2>/dev/null | jq -r '.data[] | .id'` do for adbid in `oci db autonomous-database list
+    --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |
+    select(."nsg-ids" == null).id'` do output=`oci db autonomous-database get
+    --autonomous-database-id $adbid --region $region
+    --query=data.{"WhiteListIPs:\"whitelisted-ips\","id:id""} --output table 2>/dev/null` if [
+    ! -z "$output" ]; then echo $output; fi done done done Ensure WhiteListIPs are correct.
+  CHECK
+
+  desc 'fix', <<~FIX
+    From Console: Follow the audit procedure above. For each ADB-S database in the returned
+
+    results, click the ADB-S database name Click Edit next to Access Control Rules Click
+    +Another Rule and add rules as required Click Save Changes From CLI: Follow the audit
+    procedure. Get the json input format by executing the following command: oci db
+    autonomous-database update --generate-full-command-json-input For each of the ADB-S
+    Database identified get its details. Update the whitelistIps , copy the WhiteListIPs
+    element from the JSON returned by the above get call, edit it appropriately and use it in
+    the following command: oci db autonomous-database update –-autonomous-database-id <ABD-S
+    OCID> --from-json '<network endpoints JSON>'
+  FIX
+
+  desc 'potential_impacts', <<~POTENTIAL_IMPACTS
+    When updating ingress filters for an existing environment, care should be taken to ensure
+    that IP addresses and VCNs currently used by administrators, users, and services to access
+    your ADB-S instances are included in the updated filters.
+  POTENTIAL_IMPACTS
+
+  impact 0.5
+
+  tag severity: 'medium'
+  tag benchmark_ref: '2.8'
+  tag cis_level: 'Level 1'
+  tag assessment_status: 'Manual'
+  tag cis_controls: %w[4.4 12.3]
+
+  tag cci: %w[CCI-001097 CCI-001184]
+
+  tag nist: ['SC-7', 'SC-23']
+
+  allowed_adb_whitelisted_ips = input('allowed_adb_whitelisted_ips')
+  allowed_adb_whitelisted_ips = allowed_adb_whitelisted_ips.map { |value| value.to_s.strip.downcase }.reject(&:empty?)
+
+  regions_response = json(command: 'oci iam region-subscription list --all')
+  regions_data = regions_response.params.fetch('data', [])
+  regions = regions_data.map { |region| region['region-name'] }.compact
+
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
+
+  whitelist_findings = []
+  total_adb_instances = 0
+
+  regions.each do |region|
+    compartment_ids.each do |compartment_id|
+      instances_response = json(
+        command: %(oci db autonomous-database list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
+      )
+      instances = instances_response.params.fetch('data', [])
+
+      instances.each do |instance|
+        next if instance['is-dedicated']
+
+        total_adb_instances += 1
+        next unless instance['nsg-ids'].nil?
+
+        instance_id = instance['id'].to_s
+        next if instance_id.empty?
+
+        details_response = json(
+          command: %(oci db autonomous-database get --autonomous-database-id "#{instance_id}" --region "#{region}" 2>/dev/null)
+        )
+        details = details_response.params.fetch('data', {})
+        whitelisted_ips = details['whitelisted-ips'].map { |ip| ip.to_s.strip.downcase }.reject(&:empty?)
+
+        if whitelisted_ips.empty?
+          whitelist_findings << {
+            'name' => instance['display-name'],
+            'id' => instance_id,
+            'region' => region,
+            'compartment_id' => compartment_id,
+            'whitelisted_ips' => whitelisted_ips,
+            'issue' => 'whitelisted-ips is empty or unset'
+          }
+          next
+        end
+
+        unauthorized_ips = whitelisted_ips.reject { |ip| allowed_adb_whitelisted_ips.include?(ip) }
+        next if unauthorized_ips.empty?
+
+        whitelist_findings << {
+          'name' => instance['display-name'],
+          'id' => instance_id,
+          'region' => region,
+          'compartment_id' => compartment_id,
+          'whitelisted_ips' => whitelisted_ips,
+          'unauthorized_ips' => unauthorized_ips
+        }
+      end
+    end
+  end
+
+  if total_adb_instances.zero?
+    impact 0.0
+    describe 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
+      skip 'No Oracle Autonomous Databases found in tenancy.'
+    end
+  else
+    describe 'Ensure Oracle Autonomous Shared Databases (ADB) access is restricted to allowed sources or deployed within a Virtual Cloud Network' do
+      subject { whitelist_findings }
+      it { should cmp [] }
+    end
+  end
+end

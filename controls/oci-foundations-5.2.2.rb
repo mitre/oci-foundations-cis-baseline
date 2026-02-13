@@ -1,0 +1,78 @@
+control 'oci-foundations-5.2.2' do
+  title 'Ensure boot volumes are encrypted with Customer Managed Key (CMK).'
+
+  desc <<~DESC
+    When you launch a virtual machine (VM) or bare metal instance based on a platform image or
+    custom image, a new boot volume for the instance is created in the same compartment. That
+    boot volume is associated with that instance until you terminate the instance. By default,
+    the Oracle service manages the keys that encrypt this boot volume. Boot Volumes can also
+    be encrypted using a customer managed key. Encryption of boot volumes provides an
+    additional level of security for your data. Management of encryption keys is critical to
+    protecting and accessing protected data. Customers should identify boot volumes encrypted
+    with Oracle service managed keys in order to determine if they want to manage the keys for
+    certain boot volumes and then apply their own key lifecycle management to the selected
+    boot volumes.
+  DESC
+
+  desc 'check', <<~CHECK
+    From Console: Login into the OCI Console Click in the search bar, top of the screen. Type
+
+    Advanced Resource Query and click enter. Click the Advanced Resource Query button in the
+    upper right of the screen. Enter the following query in the query box: query bootvolume
+    resources For each boot volume returned click on the link under Display name Ensure
+    Encryption Key does not say Oracle managed key Repeat for other subscribed regions From
+    CLI: Execute the following command: for region in `oci iam region list | jq -r '.data[] |
+    .name'`; do for bvid in `oci search resource structured-search --region $region
+    --query-text "query bootvolume resources" 2>/dev/null | jq -r '.data.items[] |
+    .identifier'` do output=`oci bv boot-volume get --boot-volume-id $bvid 2>/dev/null | jq -r
+    '.data | select(."kms-key-id" == null).id'` if [ ! -z "$output" ]; then echo $output; fi
+    done done Ensure query returns no results.
+  CHECK
+
+  desc 'fix', <<~FIX
+    From Console: Follow the audit procedure above. For each Boot Volume in the returned
+
+    results, click the Boot Volume name Click Assign next to Encryption Key Select the Vault
+    Compartment and Vault Select the Master Encryption Key Compartment and Master Encryption
+    key Click Assign From CLI: Follow the audit procedure. For each boot volume identified get
+    its OCID. Execute the following command: oci bv boot-volume-kms-key update
+    --boot-volume-id <Boot Volume OCID> --kms-key-id <KMS Key OCID>
+  FIX
+
+  desc 'potential_impacts', <<~POTENTIAL_IMPACTS
+    [object Object]
+  POTENTIAL_IMPACTS
+
+  impact 0.5
+
+  tag severity: 'medium'
+  tag benchmark_ref: '5.2.2'
+  tag cis_level: 'Level 2'
+  tag assessment_status: 'Automated'
+  tag cis_controls: %w[3.11]
+
+  tag cci: %w[CCI-001199]
+
+  tag nist: ['SC-28']
+
+  cmd = <<~CMD
+    (
+      for region in `oci iam region-subscription list | jq -r '.data[] | ."region-name"'`;
+      do
+        for bvid in `oci search resource structured-search --region $region --query-text "query bootvolume resources" 2>/dev/null | jq -r '.data.items[] |.identifier'`
+        do
+          output=`oci bv boot-volume get --boot-volume-id $bvid 2>/dev/null| jq -r '.data | select(."kms-key-id" == null).id'`
+          if [ ! -z "$output" ]; then echo $output; fi
+        done
+      done
+    ) | jq -nR '[inputs]'
+  CMD
+
+  json_output = json(command: cmd)
+  output = json_output.params
+
+  describe 'Ensure boot volumes are encrypted with Customer Managed Key (CMK)' do
+    subject { output }
+    it { should cmp [] }
+  end
+end
