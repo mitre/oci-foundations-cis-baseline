@@ -1,8 +1,11 @@
-class CloudGuardHelper < Inspec.resource(1)
+require_relative 'oci_backend'
+
+class CloudGuardHelper < OciResourceBase
   name 'cloud_guard_helper'
   desc 'Helper to query Cloud Guard configuration and detector rules'
 
   def initialize(opts = {})
+    super
     @tenancy_ocid = opts[:tenancy_ocid]
     @detector_recipe_ocid = opts[:detector_recipe_ocid]
   end
@@ -11,7 +14,7 @@ class CloudGuardHelper < Inspec.resource(1)
     return nil if @tenancy_ocid.to_s.empty?
 
     cmd = %(oci cloud-guard configuration get --compartment-id "#{@tenancy_ocid}")
-    inspec.json(command: cmd).params.dig('data', 'status')
+    oci_cli_raw(cmd).dig('data', 'status')
   end
 
   def detector_rule_value(rule_id:, config_key:)
@@ -23,17 +26,17 @@ class CloudGuardHelper < Inspec.resource(1)
       jq -r --arg ck "#{config_key}" \
       '.data.details.configurations[]? | select(.["config-key"] == $ck) | .value')
 
-    inspec.command(cmd).stdout.strip
+    oci_command(cmd).stdout.strip
   end
 
   def detector_rule_enabled?(rule_id:)
-    return nil if @detector_recipe_ocid.to_s.empty?
+    return false if @detector_recipe_ocid.to_s.empty?
 
     cmd = %(oci cloud-guard detector-recipe-detector-rule get \
       --detector-recipe-id "#{@detector_recipe_ocid}" \
       --detector-rule-id "#{rule_id}")
 
-    inspec.json(command: cmd).params.dig('data', 'details','is-enabled')
+    oci_cli_raw(cmd).dig('data', 'details', 'is-enabled')
   end
 
   def port_list_check?(config_value:, protocol:, port:)
