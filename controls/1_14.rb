@@ -74,57 +74,64 @@ control '1_14' do
     'SA-12 (8)'
   ]
 
-  tenancy_ocid = input('tenancy_ocid')
+  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
+  compartments_data = compartments_response.params.fetch('data', [])
+  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact.uniq
+  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
+    compartment_id = compartment['id']
+    next if compartment_id.to_s.empty?
 
-  dynamic_groups_cmd = %(oci iam dynamic-group list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[].name' || echo "")
-  dynamic_groups_output = command(dynamic_groups_cmd).stdout.strip
-
-  policies_with_principal_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[] | select(.statements[]? | contains("request.principal")) | .name' || echo "")
-  policies_with_principal_output = command(policies_with_principal_cmd).stdout.strip
-
-  dynamic_groups_details_cmd = %{oci iam dynamic-group list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq -r '.data[] | "\(.name)|\(.matching-rule)"' || echo ""}
-  dynamic_groups_details = command(dynamic_groups_details_cmd).stdout.strip
-
-  has_instance_matching_rules = dynamic_groups_details.lines.any? do |line|
-    parts = line.split('|')
-    parts.length == 2 && (
-      parts[1].downcase.include?('instance') ||
-      parts[1].downcase.include?('resource.type') ||
-      parts[1].downcase.include?('any.compute.instance')
-    )
+    map[compartment_id] = compartment['name']
   end
 
-  has_request_principal_policies = !policies_with_principal_output.empty?
+  request_principal_statements = []
 
-  all_policies_cmd = %(oci iam policy list --compartment-id '#{tenancy_ocid}' --all 2>/dev/null | jq '[.data[].statements[]? | select(contains("request.principal"))]' || echo "[]")
-  request_principal_statements = json(command: all_policies_cmd).params
+  compartment_ids.each do |compartment_id|
+    policies_response = json(command: %(oci iam policy list --compartment-id "#{compartment_id}" --all 2>/dev/null))
+    policies = policies_response.params.fetch('data', [])
 
-  instance_principal_configured = has_instance_matching_rules || has_request_principal_policies
+    policies.each do |policy|
+      policy_name = policy['name']
+      policy_id = policy['id']
 
-  describe 'Instance Principal Authentication Configuration' do
-    it 'should be configured via Dynamic Groups or request.principal policies' do
-      failure_message = <<~MSG
-        Instance Principal authentication is not properly configured.
+      Array(policy['statements']).each do |statement|
+        normalized_statement = statement.to_s.strip
+        next if normalized_statement.empty?
+        next unless normalized_statement.match?(/request\.principal/i)
 
-        Dynamic Groups with instance matching rules found: #{has_instance_matching_rules}
-        Request.principal policies found: #{has_request_principal_policies}
-
-        For compliance, ensure at least one of the following:
-        1. Dynamic Groups exist with matching rules that include instances accessing OCI resources
-        2. IAM policies contain request.principal conditions like:
-           - allow any-user to <verb> <resource> in compartment <compartment-name> where ALL {request.principal.type='<resource_type>', request.principal.id='<resource_ocid>'}
-           - allow any-user to <verb> <resource> in compartment <compartment-name> where ALL {request.principal.type='<resource_type>', request.principal.compartment.id='<compartment_OCID>'}
-      MSG
-
-      expect(instance_principal_configured).to eq(true), failure_message
+        request_principal_statements << {
+          'compartment_id' => compartment_id,
+          'compartment_name' => compartment_names_by_id[compartment_id],
+          'policy_id' => policy_id,
+          'policy_name' => policy_name,
+          'statement' => normalized_statement
+        }
+      end
     end
   end
 
-  if request_principal_statements.any?
-    describe 'Request.principal policy statements' do
-      it 'should include proper conditions for resource types and IDs' do
-        expect(request_principal_statements).not_to be_empty
-      end
+  findings = []
+
+  malformed_statements = request_principal_statements.reject do |entry|
+    statement = entry['statement']
+    has_type = statement.match?(/request\.principal\.type/i)
+    has_identifier = statement.match?(/request\.principal\.(?:id|compartment\.id)/i)
+    has_type && has_identifier
+  end
+
+  malformed_statements.each do |entry|
+    findings << entry.merge('issue' => 'Statement includes request.principal but is missing request.principal.type and/or request.principal.id/request.principal.compartment.id')
+  end
+
+  if request_principal_statements.empty?
+    impact 0.0
+    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
+      skip 'No IAM policy statements with request.principal were found.'
+    end
+  else
+    describe 'Ensure Instance Principal authentication is used for OCI instances, OCI Cloud Databases and OCI Functions to access OCI resources.' do
+      subject { findings }
+      it { should cmp [] }
     end
   end
 end

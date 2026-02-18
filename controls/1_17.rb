@@ -74,7 +74,7 @@ control '1_17' do
     )
   end
 
-  domains.select! { |domain| !domain['url'].to_s.empty? }
+  domains.reject! { |domain| domain['url'].to_s.empty? }
   domains.uniq! { |domain| domain['url'] }
 
   domains.each do |domain|
@@ -101,7 +101,7 @@ control '1_17' do
         'api_key_count' => api_keys.length,
         'user_ocid' => user_ocid,
         'domain_name' => domain_name,
-        'domain_url' => domain_url,
+        'domain_url' => domain_url
       }
     end
   end
