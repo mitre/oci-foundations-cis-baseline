@@ -56,7 +56,7 @@ control 'oci-foundations-4.16' do
     end
   else
     findings = vault_keys.non_compliant_findings(max_age_days: 365)
-    numbered_findings = OciHelpers.format_findings(findings)
+    numbered_findings = oci_helpers.format_findings(findings)
 
     describe 'Customer-managed encryption keys' do
       it 'should be enabled and rotated within the last 365 days' do

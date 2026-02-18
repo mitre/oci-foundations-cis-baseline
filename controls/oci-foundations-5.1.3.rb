@@ -57,7 +57,7 @@ control 'oci-foundations-5.1.3' do
     end
   else
     findings = buckets.missing_versioning_findings
-    numbered_findings = OciHelpers.format_findings(findings)
+    numbered_findings = oci_helpers.format_findings(findings)
 
     describe 'Object Storage buckets' do
       it 'should have versioning enabled' do

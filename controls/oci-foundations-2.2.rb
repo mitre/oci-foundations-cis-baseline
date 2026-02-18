@@ -79,7 +79,7 @@ control 'oci-foundations-2.2' do
   tag nist: ['SC-7', 'SC-23']
 
   findings = oci_security_lists.internet_ingress_findings(port: 3389)
-  numbered_findings = OciHelpers.format_findings(findings)
+  numbered_findings = oci_helpers.format_findings(findings)
 
   describe 'Security lists' do
     it 'should not allow ingress from 0.0.0.0/0 to port 3389' do

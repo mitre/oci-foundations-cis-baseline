@@ -55,7 +55,7 @@ control 'oci-foundations-5.1.2' do
   tag nist: ['SC-28']
 
   findings = oci_buckets.missing_cmk_findings
-  numbered_findings = OciHelpers.format_findings(findings)
+  numbered_findings = oci_helpers.format_findings(findings)
 
   describe 'Object Storage buckets' do
     it 'should be encrypted with a customer-managed key (CMK)' do
