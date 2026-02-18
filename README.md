@@ -50,7 +50,95 @@ validation to the defined DoD requirements, the guidance can provide insight for
 to enhance their security posture and can be tailored easily for use in your organization.
 
 [top](#table-of-contents)
+## Requirements
+### Prerequisites
+- [Oracle Cloud Infrastructre CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#InstallingCLI__linux_and_unix)
+- [CINC-auditor](https://cinc.sh/start/auditor/) or [InSpec](https://docs.chef.io/inspec/7.0/install/)
+- [Ruby](https://www.ruby-lang.org/en/documentation/installation/)
+
 ## Getting Started
+
+### Install OCI-CLI
+To install OCI-CLI on a UNIX/Linux platform use the following command:
+```bash
+bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)"
+```
+
+To install OCI-CLI on a Mac OS platform use the following command:
+```brew
+brew update && brew install oci-cli
+```
+To upgrade installation:
+```brew
+brew update && brew upgrade oci-cli
+```
+
+To install OCI-CLI on a Windows platform use the following commands in order (Note: you need to be able to run PowerShell as an Administrator):
+
+1. 
+```Powershell
+Set-ExecutionPolicy RemoteSigned
+```
+2. 
+```
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 
+```
+3. 
+```
+Invoke-WebRequest https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.ps1 -OutFile install.ps1
+```
+4. 
+To run the installer script with prompts:
+```
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.ps1'))
+```
+To run the installer script without prompting the user:
+```
+./install.ps1 -AcceptAllDefaults  
+```
+
+### Oracle Account Configuration
+To successfully authenticate your application with Oracle, you need to obtain the following credentials from your app registration:
+
+- User tenancy ID
+- Fingerprint
+- Root tenancy ID
+- Region
+- Path to your private key file
+
+#### 1. Retrieve App Registration Credentials
+1. Register Your Oracle Cloud
+
+If you don't already have a Oracle Cloud accout an account admin can add you as a user by going to Oracle Portal -> Identity & Security -> Domains -> Select the domain you want to add a user to -> User Management -> Create. This will prompt them to fill out your name and email and you should get an email to register your account.
+
+2. Create an API Key
+
+Once logged into your account navigate to Identity & Security -> My Profile -> Tokens and Keys. Once you're there you can view your current API keys and add new ones. When you add a new API key you can decide if you want to generate a key pair or use an existing public key and once you've completed the process a template config file will be generated. 
+Note: You will have to download the private key before you can finish making an API key if you select to generate a key pair.
+
+#### 2. Configure Your OCI Instance
+
+1. Navigate to your .oci Directory
+ 
+ It should be stored in your home directory after you install oci-cli. The path may look something like this:
+/home/oracle/.oci/
+
+2. Create a .pem File
+
+Create a .pem file in your .oci directory and copy and paste your public/private key pair into that file.
+
+3. Create a config file
+
+Create a config file in your .oci directory and copy and paste the config file template from the privious steps into that file you made. You will need to replace the key_file value with the file path of your key pair .pem file that you previously made. 
+
+4. Varify your setup
+
+Lastly to varify your OCI CLI installation is opperational use the following command:
+```Python
+oci os ns get  
+```
+If your setup is successful the command wil return a valid namespace in JSON format.
+
 ### InSpec (CINC-auditor) setup
 For maximum flexibility/accessibility `cinc-auditor`, the open-source packaged binary version of Chef InSpec should be used,
 compiled by the CINC (CINC Is Not Chef) project in coordination with Chef using Chef's always-open-source InSpec source code.
