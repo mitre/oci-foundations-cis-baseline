@@ -276,6 +276,39 @@ Ensure the controls are ready to be committed into the repo:
 
 
 [top](#table-of-contents)
+## Setting up the Profile
+
+1. **Clone the Repository**
+
+    Start by cloning the `oci-foundations-cis-baseline` repository from GitHub to your local machine:
+
+    ```sh
+    git clone https://github.com/mitre/oci-foundations-cis-baseline.git
+    cd oci-foundations-cis-baseline
+    ```
+
+2. **Clone the Repository**
+
+    Once the repository is cloned, install the required Ruby dependencies by running:
+
+    ```sh
+    bundle install
+    ```
+
+3. **Create and Update `inputs.yml` for Inspec**
+
+   Execute the following command to create the `inputs.yml` file by copying `inputs_template.yml` and renaming it to `inputs.yml`.
+   Update this file with your values.
+
+   ```sh
+   cp inputs_template.yml inputs.yml
+   ```
+
+### Example `inputs.yml`
+
+The [inputs_template.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/example.inputs.yml) file offers a comprehensive template that outlines all the required inputs for this profile, complete with detailed descriptions for each input.
+
+
 ## Running the Profile
 ### Directly from Github
 This option is best used when network connectivity is available and policies permit
