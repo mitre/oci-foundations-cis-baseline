@@ -75,68 +75,8 @@ control 'oci-foundations-2.4' do
 
   tag nist: ['SC-7', 'SC-23']
 
-  regions_response = json(command: 'oci iam region-subscription list --all')
-  regions_data = regions_response.params.fetch('data', [])
-  regions = regions_data.map { |region| region['region-name'] }.compact
-
-  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
-  compartments_data = compartments_response.params.fetch('data', [])
-  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
-  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
-    compartment_id = compartment['id'].to_s
-    next if compartment_id.empty?
-
-    map[compartment_id] = compartment['name']
-  end
-
-  findings = []
-  regions.each do |region|
-    compartment_ids.each do |compartment_id|
-      nsgs_response = json(
-        command: %(oci network nsg list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
-      )
-      nsgs = nsgs_response.params.fetch('data', [])
-
-      nsgs.each do |nsg|
-        nsg_id = nsg['id'].to_s
-        next if nsg_id.empty?
-
-        rules_response = json(command: %(oci network nsg rules list --nsg-id "#{nsg_id}" --all 2>/dev/null))
-        rules = rules_response.params.fetch('data', [])
-
-        rules.each do |rule|
-          next unless rule['direction'] == 'INGRESS'
-          next unless rule['source'] == '0.0.0.0/0'
-
-          destination_port_range = rule.dig('tcp-options', 'destination-port-range')
-          port_exposed = if destination_port_range.nil?
-                           true
-                         else
-                           destination_port_range['min'].to_i <= 3389 && destination_port_range['max'].to_i >= 3389
-                         end
-          next unless port_exposed
-
-          compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
-          findings << <<~ENTRY.chomp
-            Region: #{region}
-            Compartment Name: #{compartment_name}
-            Compartment ID: #{compartment_id}
-            NSG Name: #{nsg['display-name']}
-            NSG ID: #{nsg_id}
-            Rule ID: #{rule['id']}
-            Source: #{rule['source']}
-            Direction: #{rule['direction']}
-            Destination Port Range: #{destination_port_range.nil? ? 'All TCP ports (none specified)' : "#{destination_port_range['min']}-#{destination_port_range['max']}"}
-            Issue: Ingress from 0.0.0.0/0 allows port 3389
-          ENTRY
-        end
-      end
-    end
-  end
-
-  numbered_findings = findings.each_with_index.map do |entry, index|
-    "[#{index + 1}]\n#{entry}"
-  end
+  findings = oci_network_security_groups.internet_ingress_findings(port: 3389)
+  numbered_findings = oci_helpers.format_findings(findings)
 
   describe 'Network security groups' do
     it 'should not allow ingress from 0.0.0.0/0 to port 3389' do

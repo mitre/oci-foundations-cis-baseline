@@ -54,47 +54,12 @@ control 'oci-foundations-5.1.2' do
 
   tag nist: ['SC-28']
 
-  regions_response = json(command: 'oci iam region-subscription list --all')
-  regions_data = regions_response.params.fetch('data', [])
-  regions = regions_data.map { |region| region['region-name'] }.compact
-
-  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE 2>/dev/null')
-  compartments_data = compartments_response.params.fetch('data', [])
-  compartments = compartments_data.map { |compartment| compartment['id'] }.compact
-
-  buckets_missing_cmk = []
-
-  regions.each do |region|
-    compartments.each do |compartment_id|
-      buckets_response = json(
-        command: %(oci os bucket list --compartment-id "#{compartment_id}" --region "#{region}" 2>/dev/null)
-      )
-      buckets = buckets_response.params.fetch('data', [])
-
-      buckets.each do |bucket|
-        bucket_name = bucket['name']
-        bucket_details = json(
-          command: %(oci os bucket get --bucket-name "#{bucket_name}" --region "#{region}" 2>/dev/null)
-        )
-        kms_key_id = bucket_details.params.dig('data', 'kms-key-id')
-
-        next unless kms_key_id.to_s.strip.empty?
-
-        buckets_missing_cmk << <<~ENTRY.chomp
-          Bucket Name: #{bucket_name}
-          Region: #{region}
-        ENTRY
-      end
-    end
-  end
-
-  numbered_findings = buckets_missing_cmk.each_with_index.map do |entry, index|
-    "[#{index + 1}]\n#{entry}"
-  end
+  findings = oci_buckets.missing_cmk_findings
+  numbered_findings = oci_helpers.format_findings(findings)
 
   describe 'Object Storage buckets' do
     it 'should be encrypted with a customer-managed key (CMK)' do
-      expect(buckets_missing_cmk).to be_empty, <<~MSG
+      expect(findings).to be_empty, <<~MSG
         Non-compliant findings:
 
         #{numbered_findings.join("\n\n")}

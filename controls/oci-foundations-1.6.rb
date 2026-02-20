@@ -37,22 +37,8 @@ control 'oci-foundations-1.6' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
-  domain_urls = json(command: cmd).params || []
-
-  history_values = []
-
-  domain_urls.each do |domain_url|
-    policy_cmd = %(oci identity-domains password-policies list --endpoint "#{domain_url}" --all)
-    policies = json(command: policy_cmd).params.dig('data', 'resources') || []
-
-    policies.each do |policy|
-      next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
-
-      value = policy['num-passwords-in-history']
-      history_values << value&.to_i
-    end
-  end
+  policies = oci_identity_domain_password_policies(tenancy_ocid: tenancy_ocid)
+  history_values = policies.num_passwords_in_histories
 
   describe 'Ensure IAM password policy prevents password reuse' do
     subject { history_values }

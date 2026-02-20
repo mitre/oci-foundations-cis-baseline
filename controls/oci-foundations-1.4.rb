@@ -75,30 +75,10 @@ control 'oci-foundations-1.4' do
 
   tenancy_ocid = input('tenancy_ocid')
 
-  cmd = %(oci iam domain list --compartment-id '#{tenancy_ocid}' --all | jq '[.data[] | .url]')
-  domain_urls = json(command: cmd).params || []
-
-  min_length_values = []
-  min_numeric_values = []
-  min_special_values = []
-
-  domain_urls.each do |domain_url|
-    policy_cmd = %(oci identity-domains password-policies list --endpoint "#{domain_url}" --all)
-    policies = json(command: policy_cmd).params.dig('data', 'resources') || []
-
-    policies.each do |policy|
-      next unless ['StandardPasswordPolicy', 'PasswordPolicy'].include?(policy['id'])
-
-      length_value = policy.fetch('min-length', nil)
-      min_length_values << length_value&.to_i
-
-      numeric_value = policy.fetch('min-numerals', nil)
-      min_numeric_values << numeric_value&.to_i
-
-      special_value = policy.fetch('min-special-chars', nil)
-      min_special_values << special_value&.to_i
-    end
-  end
+  policies = oci_identity_domain_password_policies(tenancy_ocid: tenancy_ocid)
+  min_length_values = policies.min_lengths
+  min_numeric_values = policies.min_numerals_list
+  min_special_values = policies.min_special_chars_list
 
   describe 'Ensure IAM password policy requires at least 1 numeric or special character' do
     it 'is enabled' do

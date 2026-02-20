@@ -94,9 +94,7 @@ control 'oci-foundations-5.1.1' do
       compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
       additional_details = item['additional-details']
       public_access_type = item['public-access-type'].to_s
-      if public_access_type.empty? && additional_details.is_a?(Hash)
-        public_access_type = additional_details['publicAccessType'].to_s
-      end
+      public_access_type = additional_details['publicAccessType'].to_s if public_access_type.empty? && additional_details.is_a?(Hash)
 
       findings << <<~ENTRY.chomp
         Bucket Name: #{item['display-name']}

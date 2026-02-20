@@ -12,7 +12,7 @@ control 'oci-foundations-4.1' do
     is set to ${iam.principal.name}:
 
     oci iam tag-default list --compartment-id "<tenancy-ocid>" --all --query
-    "data[?'lifecycle-state'=='ACTIVE'].{name:\"tag-definition-name\",value:value}"
+    "data[?'lifecycle-state'=='ACTIVE'].{name:"tag-definition-name",value:value}"
   CHECK
 
   desc 'fix', <<~FIX

@@ -20,7 +20,7 @@ control 'oci-foundations-4.10' do
     Verify that in the Actions section the Action Type contains: Notifications and that a
     valid Topic is referenced. From CLI: Find the OCID of the specific Event Rule based on
     Display Name and Compartment OCID oci events rule list --compartment-id <compartment-ocid>
-    --query "data [?\"display-name\"=='<display-name>']".{"id:id"} --output table List the
+    --query "data [?"display-name"=='<display-name>']".{"id:id"} --output table List the
     details of a specific Event Rule based on the OCID of the rule. oci events rule get
     --rule-id <rule-ocid> In the JSON output locate the Conditions key value pair and verify
     that the following Conditions are present:
@@ -45,12 +45,12 @@ control 'oci-foundations-4.10' do
     Optionally add Tags to the Rule Click Create Rule From CLI: Find the topic-id of the topic
     the Event Rule should use for sending Notifications by using the topic name and
     Compartment OCID oci ons topic list --compartment-id <compartment-ocid> --all --query
-    "data [?name=='<topic-name>']".{"name:name,topic_id:\"topic-id\""} --output table Create a
+    "data [?name=='<topic-name>']".{"name:name,topic_id:"topic-id""} --output table Create a
     JSON file to be used when creating the Event Rule. Replace topic-id, display name,
     description and compartment OCID. { "actions": { "actions": [ { "actionType": "ONS",
     "isEnabled": true, "topicId": "<topic-id>" }] }, "condition":
 
-    "{\"eventType\":[\"com.oraclecloud.virtualnetwork.changesecuritylistcompartment\",\"com.oraclecloud.virtualnetwork.createsecuritylist\",\"com.oraclecloud.virtualnetwork.deletesecuritylist\",\"com.oraclecloud.virtualnetwork.updatesecuritylist\"],\"data\":{}}",
+    "{"eventType":["com.oraclecloud.virtualnetwork.changesecuritylistcompartment","com.oraclecloud.virtualnetwork.createsecuritylist","com.oraclecloud.virtualnetwork.deletesecuritylist","com.oraclecloud.virtualnetwork.updatesecuritylist"],"data":{}}",
     "displayName": "<display-name>", "description": "<description>", "isEnabled": true,
     "compartmentId": "<compartment-ocid>" } Create the actual event rule oci events rule
     create --from-json file://event_rule.json Note in the JSON returned that it lists the
@@ -74,7 +74,7 @@ control 'oci-foundations-4.10' do
 
   tag nist: ['AC-18']
 
-  required_rule_conditions = [
+  required_event_types = [
     'com.oraclecloud.virtualnetwork.changesecuritylistcompartment',
     'com.oraclecloud.virtualnetwork.createsecuritylist',
     'com.oraclecloud.virtualnetwork.deletesecuritylist',
@@ -82,57 +82,15 @@ control 'oci-foundations-4.10' do
   ]
 
   tenancy_ocid = input('tenancy_ocid')
-  security_list_notification_topic = input('security_list_notification_topic')
+  topic_name = input('security_list_notification_topic')
 
-  regions = json(command: 'oci iam region-subscription list --all').params.fetch('data', []).map { |region| region['region-name'] }.compact
-
-  findings = []
-  regions.each do |region|
-    rules = json(command: %(oci events rule list --compartment-id "#{tenancy_ocid}" --region "#{region}" --all 2>/dev/null)).params.fetch('data', [])
-
-    rule_present = rules.any? do |rule|
-      rule_details = json(command: %(oci events rule get --rule-id "#{rule['id']}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
-
-      next false unless rule_details['is-enabled']
-
-      condition_data = begin
-        json(content: rule_details['condition'].to_s).params
-      rescue StandardError
-        {}
-      end
-
-      event_types = condition_data['eventType']
-      next false unless (required_rule_conditions - event_types).empty?
-
-      actions = rule_details.dig('actions', 'actions') || []
-      actions.any? do |action|
-        next false unless action['action-type'] == 'ONS' && action['is-enabled']
-
-        topic_id = action['topic-id']
-        next false if topic_id.to_s.strip.empty?
-
-        topic = json(command: %(oci ons topic get --topic-id "#{topic_id}" --region "#{region}" 2>/dev/null)).params.fetch('data', {})
-        topic['name'] == security_list_notification_topic && topic['lifecycle-state'] == 'ACTIVE'
-      end
-    end
-
-    findings << <<~ENTRY.chomp unless rule_present
-      Region: #{region}
-      Issue: Missing enabled security list change notification rule(s)
-    ENTRY
-  end
-
-  numbered_findings = findings.each_with_index.map do |entry, index|
-    "[#{index + 1}]\n#{entry}"
-  end
+  rules = oci_event_rules(compartment_id: tenancy_ocid)
+  missing = rules.missing_regions(required_event_types: required_event_types, topic_name: topic_name)
 
   describe 'Security list change notifications' do
-    it 'should have enabled event rules with an active ONS topic' do
-      expect(findings).to be_empty, <<~MSG
-        Non-compliant findings:
-
-        #{numbered_findings.join("\n\n")}
-      MSG
+    it 'should have enabled event rules with an active ONS topic in all regions' do
+      expect(missing).to be_empty,
+                         "Regions missing compliant event rules: #{missing.join(', ')}"
     end
   end
 end
