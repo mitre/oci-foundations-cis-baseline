@@ -75,6 +75,8 @@ control 'oci-foundations-2.4' do
 
   tag nist: ['SC-7', 'SC-23']
 
+  tenancy_ocid = input('tenancy_ocid')
+  
   findings = oci_network_security_groups.internet_ingress_findings(port: 3389)
   numbered_findings = oci_helpers.format_findings(findings)
 
@@ -88,23 +90,19 @@ control 'oci-foundations-2.4' do
     end
   end
 
-  cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')
 
-  if cloud_guard_check
-    tenancy_ocid = input('tenancy_ocid')
-    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
-    cloud_guard_status = cloud_guard.status
-    cloud_guard_output = cloud_guard.detector_rule_value(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK', config_key: 'nsgIngressRuleDisallowedPortsConfig')
-    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK')
-  end
+  cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+  cloud_guard_status = cloud_guard.status
+  cloud_guard_output = cloud_guard.detector_rule_value(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK', config_key: 'nsgIngressRuleDisallowedPortsConfig')
+  cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'VCN_NSG_INGRESS_RULE_PORTS_CHECK')
 
   describe 'Cloud Guard' do
-    if cloud_guard_check
-      it 'is enabled' do
-        expect(cloud_guard_status).to cmp 'ENABLED'
-      end
+    it 'is enabled' do
+      expect(cloud_guard_status).to cmp 'ENABLED'
+    end
 
+    if cloud_guard_status == 'ENABLED'
       it 'detector rule "NSG ingress rule contains disallowed IP/port" is enabled' do
         expect(cloud_guard_rule_enabled).to cmp true
       end
@@ -113,8 +111,6 @@ control 'oci-foundations-2.4' do
         expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'TCP', port: 3389)).to cmp true
         expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'UDP', port: 3389)).to cmp true
       end
-    else
-      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
     end
   end
 end

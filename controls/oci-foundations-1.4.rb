@@ -96,23 +96,19 @@ control 'oci-foundations-1.4' do
     it { should all(be >= 14) }
   end
 
-  cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')
 
-  if cloud_guard_check
-    tenancy_ocid = input('tenancy_ocid')
-    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
-    cloud_guard_status = cloud_guard.status
-    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'PASSWORD_POLICY_NOT_COMPLEX')
-    cloud_guard_min_length = cloud_guard.detector_rule_value(rule_id: 'PASSWORD_POLICY_NOT_COMPLEX', config_key: 'passwordPolicyMinLength')
-  end
+  cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+  cloud_guard_status = cloud_guard.status
+  cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'PASSWORD_POLICY_NOT_COMPLEX')
+  cloud_guard_min_length = cloud_guard.detector_rule_value(rule_id: 'PASSWORD_POLICY_NOT_COMPLEX', config_key: 'passwordPolicyMinLength')
 
   describe 'Cloud Guard' do
-    if cloud_guard_check
-      it 'is enabled' do
-        expect(cloud_guard_status).to cmp 'ENABLED'
-      end
+    it 'is enabled' do
+      expect(cloud_guard_status).to cmp 'ENABLED'
+    end
 
+    if cloud_guard_status == 'ENABLED'
       it 'detector rule "Password policy does not meet complexity requirements" is enabled' do
         expect(cloud_guard_rule_enabled).to cmp true
       end
@@ -120,8 +116,6 @@ control 'oci-foundations-1.4' do
       it 'detector rule "Password policy does not meet complexity requirements" enforces minimum password length of 14 or greater' do
         expect(cloud_guard_min_length.to_i).to be >= 14
       end
-    else
-      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
     end
   end
 end
