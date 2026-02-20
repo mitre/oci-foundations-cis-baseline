@@ -4,7 +4,6 @@ name: CIS OCI Foundations v3.0.0
 on:
   push:
     branches:
-      - actions
       - main
   pull_request:
 
