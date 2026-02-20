@@ -1,3 +1,5 @@
+# this threshold simply checks the profile doesn't throw any runtime errors
+# ergo we don't care about pass or fail in CI, just whether the profile executes successfully
 error:
   total:
     max: 0
