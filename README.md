@@ -254,11 +254,11 @@ For more information on developing overlays, reference the [MITRE SAF Training](
 # 2.1, 2.2, 2.3, 2.4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
 # 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.14, 4.15, 4.18
 # 5.1.1, 5.1.2, 6.1, 6.2
-#The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool
+# The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool
 tenancy_ocid: ""
 
 # 1.1
-#A list of expected tenancy level policy statements
+# A list of expected tenancy level policy statements
 tenancy_level_policy_statements: []
 
 # 1.1
@@ -461,7 +461,7 @@ git clone https://github.com/mitre/oci-foundations-cis-baseline.git
 [inspec or cinc-auditor] archive 
 
 # Running locally
-[inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
+[inspec or cinc-auditor] exec <name of generated archive> --enhanced-outcomes --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 For every successive run, follow these steps to always have the latest version of this profile baseline:
@@ -473,7 +473,7 @@ cd ..
 [inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0 --overwrite
 
 # Running locally
-[inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
+[inspec or cinc-auditor] exec <name of generated archive> --enhanced-outcomes --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 [top](#table-of-contents)
@@ -510,7 +510,7 @@ Additionally both Heimdall applications can be deployed via docker, kubernetes, 
 
 ## NOTICE
 
-© 2018-2025 The MITRE Corporation.
+© 2018-2026 The MITRE Corporation.
 
 Approved for Public Release; Distribution Unlimited. Case Number 18-3678.
 
