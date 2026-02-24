@@ -4,7 +4,7 @@ This InSpec Profile was created to facilitate testing and auditing of `CIS Oracl
 infrastructure and applications when validating compliancy with [Center for Internet Security (CIS) Benchmark](https://www.cisecurity.org/cis-benchmarks)
 requirements.
 
-- Profile Version: **3.0.0.1.0**
+- Profile Version: **3.0.0**
 - Benchmark Date: **05 Nov 2025**
 - Benchmark Version: **Version 3.0.0 Release 1 (V3.0.0R1)**
 
@@ -61,7 +61,6 @@ to enhance their security posture and can be tailored easily for use in your org
 
 - [Oracle Cloud Infrastructre CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm)
 - [CINC-auditor](https://cinc.sh/start/auditor/) or [InSpec](https://docs.chef.io/inspec/7.0/install/)
-- [Ruby](https://www.ruby-lang.org/en/documentation/installation/)
 
 ### OCI Account Configuration
 
@@ -251,22 +250,88 @@ For more information on developing overlays, reference the [MITRE SAF Training](
 #### Example of tailoring Inputs _While Still Complying_ with the security guidance document for the profile
 
 ```yaml
-  # This file specifies the attributes for the configurable controls
-  # used by the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS profile.
+# 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.12, 1.14, 1.16
+# 2.1, 2.2, 2.3, 2.4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+# 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.14, 4.15, 4.18
+# 5.1.1, 5.1.2, 6.1, 6.2
+#The Tenancy OCID can be found in the ~/.oci/config file used by the OCI Command Line Tool
+tenancy_ocid: ""
 
-  # Disable controls that are known to consistently have long run times
-  disable_slow_controls: [true or false]
+# 1.1
+#A list of expected tenancy level policy statements
+tenancy_level_policy_statements: []
 
-  # A unique list of administrative users
-  admins_list: [admin1, admin2, admin3]
+# 1.1
+# A list of expected compartment level policy statements
+compartment_level_policy_statements: []
 
-  # List of configuration files for the specific system
-  logging_conf_files: [
-    <dir-path-1>/*.conf
-    <dir-path-2>/*.conf
-  ]
+# 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
+# OCID of the detector recipe named 'OCI Configuration Detector Recipe (Oracle Managed)'
+detector_recipe_ocid: ""
 
-  ...
+# 2.6
+# Expected values (IPs/CIDRs) for active Oracle Integration instances
+allowed_oic_allowlisted_http_ips: []
+
+# 2.6
+# Expected map of VCN OCID to IP/CIDR for active Oracle Integration instances
+allowed_oic_allowlisted_http_vcns: {}
+
+# 2.7
+# Allowed Oracle Analytics Cloud network endpoint types (e.g., PUBLIC, PRIVATE)
+allowed_network_endpoint_types: ["PUBLIC"]
+
+# 2.8
+# Allowed Autonomous Database shared whitelist IPs/CIDRs for public endpoints
+allowed_adb_whitelisted_ips: []
+
+# 4.3
+# Notification topic name for rule containing Identity Provider changes
+identity_provider_notification_topic: ""
+
+# 4.4
+# Notification topic name for rule containing Group Mapping changes
+group_mapping_notification_topic: ""
+
+# 4.5
+# Notification topic name for rule containing IAM Group changes
+iam_group_notification_topic: ""
+
+# 4.6
+#Notification topic name for rule containing IAM Policy changes
+iam_policy_notification_topic: ""
+
+# 4.7
+# Notification topic name for rule containing User changes
+user_notification_topic: ""
+
+# 4.8
+# Notification topic name for rule containing VCN changes
+vcn_list_notification_topic: ""
+
+# 4.9
+# Notification topic name for rule containing Route Table changes
+route_table_notification_topic: ""
+
+# 4.10
+# Notification topic name for rule containing Security List changes
+security_list_notification_topic: ""
+
+# 4.11
+# Notification topic name for rule containing Network Security Group changes
+network_security_notification_topic: ""
+
+# 4.12
+# Notification topic name for rule containing Network Gateway changes
+network_gateway_notification_topic: ""
+
+# 4.15
+# Notification topic name for rule containing Cloud Guard changes
+cloud_guard_notification_topic: ""
+
+# 4.18
+# Notification topic name for rule containing Identity Sign-On changes
+identity_signon_notification_topic: ""
 ```
 
 > [!NOTE]
@@ -374,11 +439,7 @@ This option is best used when network connectivity is available and policies per
 access to the hosting repository.
 
 ```bash
-# Using `ssh` transport
-bundle exec [inspec or cinc-auditor] exec https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0/archive/main.tar.gz --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
-
-# Using `winrm` transport
-bundle exec [inspec or cinc-auditor] exec https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0/archive/master.tar.gz --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+[inspec or cinc-auditor] exec https://github.com/mitre/oci-foundations-cis-baseline/archive/main.tar.gz --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 [top](#table-of-contents)
@@ -396,14 +457,11 @@ When the **"runner"** host uses this profile overlay for the first time, follow 
 ```bash
 mkdir profiles
 cd profiles
-git clone https://github.com/mitre/cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0.git
-bundle exec [inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0
+git clone https://github.com/mitre/oci-foundations-cis-baseline.git
+[inspec or cinc-auditor] archive 
 
-# Using `ssh` transport
-bundle exec [inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
-
-# Using `winrm` transport
-bundle exec [inspec or cinc-auditor] exec <name of generated archive> --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+# Running locally
+[inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 For every successive run, follow these steps to always have the latest version of this profile baseline:
@@ -412,13 +470,10 @@ For every successive run, follow these steps to always have the latest version o
 cd cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0
 git pull
 cd ..
-bundle exec [inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0 --overwrite
+[inspec or cinc-auditor] archive cis-oracle-cloud-infrastructure-foundations-benchmark-v3.0.0 --overwrite
 
-# Using `ssh` transport
-bundle exec [inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> -t ssh://<hostname>:<port> --sudo --reporter=cli json:<your_results_file.json>
-
-# Using `winrm` transport
-bundle exec [inspec or cinc-auditor] exec <name of generated archive> --target winrm://<hostip> --user '<admin-account>' --password=<password> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+# Running locally
+[inspec or cinc-auditor] exec <name of generated archive> --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 [top](#table-of-contents)

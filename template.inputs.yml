@@ -13,10 +13,6 @@ tenancy_level_policy_statements: []
 #Description: A list of expected compartment level policy statements
 compartment_level_policy_statements: []
 
-# 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1, 5.1.2
-#Description: Toggle Cloud Guard validation (set false to skip Cloud Guard-specific checks)
-cloud_guard_check: true
-
 # 1.4, 2.1, 2.2, 2.3, 2.4, 5.1.1
 # Description: OCID of the detector recipe named 'OCI Configuration Detector Recipe (Oracle Managed)'
 detector_recipe_ocid: ""
