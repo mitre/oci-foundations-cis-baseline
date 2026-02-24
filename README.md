@@ -249,6 +249,8 @@ For more information on developing overlays, reference the [MITRE SAF Training](
 
 #### Example of tailoring Inputs _While Still Complying_ with the security guidance document for the profile
 
+- The [example.inputs.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/example.inputs.yml) shows a filled out example for the below
+
 ```yaml
 # 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.12, 1.14, 1.16
 # 2.1, 2.2, 2.3, 2.4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
@@ -298,7 +300,7 @@ group_mapping_notification_topic: ""
 iam_group_notification_topic: ""
 
 # 4.6
-#Notification topic name for rule containing IAM Policy changes
+# Notification topic name for rule containing IAM Policy changes
 iam_policy_notification_topic: ""
 
 # 4.7
@@ -429,7 +431,9 @@ Ensure the controls are ready to be committed into the repo:
 
 ### Example `inputs.yml`
 
-The [template.inputs.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/template.inputs.yml) file offers a comprehensive template that outlines all the inputs for this profile. The [inspec.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/inspec.yml) contains detailed descriptions for each input.
+- The [template.inputs.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/template.inputs.yml) offers a comprehensive template that outlines all the inputs for this profile
+- The [example.inputs.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/example.inputs.yml) shows a filled out example
+- The [inspec.yml](https://github.com/mitre/oci-foundations-cis-baseline/blob/main/inspec.yml) contains detailed descriptions for each input
 
 ## Running the Profile
 
