@@ -17,7 +17,7 @@ control 'oci-foundations-4.17' do
     Log Retention. Click Enable Log . From CLI: Find the bucket name of the specific bucket.
     oci os bucket list --compartment-id <compartment-id> Find the OCID of the Log Group used
     for FlowLogs . oci logging log-group list --compartment-id <compartment-id> --query "data
-    [?\"display-name\"=='<log-group-name>']" List the logs associated with the bucket name for
+    [?"display-name"=='<log-group-name>']" List the logs associated with the bucket name for
     this bucket oci logging log list --log-group-id <log-group-id> --query "data
     [?configuration.source.resource=='<bucket-name>']" Ensure a log is listed for this bucket
     name

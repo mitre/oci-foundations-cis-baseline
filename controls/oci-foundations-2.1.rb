@@ -75,70 +75,10 @@ control 'oci-foundations-2.1' do
 
   tag nist: ['SC-7', 'SC-23']
 
-  regions_response = json(command: 'oci iam region-subscription list --all')
-  regions_data = regions_response.params.fetch('data', [])
-  regions = regions_data.map { |region| region['region-name'] }.compact
-
-  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
-  compartments_data = compartments_response.params.fetch('data', [])
-  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
-  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
-    compartment_id = compartment['id'].to_s
-    next if compartment_id.empty?
-
-    map[compartment_id] = compartment['name']
-  end
-
-  findings = []
-
-  regions.each do |region|
-    compartment_ids.each do |compartment_id|
-      security_lists_response = json(
-        command: %(oci network security-list list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
-      )
-      security_lists = security_lists_response.params.fetch('data', [])
-
-      security_lists.each do |security_list|
-        security_list_id = security_list['id'].to_s
-        next if security_list_id.empty?
-
-        security_list_details_response = json(
-          command: %(oci network security-list get --security-list-id "#{security_list_id}" --region "#{region}" 2>/dev/null)
-        )
-        security_list_details = security_list_details_response.params.fetch('data', {})
-        ingress_rules = security_list_details['ingress-security-rules'] || []
-
-        ingress_rules.each do |rule|
-          next unless rule['source'] == '0.0.0.0/0'
-          next unless rule['protocol'].to_s == '6'
-
-          destination_port_range = rule.dig('tcp-options', 'destination-port-range')
-          port_exposed = if destination_port_range.nil?
-                           true
-                         else
-                           destination_port_range['min'].to_i <= 22 && destination_port_range['max'].to_i >= 22
-                         end
-          next unless port_exposed
-
-          compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
-          findings << <<~ENTRY.chomp
-            Region: #{region}
-            Compartment Name: #{compartment_name}
-            Compartment ID: #{compartment_id}
-            Security List Name: #{security_list['display-name']}
-            Security List ID: #{security_list_id}
-            Source: #{rule['source']}
-            Destination Port Range: #{destination_port_range.nil? ? 'All TCP ports (none specified)' : "#{destination_port_range['min']}-#{destination_port_range['max']}"}
-            Issue: Ingress from 0.0.0.0/0 allows port 22
-          ENTRY
-        end
-      end
-    end
-  end
-
-  numbered_findings = findings.each_with_index.map do |entry, index|
-    "[#{index + 1}]\n#{entry}"
-  end
+  tenancy_ocid = input('tenancy_ocid')
+  
+  findings = oci_security_lists.internet_ingress_findings(port: 22)
+  numbered_findings = oci_helpers.format_findings(findings)
 
   describe 'Security lists' do
     it 'should not allow ingress from 0.0.0.0/0 to port 22' do
@@ -150,23 +90,19 @@ control 'oci-foundations-2.1' do
     end
   end
 
-  cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')
 
-  if cloud_guard_check
-    tenancy_ocid = input('tenancy_ocid')
-    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
-    cloud_guard_status = cloud_guard.status
-    cloud_guard_output = cloud_guard.detector_rule_value(rule_id: 'SECURITY_LISTS_OPEN_SOURCE', config_key: 'securityListsOpenSourceConfig')
-    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'SECURITY_LISTS_OPEN_SOURCE')
-  end
+  cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+  cloud_guard_status = cloud_guard.status
+  cloud_guard_output = cloud_guard.detector_rule_value(rule_id: 'SECURITY_LISTS_OPEN_SOURCE', config_key: 'securityListsOpenSourceConfig')
+  cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'SECURITY_LISTS_OPEN_SOURCE')
 
   describe 'Cloud Guard' do
-    if cloud_guard_check
-      it 'is enabled' do
-        expect(cloud_guard_status).to cmp 'ENABLED'
-      end
+    it 'is enabled' do
+      expect(cloud_guard_status).to cmp 'ENABLED'
+    end
 
+    if cloud_guard_status == 'ENABLED'
       it 'detector rule "VCN Security list allows traffic to non-public port from all sources (0.0.0.0/0)" is enabled' do
         expect(cloud_guard_rule_enabled).to cmp true
       end
@@ -175,8 +111,6 @@ control 'oci-foundations-2.1' do
         expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'TCP', port: 22)).to cmp true
         expect(cloud_guard.port_list_check?(config_value: cloud_guard_output, protocol: 'UDP', port: 22)).to cmp true
       end
-    else
-      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
     end
   end
 end

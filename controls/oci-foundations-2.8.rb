@@ -25,7 +25,7 @@ control 'oci-foundations-2.8' do
     --compartment-id $compid --region $region --all 2>/dev/null | jq -r '.data[] |
     select(."nsg-ids" == null).id'` do output=`oci db autonomous-database get
     --autonomous-database-id $adbid --region $region
-    --query=data.{"WhiteListIPs:\"whitelisted-ips\","id:id""} --output table 2>/dev/null` if [
+    --query=data.{"WhiteListIPs:"whitelisted-ips","id:id""} --output table 2>/dev/null` if [
     ! -z "$output" ]; then echo $output; fi done done done Ensure WhiteListIPs are correct.
   CHECK
 

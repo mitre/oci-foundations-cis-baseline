@@ -48,65 +48,16 @@ control 'oci-foundations-5.1.3' do
 
   tag nist: ['CP-9']
 
-  regions_response = json(command: 'oci iam region-subscription list --all')
-  regions_data = regions_response.params.fetch('data', [])
-  regions = regions_data.map { |region| region['region-name'] }.compact
+  buckets = oci_buckets
 
-  compartments_response = json(command: 'oci iam compartment list --include-root --compartment-id-in-subtree TRUE --all 2>/dev/null')
-  compartments_data = compartments_response.params.fetch('data', [])
-  compartment_ids = compartments_data.map { |compartment| compartment['id'] }.compact
-  compartment_names_by_id = compartments_data.each_with_object({}) do |compartment, map|
-    compartment_id = compartment['id'].to_s
-    next if compartment_id.empty?
-
-    map[compartment_id] = compartment['name']
-  end
-
-  findings = []
-  total_buckets = 0
-
-  regions.each do |region|
-    compartment_ids.each do |compartment_id|
-      buckets_response = json(
-        command: %(oci os bucket list --compartment-id "#{compartment_id}" --region "#{region}" --all 2>/dev/null)
-      )
-      buckets = buckets_response.params.fetch('data', [])
-
-      buckets.each do |bucket|
-        bucket_name = bucket['name'].to_s
-        next if bucket_name.empty?
-
-        total_buckets += 1
-
-        bucket_details_response = json(
-          command: %(oci os bucket get --bucket-name "#{bucket_name}" --region "#{region}" 2>/dev/null)
-        )
-        bucket_details = bucket_details_response.params.fetch('data', {})
-        versioning = bucket_details['versioning'].to_s
-        next if versioning.casecmp('Enabled').zero?
-
-        compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
-        findings << <<~ENTRY.chomp
-          Bucket Name: #{bucket_name}
-          Region: #{region}
-          Compartment Name: #{compartment_name}
-          Compartment ID: #{compartment_id}
-          Versioning: #{versioning.empty? ? 'Unknown' : versioning}
-          Issue: Bucket versioning is not enabled
-        ENTRY
-      end
-    end
-  end
-
-  if total_buckets.zero?
+  if buckets.table.empty?
     impact 0.0
     describe 'Ensure Versioning is Enabled for Object Storage Buckets' do
       skip 'No Object Storage buckets found in tenancy.'
     end
   else
-    numbered_findings = findings.each_with_index.map do |entry, index|
-      "[#{index + 1}]\n#{entry}"
-    end
+    findings = buckets.missing_versioning_findings
+    numbered_findings = oci_helpers.format_findings(findings)
 
     describe 'Object Storage buckets' do
       it 'should have versioning enabled' do

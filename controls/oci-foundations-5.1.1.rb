@@ -60,6 +60,8 @@ control 'oci-foundations-5.1.1' do
 
   tag nist: ['AC-3']
 
+  tenancy_ocid = input('tenancy_ocid')
+  
   query_text = %(query bucket resources where (publicAccessType == 'ObjectRead') || (publicAccessType == 'ObjectReadWithoutList'))
 
   regions_response = json(command: 'oci iam region-subscription list --all')
@@ -94,9 +96,7 @@ control 'oci-foundations-5.1.1' do
       compartment_name = compartment_names_by_id[compartment_id] || 'Unknown'
       additional_details = item['additional-details']
       public_access_type = item['public-access-type'].to_s
-      if public_access_type.empty? && additional_details.is_a?(Hash)
-        public_access_type = additional_details['publicAccessType'].to_s
-      end
+      public_access_type = additional_details['publicAccessType'].to_s if public_access_type.empty? && additional_details.is_a?(Hash)
 
       findings << <<~ENTRY.chomp
         Bucket Name: #{item['display-name']}
@@ -124,27 +124,21 @@ control 'oci-foundations-5.1.1' do
     end
   end
 
-  cloud_guard_check = input('cloud_guard_check')
   detector_recipe_ocid = input('detector_recipe_ocid')
 
-  if cloud_guard_check
-    tenancy_ocid = input('tenancy_ocid')
-    cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
-    cloud_guard_status = cloud_guard.status
-    cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'BUCKET_IS_PUBLIC')
-  end
+  cloud_guard = cloud_guard_helper(tenancy_ocid: tenancy_ocid, detector_recipe_ocid: detector_recipe_ocid)
+  cloud_guard_status = cloud_guard.status
+  cloud_guard_rule_enabled = cloud_guard.detector_rule_enabled?(rule_id: 'BUCKET_IS_PUBLIC')
 
   describe 'Cloud Guard' do
-    if cloud_guard_check
-      it 'is enabled' do
-        expect(cloud_guard_status).to cmp 'ENABLED'
-      end
+    it 'is enabled' do
+      expect(cloud_guard_status).to cmp 'ENABLED'
+    end
 
+    if cloud_guard_status == 'ENABLED'
       it 'detector rule "Bucket is public" is enabled' do
         expect(cloud_guard_rule_enabled).to cmp true
       end
-    else
-      skip 'Cloud Guard check skipped. cloud_guard_check is set to false.'
     end
   end
 end

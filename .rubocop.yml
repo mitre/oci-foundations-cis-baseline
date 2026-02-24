@@ -1,6 +1,8 @@
 AllCops:
+  NewCops: enable
   Exclude:
-  - "libraries/**/*"
+  - "update_controls.rb"
+  - "validate_v7_mapping.rb"
 
 Layout/LineLength:
   Max: 1500
@@ -13,7 +15,34 @@ Naming/FileName:
 Metrics/BlockLength:
   Max: 1000
 
+Metrics/MethodLength:
+  Max: 40
+
+Metrics/AbcSize:
+  Max: 40
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Metrics/ClassLength:
+  Max: 150
+
 Lint/ConstantDefinitionInBlock:
+  Enabled: false
+
+# InSpec resource classes use `desc` DSL, not Ruby doc comments
+Style/Documentation:
+  Enabled: false
+
+# InSpec.resource(1) does not use standard initialize patterns
+Lint/MissingSuper:
+  Enabled: false
+
+# Common pattern for filter + transform (select/reject then map)
+Style/MultilineBlockChain:
   Enabled: false
 
 # Required for Profiles as it can introduce profile errors

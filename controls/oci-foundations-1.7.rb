@@ -26,7 +26,7 @@ control 'oci-foundations-1.7' do
     users have enabled MFA use the below CLI. From the CLI: This CLI command checks which
     users have enabled MFA for their accounts Execute the below: tenancy_ocid=`oci iam
     compartment list --raw-output --query
-    "data[?contains(\"compartment-id\",'.tenancy.')].\"compartment-id\" | [0]"` for
+    "data[?contains("compartment-id",'.tenancy.')]."compartment-id" | [0]"` for
     id_domain_url in `oci iam domain list --compartment-id $tenancy_ocid --all | jq -r
     '.data[] | .url'` do oci identity-domains users list --endpoint $id_domain_url 2>/dev/null
     | jq -r '.data.resources[] |

@@ -132,12 +132,7 @@ control 'oci-foundations-4.13' do
     end
   end
 
-  if !any_resource
-    impact 0.0
-    describe 'Ensure VCN flow logging is enabled for all subnets' do
-      skip 'No subnets found in tenancy.'
-    end
-  else
+  if any_resource
     numbered_findings = findings.each_with_index.map do |entry, index|
       "[#{index + 1}]\n#{entry}"
     end
@@ -150,6 +145,11 @@ control 'oci-foundations-4.13' do
           #{numbered_findings.join("\n\n")}
         MSG
       end
+    end
+  else
+    impact 0.0
+    describe 'Ensure VCN flow logging is enabled for all subnets' do
+      skip 'No subnets found in tenancy.'
     end
   end
 end
