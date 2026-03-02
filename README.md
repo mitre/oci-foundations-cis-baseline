@@ -346,11 +346,11 @@ Customized inputs may be used at the CLI by providing an input file or a flag at
 
 1. Using the `--input` flag
 
-    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --input disable_slow_controls=true`
+    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --enhanced-outcomes --input disable_slow_controls=true`
 
 2. Using the `--input-file` flag.
 
-    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --input-file=<my_inputs_file.yml>`
+    Example: `[inspec or cinc-auditor] exec <my-profile.tar.gz> --enhanced-outcomes --input-file=<my_inputs_file.yml>`
 
 >[!TIP]
 > For additional information about `input` file examples reference the [MITRE SAF Training](https://mitre.github.io/saf-training/courses/beginner/06.html#input-file-example)
@@ -443,7 +443,7 @@ This option is best used when network connectivity is available and policies per
 access to the hosting repository.
 
 ```bash
-[inspec or cinc-auditor] exec https://github.com/mitre/oci-foundations-cis-baseline/archive/main.tar.gz --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
+[inspec or cinc-auditor] exec https://github.com/mitre/oci-foundations-cis-baseline/archive/main.tar.gz --enhanced-outcomes --input-file=<your_inputs_file.yml> --sudo --reporter=cli json:<your_results_file.json>
 ```
 
 [top](#table-of-contents)
