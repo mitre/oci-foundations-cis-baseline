@@ -39,11 +39,7 @@ Table of Contents
 
 ## Benchmark Information
 
-The Center for Internet Security, Inc. (CIS®) creates and maintains a set of Critical Security Controls (CIS Controls) for applications, computer systems and networks
-connected to the Department of Defense (DoD). These guidelines are the primary security standards
-used by the DoD agencies. In addition to defining security guidelines, the CISs also stipulate
-how security training should proceed and when security checks should occur. Organizations must
-stay compliant with these guidelines or they risk having their access to the DoD terminated.
+The Center for Internet Security, Inc. (CIS®) creates and maintains the CIS Benchmarks, which are community-developed secure configuration recommendations for hardening organizations’ technologies against cyber attacks. Mapped to the CIS Critical Security Controls (CIS Controls), the CIS Benchmarks elevate the security defenses for cloud provider platforms and cloud services, containers, databases, desktop software, server software, mobile devices, network devices, and operating systems.
 
 Requirements associated with the CIS Oracle Cloud Infrastructure Foundations Benchmark v3.0.0 CIS are derived from the
 [Security Requirements Guides](https://csrc.nist.gov/glossary/term/security_requirements_guide)
